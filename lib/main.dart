@@ -5,6 +5,7 @@ import 'pages/signup_page.dart';
 /** loooeeeeeeeeeeeeekkkkkooooooool */
 
 void main() => runApp(MyApp());
+//some thing from khaled ee
 
 class MyApp extends StatelessWidget {
   @override

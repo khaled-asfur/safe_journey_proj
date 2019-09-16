@@ -1,4 +1,4 @@
-#Fri Sep 13 17:52:38 EEST 2019
-base.0=C\:\\Flutter\\safe_journey\\build\\app\\intermediates\\transforms\\dexMerger\\debug\\0
+#Mon Sep 16 12:16:23 EEST 2019
+base.0=C\:\\Users\\khali\\Documents\\GitHub\\safe_journey_proj\\build\\app\\intermediates\\transforms\\dexMerger\\debug\\0
 path.0=classes.dex
 renamed.0=classes.dex

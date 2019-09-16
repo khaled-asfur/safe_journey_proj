@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Flutter\\safe_journey\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
+            "outputFile": "C:\\Users\\khali\\Documents\\GitHub\\safe_journey_proj\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
             "map": [
                 {
-                    "source": "C:\\Flutter\\safe_journey\\android\\app\\src\\main\\res\\values\\styles.xml",
+                    "source": "C:\\Users\\khali\\Documents\\GitHub\\safe_journey_proj\\android\\app\\src\\main\\res\\values\\styles.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
