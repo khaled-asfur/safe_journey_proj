@@ -1,13 +1,9 @@
-//some thing from server 222
 import 'package:flutter/material.dart';
 import 'package:safe_journey/pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'pages/signup_page.dart';
-/** loooeeeeeeeeeeeeekkkkkooooooool */
 
 void main() => runApp(MyApp());
-//some thing from khaled ee
-//new thing from khaled
 
 class MyApp extends StatelessWidget {
   @override
