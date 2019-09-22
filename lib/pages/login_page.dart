@@ -130,7 +130,7 @@ class LoginPageState extends State<LoginPage> {
   void _submitForm() {
     if (pageContext['loginFormKey'].currentState.validate() != true) return;
     pageContext['loginFormKey'].currentState.save();
-    Navigator.pushReplacementNamed(pageContext['pageContext'], 'homePage');
+    Navigator.pushReplacementNamed(context, 'homePage');
     pageContext['loginFormKey']=null;
   }
   
