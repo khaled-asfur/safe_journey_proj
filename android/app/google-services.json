@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "961692159457",
+    "firebase_url": "https://safe-journey-1c538.firebaseio.com",
+    "project_id": "safe-journey-1c538",
+    "storage_bucket": "safe-journey-1c538.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:961692159457:android:0da57f455664b0f46dd6a0",
+        "android_client_info": {
+          "package_name": "com.example.safe_journey"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "961692159457-aaqdh20ldfolji60u15bkedujfphmc5o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhYxCXmN0-O_A14fydHHHMCbMpNiPHsh4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "961692159457-aaqdh20ldfolji60u15bkedujfphmc5o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
