@@ -1,7 +1,8 @@
 import "package:flutter/material.dart";
-//from vs
+import 'package:firebase_auth/firebase_auth.dart';
+
 class SignupPage extends StatefulWidget {
-  //from web
+
   @override
   State<StatefulWidget> createState() {
     return SignupPageState();
@@ -9,6 +10,7 @@ class SignupPage extends StatefulWidget {
 }
 
 class SignupPageState extends State<SignupPage> {
+
   
 
   final Map<String, dynamic> _formData = {
@@ -46,6 +48,7 @@ class SignupPageState extends State<SignupPage> {
               SizedBox(
                 height: 10,
               ),
+
              /* _buildEmailTextField(),
               SizedBox(
                 height: 10,
@@ -193,6 +196,15 @@ class SignupPageState extends State<SignupPage> {
     //TODO:اعمل فاليديشن للفورم
     /*if (_formKey.currentState.validate() != true) return;
     _formKey.currentState.save();*/
-    Navigator.pushReplacementNamed(context, "homePage");
+    //Navigator.pushReplacementNamed(context, "homePage");
+    signup();
+    print("signed up");
+
+}
+  void signup()async {
+        AuthResult user =await  FirebaseAuth.instance.createUserWithEmailAndPassword(email:"fadi_hejazy1@hotmail.com",password:"1234567");
+        print("signed up from method");
+         print(user);
   }
+
 }

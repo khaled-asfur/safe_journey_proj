@@ -21,7 +21,6 @@ class LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    pageContext['pageContext'] = context;
     // if (MediaQuery.of(context).orientation == Orientation.landscape)
     //   print("landscape");
     /* double deviceWidth = MediaQuery.of(context).size.width;
@@ -76,7 +75,6 @@ class LoginPageState extends State<LoginPage> {
     return DecorationImage(
       fit: BoxFit.cover,
       image: AssetImage("images/background.jpg"),
-      // image: NetworkImage("https://christskingdom.org/wp-content/uploads/2018/02/lightstock_145705_medium_marsha-1024x836.jpg"),
       colorFilter:
           ColorFilter.mode(Colors.black.withOpacity(0.7), BlendMode.dstATop),
     );
