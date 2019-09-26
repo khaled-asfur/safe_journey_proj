@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import '../models/auth.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -12,13 +13,14 @@ class LoginPageState extends State<LoginPage> {
     "email": null,
     "password": null,
   };
-  final Map<String, dynamic> pageContext = {
+ 
+  /*final Map<String, dynamic> pageContext = {
     "pageContext": null,
     'loginFormKey':GlobalKey<FormState>(),
-  };
+  };*/
   
 
-  final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     // if (MediaQuery.of(context).orientation == Orientation.landscape)
@@ -40,7 +42,7 @@ class LoginPageState extends State<LoginPage> {
             child: Container(
               // width: targetWidth,
               child: Form(
-                key: pageContext['loginFormKey'],
+                key: formKey,
                 child: Column(
                   children: <Widget>[
                     _buildEmailTextField(),
@@ -51,7 +53,7 @@ class LoginPageState extends State<LoginPage> {
                         child: Text("Login"),
                         color: Theme.of(context).accentColor,
                         textColor: Colors.white,
-                        onPressed: _submitForm),
+                        onPressed:(){ _submitForm(context);}),
                     FlatButton(
                       child: Text(
                         "swith to signup page",
@@ -125,34 +127,13 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _submitForm() {
-    if (pageContext['loginFormKey'].currentState.validate() != true) return;
-    pageContext['loginFormKey'].currentState.save();
-    Navigator.pushReplacementNamed(context, 'homePage');
-    pageContext['loginFormKey']=null;
+  void _submitForm(BuildContext context) {
+    if (formKey.currentState.validate() != true) return;
+   formKey.currentState.save();
+    //Navigator.pushReplacementNamed(context, 'homePage');
+    new Auth().login(_formData['email'],_formData['password'],context);
   }
+
   
 }
-/*      showDialog(
-          context: pageContext,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("An error occured"),
-              content: Text("logged in successfully"),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text('OK'),
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(pageContext, "/");
-                    Navigator.of(context).pop();
-                  },
-                ),
-                FlatButton(
-                  child: Text('cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          });*/
+

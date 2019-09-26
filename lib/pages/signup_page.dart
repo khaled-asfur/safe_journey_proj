@@ -1,8 +1,8 @@
 import "package:flutter/material.dart";
-import 'package:firebase_auth/firebase_auth.dart';
+import '../models/auth.dart';
 
 class SignupPage extends StatefulWidget {
-
+  //TODO: add user data to firebase
   @override
   State<StatefulWidget> createState() {
     return SignupPageState();
@@ -10,16 +10,13 @@ class SignupPage extends StatefulWidget {
 }
 
 class SignupPageState extends State<SignupPage> {
-
-  
-
-  final Map<String, dynamic> _formData = {
+  final Map<String, dynamic> _formData={
     "name": null,
     "phoneNumber": null,
     "email": null,
     "password": null,
     "confirm_password": null
-  };
+  }; 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.width;
@@ -29,16 +26,14 @@ class SignupPageState extends State<SignupPage> {
         title: Text("Signup page"),
       ),
       body: Form(
-        //TODO: ضيف فورم كي
-        
-       key: _formKey,
+        key: _formKey,
         child: Container(
           alignment: Alignment.center,
           child: ListView(
             padding: EdgeInsets.all(10),
             children: <Widget>[
               SizedBox(
-                height: 0.1*deviceHeight,
+                height: 0.1 * deviceHeight,
               ),
               _buildNameTextField(),
               SizedBox(
@@ -48,8 +43,7 @@ class SignupPageState extends State<SignupPage> {
               SizedBox(
                 height: 10,
               ),
-
-             /* _buildEmailTextField(),
+              _buildEmailTextField(),
               SizedBox(
                 height: 10,
               ),
@@ -61,22 +55,7 @@ class SignupPageState extends State<SignupPage> {
               SizedBox(
                 height: 10,
               ),
-              _buildConfirmPasswordTextField(),
-              SizedBox(
-                height: 10,
-              ),
-              _buildConfirmPasswordTextField(),
-              SizedBox(
-                height: 10,
-              ),
-              _buildConfirmPasswordTextField(),
-              SizedBox(
-                height: 10,
-              ),
-              _buildConfirmPasswordTextField(),
-              SizedBox(
-                height: 10,
-              ),*/
+              //TODO:add choose image button
               RaisedButton(
                   child: Text("Signup"),
                   color: Theme.of(context).accentColor,
@@ -91,14 +70,15 @@ class SignupPageState extends State<SignupPage> {
 
   Widget _buildNameTextField() {
     return TextFormField(
+      initialValue: "Ahmad awwad",
       decoration: InputDecoration(
         labelText: "Name",
         filled: true,
         fillColor: Colors.blueGrey[50],
       ),
       validator: (String value) {
-        if (value.isEmpty || value.length < 4)
-          return "name value must be 4+ characters";
+        //بستقبل بس حروف عربي وانجليزي وسبيسز 
+        if (value.length < 4 || !RegExp('^[\\s\\u0600-\\u065F\\u066A-\\u06EF\\u06FA-\\u06FFa-zA-Z]+[\\u0600-\\u065F\\u066A-\\u06EF\\u06FA-\\u06FFa-zA-Z-_]*\$').hasMatch(value)) return "Please enter your full name";
         return null;
       },
       keyboardType: TextInputType.text,
@@ -110,14 +90,14 @@ class SignupPageState extends State<SignupPage> {
 
   Widget _buildPhoneTextField() {
     return TextFormField(
+      initialValue: "0597458621",
       decoration: InputDecoration(
         labelText: "Phone number",
         filled: true,
         fillColor: Colors.blueGrey[50],
       ),
       validator: (String value) {
-        if (value.isEmpty || value.length != 10)
-          return "Please enter a valid form number";
+        if (value.length != 10) return "Please enter a valid phone number";
         return null;
       },
       keyboardType: TextInputType.phone,
@@ -129,14 +109,15 @@ class SignupPageState extends State<SignupPage> {
 
   Widget _buildEmailTextField() {
     return TextFormField(
+      initialValue: "family_safe@hotmail.com",
       decoration: InputDecoration(
+        
         labelText: "Email",
         filled: true,
         fillColor: Colors.blueGrey[50],
       ),
       validator: (String value) {
-        if (value.isEmpty ||
-            value.length < 5 ||
+        if (value.length < 5 ||
             !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
                 .hasMatch(value)) //هاي جاهزة لفحص اذا كان ايميل او لا
           return "please enter a valid email!";
@@ -151,19 +132,23 @@ class SignupPageState extends State<SignupPage> {
 
   Widget _buildPasswordTextField() {
     return TextFormField(
+      initialValue: "123456",
       decoration: InputDecoration(
         labelText: "Password",
         filled: true,
         fillColor: Colors.blueGrey[50],
       ),
-
+      keyboardType: TextInputType.text,
+     /* onChanged:(String val){
+        _formData["password"]=val;//لاني بفحص قيمة هذا الفاريابل في كونفيرم باسسورد
+      },*/
+      obscureText: true, //يخفي الاحرف لانها باسسوورد
       validator: (String value) {
-        if (value.isEmpty || value.length < 5)
+        _formData["password"] = value;
+        if (value.length < 5)
           return "Passwords value must be 5+ characters";
         return null;
       },
-      keyboardType: TextInputType.text,
-      obscureText: true, //يخفي الاحرف لانها باسسوورد
       onSaved: (String value) {
         _formData["password"] = value;
       },
@@ -171,8 +156,8 @@ class SignupPageState extends State<SignupPage> {
   }
 
   Widget _buildConfirmPasswordTextField() {
-    //TODO: تأكد انه الباسوورد والكونفيرم باسسورد الهن نفس القيمة
     return TextFormField(
+      initialValue: "123456",
       decoration: InputDecoration(
         labelText: "Confirm password",
         filled: true,
@@ -180,8 +165,9 @@ class SignupPageState extends State<SignupPage> {
       ),
 
       validator: (String value) {
-        if (value.isEmpty || value.length < 5)
-          return "Passwords value must be 5+ characters";
+        print('value= $value & form data= ${_formData["password"]}');
+        if (value != _formData["password"])
+          return "This doesn't equal password's value ";
         return null;
       },
       keyboardType: TextInputType.text,
@@ -193,18 +179,10 @@ class SignupPageState extends State<SignupPage> {
   }
 
   void _submitForm() {
-    //TODO:اعمل فاليديشن للفورم
-    /*if (_formKey.currentState.validate() != true) return;
-    _formKey.currentState.save();*/
+    if (_formKey.currentState.validate() != true) return;
+    _formKey.currentState.save();
     //Navigator.pushReplacementNamed(context, "homePage");
-    signup();
-    print("signed up");
-
-}
-  void signup()async {
-        AuthResult user =await  FirebaseAuth.instance.createUserWithEmailAndPassword(email:"fadi_hejazy1@hotmail.com",password:"1234567");
-        print("signed up from method");
-         print(user);
+    Auth().signup(_formData['email'],_formData['password'],context);
   }
 
 }
