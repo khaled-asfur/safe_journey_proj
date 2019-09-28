@@ -52,9 +52,9 @@ class Auth {
       String imageURL;
       if (image != null){
         Map<String,dynamic >result = await uploadImage(image, context);
-        if(result['success']==true){
+        print('result from signup= $result');
+        if(result['success'])
           imageURL=result['imageURL'];
-        }
       }
 
       result = true;
@@ -92,12 +92,15 @@ class Auth {
           FirebaseStorage.instance.ref().child(email);
       final StorageUploadTask task = storageRef.putFile(image);
       result['success']=true;
-      result['uploadURL'] = await(await task.onComplete).ref.getDownloadURL();
+      result['imageURL'] = await(await task.onComplete).ref.getDownloadURL();
+      print('complete upload');
       print(task);
     } catch (e) {
       Helpers.showErrorDialog(context, e.message);
     }
+     print('result= $result');
     return result;
+   
   }
 
   Future<void> _addUserInfoToFireStore(
