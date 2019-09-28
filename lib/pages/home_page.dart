@@ -66,6 +66,8 @@ class HomePageState extends State<HomePage> {
 
   //*********************** for slide show start *******************/
   Widget _buildSlideShow() {
+    double deviceHeight=MediaQuery.of(context).size.height;
+    double deviceWidth=MediaQuery.of(context).size.height;
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -76,7 +78,7 @@ class HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           carouselSlider = CarouselSlider(
-            height: 400.0,
+            height: deviceHeight / 1.8,
             initialPage: 0,
             enlargeCenterPage: true,
             autoPlay: false,
@@ -94,31 +96,48 @@ class HomePageState extends State<HomePage> {
             items: imgList.map((imgUrl) {
               return Builder(
                 builder: (BuildContext context) {
-                  return Container(
-                      width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.all(10.0),
-                      padding: EdgeInsets.all( 5.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(40)),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black38,
-                            blurRadius:
-                                20.0, // has the effect of softening the shadow
-                            spreadRadius:
-                                5.0, // has the effect of extending the shadow
-                            offset: Offset(
-                              10.0, // horizontal, move right 10
-                              10.0, // vertical, move down 10
-                            ),
-                          )
-                        ],
+                  return Card(borderOnForeground: true,
+                  color: Colors.white,
+                    child:Column(
+
+                    /*mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,*/
+                    children: <Widget>[
+                      //photo oooooooooooooooooooooooooooooooooooooo
+                      
+                      Container(
+                        width: MediaQuery.of(context).size.width/1.5,
+                        margin: EdgeInsets.all( deviceHeight/70),
+                        // padding: EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black38,
+                              blurRadius:
+                                  20.0, // has the effect of softening the shadow
+                              spreadRadius:
+                                  5.0, // has the effect of extending the shadow
+                              offset: Offset(
+                                10.0, // horizontal, move right 10
+                                10.0, // vertical, move down 10
+                              ),
+                            )
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: new BorderRadius.circular(10.0),
+                          child: Image.network(
+                            imgUrl,
+                            fit: BoxFit.fill,
+                            height: MediaQuery.of(context).size.height / 2.6,
+                          ),
+                        ),
                       ),
-                      child: ClipRRect(
-                        borderRadius: new BorderRadius.circular(40.0),
-                        child: Image.network(imgUrl, fit: BoxFit.fill),
-                      ));
+                      Text('Palce description'),
+                    ],
+                  ),);
                 },
               );
             }).toList(),
@@ -132,18 +151,18 @@ class HomePageState extends State<HomePage> {
               return Container(
                 width: 10.0,
                 height: 10.0,
-                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                margin: EdgeInsets.symmetric(vertical:deviceHeight/60, horizontal: 2.0),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _current == index ? Colors.redAccent : Colors.green,
+                  color: _current == index ? Colors.black45 : Colors.white,
                 ),
               );
             }),
           ),
-          SizedBox(
+          /*SizedBox(
             height: 20.0,
-          ),
-          Row(
+          ),*/
+          /*Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               OutlineButton(
@@ -155,7 +174,7 @@ class HomePageState extends State<HomePage> {
                 child: Text(">"),
               ),
             ],
-          ),
+          ),*/
         ],
       ),
     );
