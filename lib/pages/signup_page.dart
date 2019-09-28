@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import "package:flutter/material.dart";
 import '../models/auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class SignupPage extends StatefulWidget {
-  //TODO: add user data to firebase
   @override
   State<StatefulWidget> createState() {
     return SignupPageState();
@@ -10,15 +13,18 @@ class SignupPage extends StatefulWidget {
 }
 
 class SignupPageState extends State<SignupPage> {
-  final Map<String, dynamic> _formData={
+  File sampleImage;
+  bool isLoading=false;
+  final Map<String, dynamic> _formData = {
     "name": null,
     "phoneNumber": null,
     "email": null,
     "password": null,
     "confirm_password": null
-  }; 
+  };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Widget build(BuildContext context) {
+    print(Auth().currentUser);
     double deviceHeight = MediaQuery.of(context).size.width;
     print("in signup build");
     return Scaffold(
@@ -55,12 +61,19 @@ class SignupPageState extends State<SignupPage> {
               SizedBox(
                 height: 10,
               ),
-              //TODO:add choose image button
-              RaisedButton(
-                  child: Text("Signup"),
-                  color: Theme.of(context).accentColor,
-                  textColor: Colors.white,
-                  onPressed: _submitForm),
+              _buldChooseImageButton(),
+              Container(
+                child: sampleImage == null
+                    ? Text("Please choose an image from gallery")
+                    : Image.file(
+                        sampleImage,
+                        height: 300.0,
+                        width: 300.0,
+                      ),
+              ),
+              _buildSignupButton(),
+              Center(child:isLoading==true?CircularProgressIndicator():Container() ,)
+              
             ],
           ),
         ),
@@ -77,8 +90,10 @@ class SignupPageState extends State<SignupPage> {
         fillColor: Colors.blueGrey[50],
       ),
       validator: (String value) {
-        //بستقبل بس حروف عربي وانجليزي وسبيسز 
-        if (value.length < 4 || !RegExp('^[\\s\\u0600-\\u065F\\u066A-\\u06EF\\u06FA-\\u06FFa-zA-Z]+[\\u0600-\\u065F\\u066A-\\u06EF\\u06FA-\\u06FFa-zA-Z-_]*\$').hasMatch(value)) return "Please enter your full name";
+        //بستقبل بس حروف عربي وانجليزي وسبيسز
+        if (value.length < 4 ||
+            !RegExp('^[\\s\\u0600-\\u065F\\u066A-\\u06EF\\u06FA-\\u06FFa-zA-Z]+[\\u0600-\\u065F\\u066A-\\u06EF\\u06FA-\\u06FFa-zA-Z-_]*\$')
+                .hasMatch(value)) return "Please enter your full name";
         return null;
       },
       keyboardType: TextInputType.text,
@@ -111,7 +126,6 @@ class SignupPageState extends State<SignupPage> {
     return TextFormField(
       initialValue: "family_safe@hotmail.com",
       decoration: InputDecoration(
-        
         labelText: "Email",
         filled: true,
         fillColor: Colors.blueGrey[50],
@@ -139,14 +153,10 @@ class SignupPageState extends State<SignupPage> {
         fillColor: Colors.blueGrey[50],
       ),
       keyboardType: TextInputType.text,
-     /* onChanged:(String val){
-        _formData["password"]=val;//لاني بفحص قيمة هذا الفاريابل في كونفيرم باسسورد
-      },*/
       obscureText: true, //يخفي الاحرف لانها باسسوورد
       validator: (String value) {
         _formData["password"] = value;
-        if (value.length < 5)
-          return "Passwords value must be 5+ characters";
+        if (value.length < 5) return "Passwords value must be 5+ characters";
         return null;
       },
       onSaved: (String value) {
@@ -178,11 +188,69 @@ class SignupPageState extends State<SignupPage> {
     );
   }
 
+  Widget _buldChooseImageButton() {
+    return Container(
+      padding: EdgeInsets.only(right: 50.0),
+      alignment: Alignment.centerLeft,
+      child: ButtonTheme(
+  child:RaisedButton(
+          child: Row(children: <Widget>[
+            Text("Choose profile image "),
+            Icon(Icons.add_photo_alternate)
+          ]),
+          color: Theme.of(context).accentColor,
+          textColor: Colors.white,
+          onPressed: getImage),),
+    );
+  }
+
   void _submitForm() {
+    setState(() {
+     isLoading=true; 
+    });
     if (_formKey.currentState.validate() != true) return;
     _formKey.currentState.save();
     //Navigator.pushReplacementNamed(context, "homePage");
-    Auth().signup(_formData['email'],_formData['password'],context);
+    Auth().signup(
+        _formData['name'],_formData['phoneNumber'],_formData['email'], _formData['password'], context, sampleImage)
+        .then((bool result){
+          if(result==false){
+            setState(() {
+             isLoading=false; //to stop the loading circle 
+            });
+          }
+        });
   }
 
+  Future getImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      sampleImage = image;
+    });
+  }
+
+  Widget showImage() {
+    return Column(
+      children: <Widget>[
+        RaisedButton(
+            child: Text("upload image"),
+            color: Theme.of(context).accentColor,
+            textColor: Colors.white,
+            onPressed: () async {
+              final StorageReference storageRef =
+                  FirebaseStorage.instance.ref().child('new pic');
+              final StorageUploadTask task = storageRef.putFile(sampleImage);
+              print(task);
+            }),
+      ],
+    );
+  }
+
+  Widget _buildSignupButton() {
+    return RaisedButton(
+        child: Text("Signup"),
+        color: Theme.of(context).accentColor,
+        textColor: Colors.white,
+        onPressed: _submitForm);
+  }
 }
