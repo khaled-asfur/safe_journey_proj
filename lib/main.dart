@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'pages/signup_page.dart';
+import 'package:flutter/rendering.dart';
 //from web
-void main() => runApp(MyApp());
+void main(){
+  //debugPaintSizeEnabled =true;
+   runApp(MyApp());
+}
+
 //from vs
 class MyApp extends StatelessWidget {
   @override
@@ -15,7 +20,7 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.purple,
       ),
       routes: {
-        '/': (BuildContext context) => LoginPage(),
+        '/': (BuildContext context) =>HomePage() /*LoginPage()*/,
        //'/': (BuildContext context) => AuthPage(),
         'homePage': (BuildContext context) => HomePage(),
         'signupPage': (BuildContext context) => SignupPage(),

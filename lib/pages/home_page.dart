@@ -55,8 +55,9 @@ class HomePageState extends State<HomePage> {
       ),
       body: ListView(
         children: <Widget>[
-          Container(decoration: BoxDecoration(color: Colors.grey[200]),
-            child:_buildSlideShow()),
+          Container(
+              decoration: BoxDecoration(color: Colors.grey[200]),
+              child: _buildSlideShow()),
           Text('heeeey'),
         ],
       ),
@@ -66,80 +67,98 @@ class HomePageState extends State<HomePage> {
   //*********************** for slide show start *******************/
   Widget _buildSlideShow() {
     return Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            carouselSlider = CarouselSlider(
-              height: 400.0,
-              initialPage: 0,
-              enlargeCenterPage: true,
-              autoPlay: true,
-              reverse: false,
-              enableInfiniteScroll: true,
-              autoPlayInterval: Duration(seconds: 2),
-              autoPlayAnimationDuration: Duration(milliseconds: 2000),
-              pauseAutoPlayOnTouch: Duration(seconds: 10),
-              scrollDirection: Axis.horizontal,
-              onPageChanged: (index) {
-                setState(() {
-                  _current = index;
-                });
-              },
-              items: imgList.map((imgUrl) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(5)),
+        color: Colors.grey[200],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          carouselSlider = CarouselSlider(
+            height: 400.0,
+            initialPage: 0,
+            enlargeCenterPage: true,
+            autoPlay: false,
+            reverse: false,
+            enableInfiniteScroll: true,
+            autoPlayInterval: Duration(seconds: 2),
+            autoPlayAnimationDuration: Duration(milliseconds: 2000),
+            pauseAutoPlayOnTouch: Duration(seconds: 10),
+            scrollDirection: Axis.horizontal,
+            onPageChanged: (index) {
+              setState(() {
+                _current = index;
+              });
+            },
+            items: imgList.map((imgUrl) {
+              return Builder(
+                builder: (BuildContext context) {
+                  return Container(
                       width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.symmetric(horizontal: 10.0),
+                      margin: EdgeInsets.all(10.0),
+                      padding: EdgeInsets.all( 5.0),
                       decoration: BoxDecoration(
-                        color: Colors.green,
+                        borderRadius: BorderRadius.all(Radius.circular(40)),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black38,
+                            blurRadius:
+                                20.0, // has the effect of softening the shadow
+                            spreadRadius:
+                                5.0, // has the effect of extending the shadow
+                            offset: Offset(
+                              10.0, // horizontal, move right 10
+                              10.0, // vertical, move down 10
+                            ),
+                          )
+                        ],
                       ),
-                      child: Image.network(
-                        imgUrl,
-                        fit: BoxFit.fill,
-                      ),
-                    );
-                  },
-                );
-              }).toList(),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: map<Widget>(imgList, (index, url) {
-                return Container(
-                  width: 10.0,
-                  height: 10.0,
-                  margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _current == index ? Colors.redAccent : Colors.green,
-                  ),
-                );
-              }),
-            ),
-            SizedBox(
-              height: 20.0,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                OutlineButton(
-                  onPressed: goToPrevious,
-                  child: Text("<"),
+                      child: ClipRRect(
+                        borderRadius: new BorderRadius.circular(40.0),
+                        child: Image.network(imgUrl, fit: BoxFit.fill),
+                      ));
+                },
+              );
+            }).toList(),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: map<Widget>(imgList, (index, url) {
+              return Container(
+                width: 10.0,
+                height: 10.0,
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _current == index ? Colors.redAccent : Colors.green,
                 ),
-                OutlineButton(
-                  onPressed: goToNext,
-                  child: Text(">"),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
+              );
+            }),
+          ),
+          SizedBox(
+            height: 20.0,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              OutlineButton(
+                onPressed: goToPrevious,
+                child: Text("<"),
+              ),
+              OutlineButton(
+                onPressed: goToNext,
+                child: Text(">"),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   goToPrevious() {
@@ -260,6 +279,20 @@ class HomePageState extends State<HomePage> {
     ));
   }
 }
+/*
+Container(
+                      // width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.all(5.0),
+                      margin: EdgeInsets.symmetric(horizontal: 10.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(40)),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: new BorderRadius.circular(40.0),
+                        child: Image.network(imgUrl),
+                      ));
+*/
 /*Container(
                           width: MediaQuery.of(context).size.width /1.5,
                           margin: EdgeInsets.symmetric(horizontal: 20.0),
