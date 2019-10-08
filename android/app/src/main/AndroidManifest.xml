@@ -10,7 +10,7 @@
           MyApplication-->
     <application
         android:name="MyApplication"
-        android:label="safe_journey"
+        android:label="Safe journey"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

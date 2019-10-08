@@ -111,10 +111,11 @@ class Auth {
         if(imageURL==null)imageURL="noURL";
     FirebaseUser user = await currentUser;
     final fsInstance = Firestore.instance;
-    fsInstance.collection('users').document(user.email).setData({
+    fsInstance.collection('users').document(user.uid).setData({
       'name': name,
       'phoneNumber': phoneNumber,
       'imageURL': imageURL,
+      'email':email
     });
   }
 }

@@ -13,12 +13,11 @@ class LoginPageState extends State<LoginPage> {
     "email": null,
     "password": null,
   };
- 
+
   /*final Map<String, dynamic> pageContext = {
     "pageContext": null,
     'loginFormKey':GlobalKey<FormState>(),
   };*/
-  
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
@@ -45,6 +44,7 @@ class LoginPageState extends State<LoginPage> {
                 key: formKey,
                 child: Column(
                   children: <Widget>[
+                    SizedBox(height: 10.0),
                     _buildEmailTextField(),
                     SizedBox(height: 10.0),
                     _buildPasswordTextField(),
@@ -53,7 +53,9 @@ class LoginPageState extends State<LoginPage> {
                         child: Text("Login"),
                         color: Theme.of(context).accentColor,
                         textColor: Colors.white,
-                        onPressed:(){ _submitForm(context);}),
+                        onPressed: () {
+                          _submitForm(context);
+                        }),
                     FlatButton(
                       child: Text(
                         "swith to signup page",
@@ -88,7 +90,11 @@ class LoginPageState extends State<LoginPage> {
       decoration: InputDecoration(
         labelText: "Email",
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Color(0xAAD8D5D3),
+        enabledBorder: new OutlineInputBorder(
+          borderRadius: new BorderRadius.circular(10.0),
+          borderSide: new BorderSide(color: Colors.white),
+        ),
       ),
       validator: (String value) {
         if (value.isEmpty ||
@@ -109,10 +115,13 @@ class LoginPageState extends State<LoginPage> {
     return TextFormField(
       initialValue: "123456",
       decoration: InputDecoration(
-        labelText: "Password",
-        filled: true,
-        fillColor: Colors.white,
-      ),
+          labelText: "Password",
+          filled: true,
+          fillColor: Color(0xAAD8D5D3),
+          enabledBorder: new OutlineInputBorder(
+            borderRadius: new BorderRadius.circular(10.0),
+            borderSide: new BorderSide(color: Colors.white),
+          )),
 
       validator: (String value) {
         if (value.isEmpty || value.length < 5)
@@ -129,11 +138,8 @@ class LoginPageState extends State<LoginPage> {
 
   void _submitForm(BuildContext context) {
     if (formKey.currentState.validate() != true) return;
-   formKey.currentState.save();
+    formKey.currentState.save();
     //Navigator.pushReplacementNamed(context, 'homePage');
-    new Auth().login(_formData['email'],_formData['password'],context);
+    new Auth().login(_formData['email'], _formData['password'], context);
   }
-
-  
 }
-
