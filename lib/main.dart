@@ -13,7 +13,9 @@ void main(){
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Safe journey',
       theme: ThemeData(
         //0x .. FF: for full obacity .. 197278: hexadecimal number for the color
@@ -21,6 +23,7 @@ class MyApp extends StatelessWidget {
           accentColor: Color(0xffAB1717),
       ),
       routes: {
+        //TODO:check if the user is logged in to determin main page
         '/': (BuildContext context) =>LoginPage(),
        //'/': (BuildContext context) => AuthPage(),
         'homePage': (BuildContext context) => HomePage(),

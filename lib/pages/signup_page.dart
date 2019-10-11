@@ -24,9 +24,9 @@ class SignupPageState extends State<SignupPage> {
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Widget build(BuildContext context) {
-    print(Auth().currentUser);
+   // print(Auth().currentUser);
     double deviceHeight = MediaQuery.of(context).size.width;
-    print("in signup build");
+   // print("in signup build");
     return Scaffold(
       appBar: new AppBar(
         title: Text("Signup page"),
@@ -210,7 +210,6 @@ class SignupPageState extends State<SignupPage> {
     });
     if (_formKey.currentState.validate() != true) return;
     _formKey.currentState.save();
-    //Navigator.pushReplacementNamed(context, "homePage");
     Auth().signup(
         _formData['name'],_formData['phoneNumber'],_formData['email'], _formData['password'], context, sampleImage)
         .then((bool result){
@@ -239,8 +238,8 @@ class SignupPageState extends State<SignupPage> {
             onPressed: () async {
               final StorageReference storageRef =
                   FirebaseStorage.instance.ref().child('new pic');
-              final StorageUploadTask task = storageRef.putFile(sampleImage);
-              print(task);
+              /*final StorageUploadTask task = */storageRef.putFile(sampleImage);
+            //  print(task);
             }),
       ],
     );

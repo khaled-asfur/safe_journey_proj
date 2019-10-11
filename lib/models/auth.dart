@@ -14,6 +14,7 @@ class Auth {
   Future<bool> login(
       String email, String password, BuildContext context) async {
     bool result = false;
+   
     try {
       /* AuthResult authResult = */ await _instance.signInWithEmailAndPassword(
           email: email, password: password);
@@ -47,21 +48,22 @@ class Auth {
       String password, BuildContext context, File image) async {
     bool result = false;
     try {
-     /* AuthResult authResult = */await FirebaseAuth.instance
+      /* AuthResult authResult = */ await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       String imageURL;
-      if (image != null){
-        Map<String,dynamic >result = await uploadImage(image, context);
+      if (image != null) {
+        Map<String, dynamic> result = await uploadImage(image, context);
         print('result from signup= $result');
-        if(result['success'])
-          imageURL=result['imageURL'];
+        if (result['success']) imageURL = result['imageURL'];
       }
 
       result = true;
       await _addUserInfoToFireStore(
-          name: name, phoneNumber: phoneNumber, email: email,imageURL: imageURL);
-          Navigator.pushReplacementNamed(context, 'homePage');
-      
+          name: name,
+          phoneNumber: phoneNumber,
+          email: email,
+          imageURL: imageURL);
+      Navigator.pushReplacementNamed(context, 'homePage');
     } on PlatformException catch (e) {
       print(e);
       Helpers.showErrorDialog(context, e.message);
@@ -71,8 +73,14 @@ class Auth {
 
   //اذا في يوزر عامل لوج ان برجع اليوزر واذا مش عامل لوج ان او صار اكسبشن برجع نل
   Future<FirebaseUser> get currentUser async {
-    FirebaseUser user = await _instance.currentUser();
+    // Map<String,dynamic> result={'user':null,
+    // 'succeeded':false};
+    FirebaseUser user;
+   
     try {
+       user = await _instance.currentUser();
+      // result['user']=user;
+      // result['succeeded'] =true;
       return user;
     } catch (e) {
       print('error occured while getting current user');
@@ -80,42 +88,58 @@ class Auth {
     }
   }
 
-  Future<Map<String,dynamic>> uploadImage(File image, BuildContext context) async {
-    Map<String,dynamic>result={
-      'success':false,
-      'uploadURL':null
-    };
+  Future<Map<String, dynamic>> uploadImage(
+      File image, BuildContext context) async {
+    Map<String, dynamic> result = {'success': false, 'uploadURL': null};
     try {
       FirebaseUser user = await Auth().currentUser;
       String email = user.email;
       final StorageReference storageRef =
           FirebaseStorage.instance.ref().child(email);
       final StorageUploadTask task = storageRef.putFile(image);
-      result['success']=true;
-      result['imageURL'] = await(await task.onComplete).ref.getDownloadURL();
+      result['success'] = true;
+      result['imageURL'] = await (await task.onComplete).ref.getDownloadURL();
       print('complete upload');
       print(task);
     } catch (e) {
       Helpers.showErrorDialog(context, e.message);
     }
-     print('result= $result');
+    print('result= $result');
     return result;
-   
   }
 
-  Future<void> _addUserInfoToFireStore(
-      {String name,
-      String phoneNumber,
-      String email,
-      String imageURL}) async {
-        if(imageURL==null)imageURL="noURL";
+  Future<void> _addUserInfoToFireStore({
+      String name, String phoneNumber, String email, String imageURL}) async {
+    if (imageURL == null) imageURL = "noURL";
     FirebaseUser user = await currentUser;
     final fsInstance = Firestore.instance;
-    fsInstance.collection('users').document(user.uid).setData({
+    String userId = user.uid;
+
+    fsInstance.collection('users').document(userId).setData({
       'name': name,
       'phoneNumber': phoneNumber,
       'imageURL': imageURL,
-      'email':email
+      'email': email
     });
   }
+
+   Future<void> addDataTofirebaseknown()async {
+     final fireStoreInstance = Firestore.instance;
+     fireStoreInstance.collection('students').document('3').setData({
+      'name': 'ahmad',
+      'phoneNumber': 0564444555,
+      'age': 15,
+      'lol':'loooool'
+    });
+  }
+  Future<void> addDataTofirebaseUnknown()async {
+     final fireStoreInstance = Firestore.instance;
+     fireStoreInstance.collection('students').add({
+      'name': 'ahmad',
+      'phoneNumber': 0564444555,
+      'age': 15,
+      'lol':'loooool'
+    });
+  }
+
 }

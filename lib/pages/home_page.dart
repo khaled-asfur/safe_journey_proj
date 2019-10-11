@@ -5,11 +5,10 @@ import 'package:flutter/material.dart';
 import '../widgets/drawer.dart';
 import '../widgets/slide_show.dart';
 import '../models/auth.dart';
+//import '../widgets/my_raised_button.dart';
 
 class HomePage extends StatefulWidget {
-  //TODO:create notifications page
   //from vs code
-
 
   @override
   State<StatefulWidget> createState() {
@@ -52,7 +51,9 @@ class HomePageState extends State<HomePage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.notifications),
-            onPressed: () {Navigator.pushNamed(context, 'notifications');},
+            onPressed: () {
+              Navigator.pushNamed(context, 'notifications');
+            },
           ),
           IconButton(
             //face .. nature ..perm_identity ..person ..portrait
@@ -64,6 +65,19 @@ class HomePageState extends State<HomePage> {
       ),
       body: ListView(
         children: <Widget>[
+          //***********
+          RaisedButton(
+              child: Text('add data to firestore with known id'),
+              onPressed: () {
+                Auth().addDataTofirebaseknown();
+              }),
+          //***********
+           RaisedButton(
+              child: Text('add data to firestore without known id'),
+              onPressed: () {
+                Auth().addDataTofirebaseUnknown();
+              }),
+          //***********
           Container(
               decoration: BoxDecoration(color: Colors.grey[200]),
               child: MySlideShow()),
@@ -100,8 +114,7 @@ class HomePageState extends State<HomePage> {
                         alignment: Alignment.bottomCenter,
                         decoration: new BoxDecoration(
                           image: new DecorationImage(
-                            image: new NetworkImage(journey['imageURL']
-                            ),
+                            image: new NetworkImage(journey['imageURL']),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -152,7 +165,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> fillUserData() async {
-    FirebaseUser user = await Auth().currentUser;
+   FirebaseUser user= await Auth().currentUser;
     databaseReference
         .collection("users")
         .document(user.uid)
@@ -174,14 +187,14 @@ class HomePageState extends State<HomePage> {
       padding: EdgeInsets.all(5),
       child: TextField(
         maxLines: null,
-        
         textAlignVertical: TextAlignVertical.center,
-        decoration: new InputDecoration(focusColor: Colors.white,
-          
+        decoration: new InputDecoration(
+          focusColor: Colors.white,
+
           hintText: "Enter journey name/id",
-          
+
           filled: true,
-        // labelText: "Enter journey name/id",
+          // labelText: "Enter journey name/id",
           fillColor: Colors.white10.withOpacity(0.8),
           enabledBorder: new OutlineInputBorder(
             borderRadius: new BorderRadius.circular(8.0),
@@ -197,13 +210,5 @@ class HomePageState extends State<HomePage> {
         ),
       ),
     );
-    /* TextField(
-          
-          decoration: InputDecoration(
-            hintText: "Enter journey name",
-            filled: true,
-            fillColor: Colors.white,
-          ),
-        ), */
   }
 }

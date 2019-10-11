@@ -68,6 +68,7 @@ class MyDrawer extends StatelessWidget {
   }
 
   _buildProfile(deviceWidth, deviceHeight) {
+    print(userData['imageURL']);
     bool havaAvalidUrl =
         (userData['imageURL'] != null && userData['imageURL'] != 'noURL');
     return Center(
