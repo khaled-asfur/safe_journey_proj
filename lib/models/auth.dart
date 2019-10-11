@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/helpers.dart';
+import '../models/global.dart';
 
 class Auth {
   final FirebaseAuth _instance = FirebaseAuth.instance;
@@ -19,6 +20,9 @@ class Auth {
       /* AuthResult authResult = */ await _instance.signInWithEmailAndPassword(
           email: email, password: password);
       Navigator.pushReplacementNamed(context, 'homePage');
+      Global.currentUser=await  FirebaseAuth.instance.currentUser();
+      /*print('curent logged in user =');
+          print(Global.currentUser);*/
       return true;
     } on PlatformException catch (e) {
       print(e);
@@ -32,6 +36,7 @@ class Auth {
     bool result = false;
     try {
       _instance.signOut();
+      Global.currentUser=null;
       return true;
     } on PlatformException catch (e) {
       print(e);
@@ -50,10 +55,14 @@ class Auth {
     try {
       /* AuthResult authResult = */ await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
+          
+          Global.currentUser=await currentUser;
+          /*print('curent signed up user =');
+          print(Global.currentUser);*/
       String imageURL;
       if (image != null) {
         Map<String, dynamic> result = await uploadImage(image, context);
-        print('result from signup= $result');
+       // print('result from signup= $result');
         if (result['success']) imageURL = result['imageURL'];
       }
 
@@ -76,7 +85,9 @@ class Auth {
     // Map<String,dynamic> result={'user':null,
     // 'succeeded':false};
     FirebaseUser user;
-   
+   if(Global.currentUser!= null){
+     return Global.currentUser;
+   }
     try {
        user = await _instance.currentUser();
       // result['user']=user;
@@ -92,26 +103,26 @@ class Auth {
       File image, BuildContext context) async {
     Map<String, dynamic> result = {'success': false, 'uploadURL': null};
     try {
-      FirebaseUser user = await Auth().currentUser;
+      FirebaseUser user = Global.currentUser;
       String email = user.email;
       final StorageReference storageRef =
           FirebaseStorage.instance.ref().child(email);
       final StorageUploadTask task = storageRef.putFile(image);
       result['success'] = true;
       result['imageURL'] = await (await task.onComplete).ref.getDownloadURL();
-      print('complete upload');
-      print(task);
+     // print('complete upload');
+     // print(task);
     } catch (e) {
       Helpers.showErrorDialog(context, e.message);
     }
-    print('result= $result');
+   // print('result= $result');
     return result;
   }
 
   Future<void> _addUserInfoToFireStore({
       String name, String phoneNumber, String email, String imageURL}) async {
     if (imageURL == null) imageURL = "noURL";
-    FirebaseUser user = await currentUser;
+    FirebaseUser user = Global.currentUser;
     final fsInstance = Firestore.instance;
     String userId = user.uid;
 
@@ -122,6 +133,13 @@ class Auth {
       'email': email
     });
   }
+
+   /*static  isSignedIn(){
+    .then((FirebaseUser user){
+       if(user!=null){
+         
+       }
+    });*/
 
    
   

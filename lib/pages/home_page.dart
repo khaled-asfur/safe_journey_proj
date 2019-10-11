@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:safe_journey/models/global.dart';
 
 import '../widgets/drawer.dart';
 import '../widgets/slide_show.dart';
@@ -183,14 +184,16 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> fillUserData() async {
-   FirebaseUser user= await Auth().currentUser;
+   FirebaseUser user= Global.currentUser;
+  // print(doc.data['name']);
+   print(user);
     databaseReference
         .collection("users")
         .document(user.uid)
         .get()
         .then((DocumentSnapshot doc) {
       if (doc.exists) {
-        print(doc.data);
+       // print(doc.data);
         setState(() {
           userData['name'] = doc.data['name'];
           userData['email'] = user.email;

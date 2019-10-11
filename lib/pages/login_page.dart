@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
 import '../models/auth.dart';
+import '../models/global.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -21,6 +22,10 @@ class LoginPageState extends State<LoginPage> {
   };*/
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  @override
+  void initState() {
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     // if (MediaQuery.of(context).orientation == Orientation.landscape)
