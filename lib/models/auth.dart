@@ -123,23 +123,7 @@ class Auth {
     });
   }
 
-   Future<void> addDataTofirebaseknown()async {
-     final fireStoreInstance = Firestore.instance;
-     fireStoreInstance.collection('students').document('3').setData({
-      'name': 'ahmad',
-      'phoneNumber': 0564444555,
-      'age': 15,
-      'lol':'loooool'
-    });
-  }
-  Future<void> addDataTofirebaseUnknown()async {
-     final fireStoreInstance = Firestore.instance;
-     fireStoreInstance.collection('students').add({
-      'name': 'ahmad',
-      'phoneNumber': 0564444555,
-      'age': 15,
-      'lol':'loooool'
-    });
-  }
+   
+  
 
 }

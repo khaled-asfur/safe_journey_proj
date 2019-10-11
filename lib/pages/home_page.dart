@@ -41,6 +41,24 @@ class HomePageState extends State<HomePage> {
     fillUserData();
     super.initState();
   }
+  Future<void> addDataTofirebaseUnknown()async {
+     final fireStoreInstance = Firestore.instance;
+     fireStoreInstance.collection('students').add({
+      'name': 'ahmad',
+      'phoneNumber': 0564444555,
+      'age': 15,
+      'lol':'loooool'
+    });
+  }
+  Future<void> addDataTofirebaseknown()async {
+     final fireStoreInstance = Firestore.instance;
+     fireStoreInstance.collection('students').document('3').setData({
+      'name': 'ahmad',
+      'phoneNumber': 0564444555,
+      'age': 15,
+      'lol':'loooool'
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,13 +87,13 @@ class HomePageState extends State<HomePage> {
           RaisedButton(
               child: Text('add data to firestore with known id'),
               onPressed: () {
-                Auth().addDataTofirebaseknown();
+                addDataTofirebaseknown();
               }),
           //***********
            RaisedButton(
               child: Text('add data to firestore without known id'),
               onPressed: () {
-                Auth().addDataTofirebaseUnknown();
+               addDataTofirebaseUnknown();
               }),
           //***********
           Container(
