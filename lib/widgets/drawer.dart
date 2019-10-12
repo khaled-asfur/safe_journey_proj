@@ -26,7 +26,7 @@ class MyDrawer extends StatelessWidget {
           leading: Icon(Icons.create),
           title: Text("create journey"),
           onTap: () {
-            Navigator.pushReplacementNamed(context, '/');
+            Navigator.pushNamed(context, 'stream');
           },
         ),
         Divider(),

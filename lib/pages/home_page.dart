@@ -5,7 +5,6 @@ import 'package:safe_journey/models/global.dart';
 
 import '../widgets/drawer.dart';
 import '../widgets/slide_show.dart';
-import '../models/auth.dart';
 //import '../widgets/my_raised_button.dart';
 
 class HomePage extends StatefulWidget {
@@ -186,7 +185,7 @@ class HomePageState extends State<HomePage> {
   Future<void> fillUserData() async {
    FirebaseUser user= Global.currentUser;
   // print(doc.data['name']);
-   print(user);
+  // print(user);
     databaseReference
         .collection("users")
         .document(user.uid)

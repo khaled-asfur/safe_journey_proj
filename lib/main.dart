@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'dummy/stream_page.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'pages/signup_page.dart';
 import 'pages/show_journey.dart';
-import 'pages/notifications.dart';
+import 'pages/notifications_page.dart';
 import 'pages/waiting_page.dart';
 // import 'models/auth.dart';
 //import 'package:flutter/rendering.dart';
@@ -20,11 +20,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
-  void initState() {
-      
-    super.initState();
-  }
-  @override
   Widget build(BuildContext context) {
 
     return MaterialApp(
@@ -36,13 +31,13 @@ class _MyAppState extends State<MyApp> {
           accentColor: Color(0xffAB1717),
       ),
       routes: {
-        //TODO:check if the user is logged in to determin main page
         '/': (BuildContext context) =>WaitingPage(),
        //'/': (BuildContext context) => AuthPage(),
         'homePage': (BuildContext context) => HomePage(),
         'loginPage': (BuildContext context) => LoginPage(),
         'signupPage': (BuildContext context) => SignupPage(),
         'notifications': (BuildContext context) => Notifications(),
+         'stream':(BuildContext context)=>MyHomePage(),
       },
       onGenerateRoute: (RouteSettings settings) {
           //هون بضيف نيمد راوت جديدة شرط ما تكون موجودة فوق بالبروبرتي روتس
@@ -62,7 +57,7 @@ class _MyAppState extends State<MyApp> {
       // لما ادخل رابط خطأ شو يعمل
       onUnknownRoute: (RouteSettings settings) {
         //هيك بروح عالصفحة الرئيسية
-        return MaterialPageRoute(builder: (BuildContext context) => HomePage());
+        return MaterialPageRoute(builder: (BuildContext context) => MyHomePage());
       },
     );
   }
