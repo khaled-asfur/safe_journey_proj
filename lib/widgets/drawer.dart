@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:safe_journey/models/auth.dart';
+
+import '../models/auth.dart';
+import '../models/global.dart';
+import '../models/user.dart';
 
 
 class MyDrawer extends StatelessWidget {
-  final Map<String, dynamic> userData;
+  final Map<String, dynamic>  userData = {
+    'name': 'fetching..',
+    'email': 'fetching..',
+    'imageURL': null,
+  };
 
-  MyDrawer(this.userData);
+  MyDrawer();
 
   Widget build(BuildContext context) {
+    fillUserData();
+
     double deviceWidth = MediaQuery.of(context).size.width;
     double deviceHeight = MediaQuery.of(context).size.height;
     return Drawer(
@@ -84,10 +93,6 @@ class MyDrawer extends StatelessWidget {
   }
 
   _buildProfile(deviceWidth, deviceHeight) {
-    print('user data=');
-    print(userData['imageURL']);
-    print('user data=');
-
     bool havaAvalidUrl =
         (userData['imageURL'] != null && userData['imageURL'] != 'noURL');
     return Center(
@@ -105,5 +110,14 @@ class MyDrawer extends StatelessWidget {
         Text(userData['email'], style: TextStyle(color: Colors.grey))
       ],
     ));
+  }
+  fillUserData(){
+    User user= Global.user;
+    userData['name']=user.name;
+    userData['email']=user.email;
+    userData['imageURL']=user.imageURL;
+    print(user.bio +"  "+user.background);
+    /**/
+
   }
 }

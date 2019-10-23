@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:safe_journey/models/user.dart';
 import '../models/global.dart';
 import '../widgets/notifications_builder.dart';
 //TODO:show number of notifications in the main page
@@ -10,7 +10,7 @@ class Notifications extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('in notification page builder');
-    FirebaseUser user = Global.currentUser;
+    User user = Global.user;
     return Scaffold(
         appBar: AppBar(
           title: Text('Notifications'),
@@ -18,7 +18,7 @@ class Notifications extends StatelessWidget {
         body: StreamBuilder(  
           stream: Firestore.instance
               .collection('notifications')
-              .where('userId', isEqualTo: user.uid)
+              .where('userId', isEqualTo: user.id)
               .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {

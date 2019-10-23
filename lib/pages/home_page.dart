@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:safe_journey/models/global.dart';
 
 import '../widgets/drawer.dart';
 import '../widgets/slide_show.dart';
@@ -29,42 +27,16 @@ class HomePageState extends State<HomePage> {
           'https://www.hoteliermiddleeast.com/sites/default/files/hme/styles/full_img/public/images/2018/11/13/JBH1.jpg?itok=P3PfnIHI'
     }
   ];
-
-  final Map<String, dynamic> userData = {
-    'name': 'fetching..',
-    'email': 'fetching..',
-    'imageURL': null
-  };
   final databaseReference = Firestore.instance;
   @override
   void initState() {
-    fillUserData();
     super.initState();
   }
-  Future<void> addDataTofirebaseUnknown()async {
-     final fireStoreInstance = Firestore.instance;
-     fireStoreInstance.collection('students').add({
-      'name': 'ahmad',
-      'phoneNumber': 0564444555,
-      'age': 15,
-      'lol':'loooool'
-    });
-  }
-  Future<void> addDataTofirebaseknown()async {
-     final fireStoreInstance = Firestore.instance;
-     fireStoreInstance.collection('students').document('3').setData({
-      'name': 'ahmad',
-      'phoneNumber': 0564444555,
-      'age': 15,
-      'lol':'loooool'
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     print('in homepage build');
     return Scaffold(
-      drawer: MyDrawer(userData),
+      drawer: MyDrawer(),
       appBar: new AppBar(
         actions: <Widget>[
           IconButton(
@@ -83,19 +55,6 @@ class HomePageState extends State<HomePage> {
       ),
       body: ListView(
         children: <Widget>[
-          //***********
-          RaisedButton(
-              child: Text('add data to firestore with known id'),
-              onPressed: () {
-                addDataTofirebaseknown();
-              }),
-          //***********
-           RaisedButton(
-              child: Text('add data to firestore without known id'),
-              onPressed: () {
-               addDataTofirebaseUnknown();
-              }),
-          //***********
           Container(
               decoration: BoxDecoration(color: Colors.grey[200]),
               child: MySlideShow()),
@@ -182,25 +141,7 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> fillUserData() async {
-   FirebaseUser user= Global.currentUser;
-  // print(doc.data['name']);
-  // print(user);
-    databaseReference
-        .collection("users")
-        .document(user.uid)
-        .get()
-        .then((DocumentSnapshot doc) {
-      if (doc.exists) {
-       // print(doc.data);
-        setState(() {
-          userData['name'] = doc.data['name'];
-          userData['email'] = user.email;
-          userData['imageURL'] = doc.data['imageURL'];
-        });
-      }
-    });
-  }
+  
 
   Widget _buildSearchTextField() {
     return Container(

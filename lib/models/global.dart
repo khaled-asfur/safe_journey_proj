@@ -1,5 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import '../models/user.dart';
 
 class Global {
-  static FirebaseUser currentUser;
+  static User user;
 }

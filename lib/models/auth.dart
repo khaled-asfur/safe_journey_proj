@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:safe_journey/models/user.dart';
 
 import '../models/helpers.dart';
 import '../models/global.dart';
@@ -20,7 +21,9 @@ class Auth {
       /* AuthResult authResult = */ await _instance.signInWithEmailAndPassword(
           email: email, password: password);
       Navigator.pushReplacementNamed(context, 'homePage');
-      Global.currentUser=await  FirebaseAuth.instance.currentUser();
+      User user;
+      FirebaseUser currentFBuser=await  currentFBUser;
+      user.getUserData(currentFBuser);
       /*print('curent logged in user =');
           print(Global.currentUser);*/
       return true;
@@ -36,7 +39,7 @@ class Auth {
     bool result = false;
     try {
       _instance.signOut();
-      Global.currentUser=null;
+      Global.user=null;
       return true;
     } on PlatformException catch (e) {
       print(e);
@@ -55,10 +58,10 @@ class Auth {
     try {
       /* AuthResult authResult = */ await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-          
-          Global.currentUser=await currentUser;
-          /*print('curent signed up user =');
-          print(Global.currentUser);*/
+          User user;
+          FirebaseUser currentFBuser=await  currentFBUser;
+          user.getUserData(currentFBuser);
+          Global.user= user;
       String imageURL;
       if (image != null) {
         Map<String, dynamic> result = await uploadImage(image, context);
@@ -81,13 +84,10 @@ class Auth {
   }
 
   //اذا في يوزر عامل لوج ان برجع اليوزر واذا مش عامل لوج ان او صار اكسبشن برجع نل
-  Future<FirebaseUser> get currentUser async {
+  Future<FirebaseUser> get currentFBUser async {
     // Map<String,dynamic> result={'user':null,
     // 'succeeded':false};
     FirebaseUser user;
-   if(Global.currentUser!= null){
-     return Global.currentUser;
-   }
     try {
        user = await _instance.currentUser();
       // result['user']=user;
@@ -103,7 +103,7 @@ class Auth {
       File image, BuildContext context) async {
     Map<String, dynamic> result = {'success': false, 'uploadURL': null};
     try {
-      FirebaseUser user = Global.currentUser;
+      User user = Global.user;
       String email = user.email;
       final StorageReference storageRef =
           FirebaseStorage.instance.ref().child(email);
@@ -122,9 +122,9 @@ class Auth {
   Future<void> _addUserInfoToFireStore({
       String name, String phoneNumber, String email, String imageURL}) async {
     if (imageURL == null) imageURL = "noURL";
-    FirebaseUser user = Global.currentUser;
+    User user = Global.user;
     final fsInstance = Firestore.instance;
-    String userId = user.uid;
+    String userId = user.id;
 
     fsInstance.collection('users').document(userId).setData({
       'name': name,
