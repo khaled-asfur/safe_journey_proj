@@ -16,17 +16,21 @@ class Auth {
   Future<bool> login(
       String email, String password, BuildContext context) async {
     bool result = false;
-   
+
     try {
-      /* AuthResult authResult = */ await _instance.signInWithEmailAndPassword(
+       AuthResult authResult =  await _instance.signInWithEmailAndPassword(
           email: email, password: password);
-      Navigator.pushReplacementNamed(context, 'homePage');
-      User user;
-      FirebaseUser currentFBuser=await  currentFBUser;
-      user.getUserData(currentFBuser);
+          
+      FirebaseUser currentFBuser = authResult.user;
+      User user=User.empty();
+      bool dataFitched = await user.getUserData(currentFBuser);
       /*print('curent logged in user =');
           print(Global.currentUser);*/
-      return true;
+      dataFitched
+          ? Navigator.pushReplacementNamed(context, 'homePage')
+          : Helpers.showErrorDialog(context, 'error while fetching user data');
+
+      return dataFitched;
     } on PlatformException catch (e) {
       print(e);
       Helpers.showErrorDialog(context, e.message);
@@ -39,7 +43,7 @@ class Auth {
     bool result = false;
     try {
       _instance.signOut();
-      Global.user=null;
+      Global.user = null;
       return true;
     } on PlatformException catch (e) {
       print(e);
@@ -56,18 +60,21 @@ class Auth {
       String password, BuildContext context, File image) async {
     bool result = false;
     try {
-      /* AuthResult authResult = */ await FirebaseAuth.instance
+       AuthResult authResult =  await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-          User user;
-          FirebaseUser currentFBuser=await  currentFBUser;
-          user.getUserData(currentFBuser);
-          Global.user= user;
+      
       String imageURL;
       if (image != null) {
         Map<String, dynamic> result = await uploadImage(image, context);
-       // print('result from signup= $result');
+        // print('result from signup= $result');
         if (result['success']) imageURL = result['imageURL'];
       }
+      FirebaseUser fbUser = authResult.user;
+       print('11111111111111111111111111111');
+      print(fbUser);
+      User user=User(fbUser.uid,email,name,imageURL,phoneNumber,imageURL,'Bio');
+      Global.user = user;
+      print('Donnnnnnnnnnnnne');
 
       result = true;
       await _addUserInfoToFireStore(
@@ -77,6 +84,7 @@ class Auth {
           imageURL: imageURL);
       Navigator.pushReplacementNamed(context, 'homePage');
     } on PlatformException catch (e) {
+      print ('error occured');
       print(e);
       Helpers.showErrorDialog(context, e.message);
     }
@@ -89,7 +97,7 @@ class Auth {
     // 'succeeded':false};
     FirebaseUser user;
     try {
-       user = await _instance.currentUser();
+      user = await _instance.currentUser();
       // result['user']=user;
       // result['succeeded'] =true;
       return user;
@@ -110,17 +118,17 @@ class Auth {
       final StorageUploadTask task = storageRef.putFile(image);
       result['success'] = true;
       result['imageURL'] = await (await task.onComplete).ref.getDownloadURL();
-     // print('complete upload');
-     // print(task);
+      // print('complete upload');
+      // print(task);
     } catch (e) {
       Helpers.showErrorDialog(context, e.message);
     }
-   // print('result= $result');
+    // print('result= $result');
     return result;
   }
 
-  Future<void> _addUserInfoToFireStore({
-      String name, String phoneNumber, String email, String imageURL}) async {
+  Future<void> _addUserInfoToFireStore(
+      {String name, String phoneNumber, String email, String imageURL}) async {
     if (imageURL == null) imageURL = "noURL";
     User user = Global.user;
     final fsInstance = Firestore.instance;
@@ -134,14 +142,11 @@ class Auth {
     });
   }
 
-   /*static  isSignedIn(){
+  /*static  isSignedIn(){
     .then((FirebaseUser user){
        if(user!=null){
          
        }
     });*/
-
-   
-  
 
 }

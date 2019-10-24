@@ -8,22 +8,24 @@ class User {
   String _email;
   String _imageURL;
   String _phoneNumber;
-  String _background;
-  String _bio;
+  String _background="https://images.pexels.com/photos/255379/pexels-photo-255379.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500";
+  String _bio ="Add your own bio";
   FirebaseUser currentFBUser;
-  // User(this.id,this.email,this.name,this.imageURL,this.phoneNumber,this.background,this.bio);
-  User(FirebaseUser currentFBUser) {
-    getUserData(currentFBUser);
-  }
-
+   User(this._id,this._email,this._name,this._imageURL,this._phoneNumber,this._background,this._bio);
+   /*User.withFBUser(FirebaseUser currentFBUser){
+     getUserData( currentFBUser);
+   }*/
+   User.empty();
   Future<bool> getUserData(FirebaseUser currentFBUser) async {
     bool fetchedDataSuccessfully = false;
     print('in get user data');
     this._email = currentFBUser.email;
    DocumentSnapshot document= await Firestore.instance
+   
         .collection("users")
         .document(currentFBUser.uid)
         .get();
+        print('document was got');
       if (document.exists) {
         print('document exist');
         this._name = document.data['name'];
