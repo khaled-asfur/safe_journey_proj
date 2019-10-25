@@ -18,14 +18,12 @@ class Auth {
     bool result = false;
 
     try {
-       AuthResult authResult =  await _instance.signInWithEmailAndPassword(
+      AuthResult authResult = await _instance.signInWithEmailAndPassword(
           email: email, password: password);
-          
+
       FirebaseUser currentFBuser = authResult.user;
-      User user=User.empty();
+      User user = User.empty();
       bool dataFitched = await user.getUserData(currentFBuser);
-      /*print('curent logged in user =');
-          print(Global.currentUser);*/
       dataFitched
           ? Navigator.pushReplacementNamed(context, 'homePage')
           : Helpers.showErrorDialog(context, 'error while fetching user data');
@@ -38,7 +36,7 @@ class Auth {
     return result;
   }
 
-  //true returned means successful operation, false returned
+  //true returned means successful operation, otherwise false returned
   Future<bool> logout(BuildContext context) async {
     bool result = false;
     try {
@@ -60,9 +58,10 @@ class Auth {
       String password, BuildContext context, File image) async {
     bool result = false;
     try {
-       AuthResult authResult =  await FirebaseAuth.instance
+      AuthResult authResult = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       
+
       String imageURL;
       if (image != null) {
         Map<String, dynamic> result = await uploadImage(image, context);
@@ -70,21 +69,20 @@ class Auth {
         if (result['success']) imageURL = result['imageURL'];
       }
       FirebaseUser fbUser = authResult.user;
-       print('11111111111111111111111111111');
-      print(fbUser);
-      User user=User(fbUser.uid,email,name,imageURL,phoneNumber,imageURL,'Bio');
+            User user =
+          User(fbUser.uid, email, name, imageURL, phoneNumber, imageURL);
       Global.user = user;
-      print('Donnnnnnnnnnnnne');
-
-      result = true;
+      
       await _addUserInfoToFireStore(
           name: name,
           phoneNumber: phoneNumber,
           email: email,
-          imageURL: imageURL);
+          imageURL: imageURL,
+          );
+      result = true;
       Navigator.pushReplacementNamed(context, 'homePage');
     } on PlatformException catch (e) {
-      print ('error occured');
+      print('error occured');
       print(e);
       Helpers.showErrorDialog(context, e.message);
     }
@@ -93,13 +91,9 @@ class Auth {
 
   //اذا في يوزر عامل لوج ان برجع اليوزر واذا مش عامل لوج ان او صار اكسبشن برجع نل
   Future<FirebaseUser> get currentFBUser async {
-    // Map<String,dynamic> result={'user':null,
-    // 'succeeded':false};
     FirebaseUser user;
     try {
       user = await _instance.currentUser();
-      // result['user']=user;
-      // result['succeeded'] =true;
       return user;
     } catch (e) {
       print('error occured while getting current user');
@@ -112,18 +106,20 @@ class Auth {
     Map<String, dynamic> result = {'success': false, 'uploadURL': null};
     try {
       User user = Global.user;
-      String email = user.email;
+      String email;
+      if (user == null) {
+       FirebaseUser fbuser= await FirebaseAuth.instance.currentUser();
+          email = fbuser.email;
+      } else
+        email = user.email;
       final StorageReference storageRef =
           FirebaseStorage.instance.ref().child(email);
       final StorageUploadTask task = storageRef.putFile(image);
       result['success'] = true;
       result['imageURL'] = await (await task.onComplete).ref.getDownloadURL();
-      // print('complete upload');
-      // print(task);
     } catch (e) {
       Helpers.showErrorDialog(context, e.message);
     }
-    // print('result= $result');
     return result;
   }
 
@@ -138,15 +134,9 @@ class Auth {
       'name': name,
       'phoneNumber': phoneNumber,
       'imageURL': imageURL,
-      'email': email
+      'email': email,
+      'bio':'Add your bio',
+      'background':imageURL
     });
   }
-
-  /*static  isSignedIn(){
-    .then((FirebaseUser user){
-       if(user!=null){
-         
-       }
-    });*/
-
 }

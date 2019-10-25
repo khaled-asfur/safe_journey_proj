@@ -116,7 +116,7 @@ class MyDrawer extends StatelessWidget {
     userData['name']=user.name;
     userData['email']=user.email;
     userData['imageURL']=user.imageURL;
-    print(user.bio +"  "+user.background);
+    //print(user.bio +"  "+user.background);
     /**/
 
   }

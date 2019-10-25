@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:safe_journey/models/global.dart';
+import 'package:safe_journey/models/helpers.dart';
 
 import '../widgets/drawer.dart';
 import '../widgets/slide_show.dart';
+import '../widgets/cards_grid.dart';
 //import '../widgets/my_raised_button.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,133 +18,64 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  List<Map<String, dynamic>> journeyDetails = [
-    {
-      'name': 'Megaland',
-      'imageURL':
-          'https://murtahil.com/wp-content/uploads/2018/07/IMG_43073.jpg'
-    },
-    {
-      'name': 'Dubai journey',
-      'imageURL':
-          'https://www.hoteliermiddleeast.com/sites/default/files/hme/styles/full_img/public/images/2018/11/13/JBH1.jpg?itok=P3PfnIHI'
-    }
-  ];
   final databaseReference = Firestore.instance;
+  bool _loadedJournies=false;
+  List<Map<String, dynamic>> _journies;
+
   @override
   void initState() {
+    fetchJoinedJournies();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     print('in homepage build');
-    return Scaffold(
-      drawer: MyDrawer(),
-      appBar: new AppBar(
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.pushNamed(context, 'notifications');
-            },
-          ),
-          IconButton(
-            //face .. nature ..perm_identity ..person ..portrait
-            icon: Icon(Icons.person),
-            onPressed: () {},
-          )
-        ],
-        title: _buildSearchTextField(),
-      ),
-      body: ListView(
-        children: <Widget>[
-          Container(
-              decoration: BoxDecoration(color: Colors.grey[200]),
-              child: MySlideShow()),
-          Container(
-              padding: EdgeInsets.all(10),
-              alignment: Alignment.center,
-              child: Text(
-                'Journeys you joined',
-                style: TextStyle(
-                    color: Colors.teal[600],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20),
-              )),
-          Container(
-            color: Colors.white30,
-            child: GridView.count(
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                crossAxisCount: 2,
-                childAspectRatio: 1.0,
-                padding: const EdgeInsets.all(4.0),
-                mainAxisSpacing: 4.0,
-                crossAxisSpacing: 4.0,
-                children: journeyDetails.map((Map<String, dynamic> journey) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                          context, '/showJourney/${journey['name']}');
-                    },
-                    child: Card(
-                      semanticContainer: true,
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      child: Container(
-                        alignment: Alignment.bottomCenter,
-                        decoration: new BoxDecoration(
-                          image: new DecorationImage(
-                            image: new NetworkImage(journey['imageURL']),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        child: Container(
-                          padding: EdgeInsets.all(5),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey[900].withOpacity(0.5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black38,
-                                blurRadius:
-                                    9.0, // has the effect of softening the shadow
-                                spreadRadius:
-                                    10.0, // has the effect of extending the shadow
-                                offset: Offset(
-                                  10.0, // horizontal, move right 10
-                                  0.0, // vertical, move down 10
-                                ),
-                              )
-                            ],
-                          ),
-                          child: Text(
-                            journey['name'],
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      elevation: 5,
-                      margin: EdgeInsets.all(10),
-                    ),
-                  );
-                  /* GridTile(
-                      child: new Image.network(journey['imageURL'],
-                          fit: BoxFit.cover));*/
-                }).toList()),
-          ),
-          SizedBox(
-            height: 30,
-          )
-        ],
-      ),
-    );
+    return Global.user == null
+        ? CircularProgressIndicator()
+        : Scaffold(
+            drawer: MyDrawer(),
+            appBar: new AppBar(
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.notifications),
+                  onPressed: () {
+                    Navigator.pushNamed(context, 'notifications');
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.person),
+                  onPressed: () {},
+                )
+              ],
+              title: _buildSearchTextField(),
+            ),
+            body: ListView(
+              children: <Widget>[
+                Container(
+                    decoration: BoxDecoration(color: Colors.grey[200]),
+                    child: MySlideShow()),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Journeys you joined',
+                    style: TextStyle(
+                        color: Colors.teal[600],
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20),
+                  ),
+                ),
+                _loadedJournies? MyCardsGrid(_journies,'/showJourney/')
+                :Center(child:CircularProgressIndicator()),
+                SizedBox(
+                  height: 30,
+                )
+              ],
+            ),
+          );
   }
-
-  
+  //*********************************** functions *******************************************
 
   Widget _buildSearchTextField() {
     return Container(
@@ -155,21 +89,67 @@ class HomePageState extends State<HomePage> {
           hintText: "Enter journey name/id",
 
           filled: true,
-          // labelText: "Enter journey name/id",
           fillColor: Colors.white10.withOpacity(0.8),
           enabledBorder: new OutlineInputBorder(
             borderRadius: new BorderRadius.circular(8.0),
             borderSide: new BorderSide(color: Colors.white),
           ),
-          //fillColor: Colors.green
         ),
         keyboardType: TextInputType.text,
         style: new TextStyle(
-          //color: Colors.white,
           fontSize: 10,
           fontFamily: "Poppins",
         ),
       ),
     );
+  }
+//***********************************  *******************************************
+  Future<List<Map<String, dynamic>>> fetchJoinedJournies() async {
+    List<Map<String,dynamic>>myJournies=List<Map<String,dynamic>>();
+    int index=0;
+    try {
+      QuerySnapshot docs = await Firestore.instance
+          .collection('journey_user')
+          .where('userId', isEqualTo: Global.user.id)
+          .getDocuments();
+      List<DocumentSnapshot> allDocuments=docs.documents;
+      allDocuments.forEach((doc) {
+        fetchJourneyDetails(doc['journeyId']).then((Map<String, dynamic> details){
+          Map<String, dynamic> journey = {
+          'id': doc['userId'],
+          'journeyImageURL': details['imageURL'],
+          'name': details['name'],
+        };
+        myJournies.add(journey);
+        index++;
+        if(index==allDocuments.length){
+        setState(() {
+        _loadedJournies =true;
+        _journies=myJournies;
+        });
+        }
+        });
+        
+      });
+    } catch (error) {
+      Helpers.showErrorDialog(context, error);
+    }
+    return myJournies;
+  }
+//****************************************************************************
+  Future<Map<String,dynamic>> fetchJourneyDetails(String journeyId) async {
+    Map<String,dynamic> journeyDetails={
+      'imageURL':null,
+      'name':null
+    };
+    try {
+       DocumentSnapshot journeyDocument = await Firestore.instance
+          .collection('journies').document(journeyId).get();
+       journeyDetails['imageURL'] = journeyDocument.data['imageURL'];
+       journeyDetails['name'] = journeyDocument.data['name'];
+    } catch (error) {
+      Helpers.showErrorDialog(context, error.toString());
+    }
+    return journeyDetails;
   }
 }

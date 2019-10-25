@@ -27,6 +27,7 @@ class LoginPageState extends State<LoginPage> {
   }
   @override
   Widget build(BuildContext context) {
+    print('login page build');
     // if (MediaQuery.of(context).orientation == Orientation.landscape)
     //   print("landscape");
     /* double deviceWidth = MediaQuery.of(context).size.width;
@@ -91,7 +92,7 @@ class LoginPageState extends State<LoginPage> {
 
   Widget _buildEmailTextField() {
     return TextFormField(
-      initialValue: "family_safe@hotmail.com",
+      initialValue: "family_safe1@hotmail.com",
       decoration: InputDecoration(
         labelText: "Email",
         filled: true,

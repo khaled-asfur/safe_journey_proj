@@ -11,12 +11,14 @@ class User {
   String _background="https://images.pexels.com/photos/255379/pexels-photo-255379.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500";
   String _bio ="Add your own bio";
   FirebaseUser currentFBUser;
-   User(this._id,this._email,this._name,this._imageURL,this._phoneNumber,this._background,this._bio);
+   User(this._id,this._email,this._name,this._imageURL,this._phoneNumber,[this._background,this._bio]);
    /*User.withFBUser(FirebaseUser currentFBUser){
      getUserData( currentFBUser);
    }*/
    User.empty();
   Future<bool> getUserData(FirebaseUser currentFBUser) async {
+    this._id=currentFBUser.uid;
+
     bool fetchedDataSuccessfully = false;
     print('in get user data');
     this._email = currentFBUser.email;
@@ -41,7 +43,7 @@ class User {
   }
 
   String get id {
-    return id;
+    return _id;
   }
 
   String get name {
@@ -66,5 +68,8 @@ class User {
 
   String get bio {
     return _bio;
+  }
+  String toString(){
+    return "id=${this._id},email=${this._email},name=${this._name},imageURL=${this._imageURL},phone number=${this._phoneNumber},background=${this._background},bio=${this._bio}";
   }
 }

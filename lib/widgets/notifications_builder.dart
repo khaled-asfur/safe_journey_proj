@@ -60,7 +60,6 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
     print('document changed');
     });*/
 
-    print('in builder build $dataRetrieved***************************');
     if (widget.snapshots.data.documents.length > 0) {
       if (dataRetrieved == false || _startingDocumentsLength !=
                 widget.snapshots.data.documents.length) {
@@ -71,14 +70,6 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
         return ListView.builder(
           itemCount: widget.snapshots.data.documents.length,
           itemBuilder: (BuildContext context, int index) {
-           /* if () {
-              _startingDocumentsLength = widget.snapshots.data.documents.length;
-              setState(() {
-                dataRetrieved = false;
-              });
-              
-             
-            }*/
             print(
                 'index= $index and length = ${widget.snapshots.data.documents.length} ***');
             print('index= $index and length = ${notifications.length} ***');
