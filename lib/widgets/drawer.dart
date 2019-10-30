@@ -94,7 +94,7 @@ class MyDrawer extends StatelessWidget {
 
   _buildProfile(deviceWidth, deviceHeight) {
     bool havaAvalidUrl =
-        (userData['imageURL'] != null && userData['imageURL'] != 'noURL');
+        (userData['imageURL'] != null && userData['imageURL'] != 'noURL' && userData['imageURL'] !='');
     return Center(
         child: Column(
       children: <Widget>[
@@ -116,6 +116,9 @@ class MyDrawer extends StatelessWidget {
     userData['name']=user.name;
     userData['email']=user.email;
     userData['imageURL']=user.imageURL;
+    /*print('looooooooooooool');
+    print(user.toString());*/
+    //print(userData['imageURL']);
     //print(user.bio +"  "+user.background);
     /**/
 

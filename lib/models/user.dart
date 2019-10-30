@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import '../models/global.dart';
 
 class User {
@@ -20,16 +21,16 @@ class User {
     this._id=currentFBUser.uid;
 
     bool fetchedDataSuccessfully = false;
-    print('in get user data');
+    print('Fetching current user data..');
     this._email = currentFBUser.email;
+    try{
    DocumentSnapshot document= await Firestore.instance
    
         .collection("users")
         .document(currentFBUser.uid)
         .get();
-        print('document was got');
       if (document.exists) {
-        print('document exist');
+       
         this._name = document.data['name'];
         this._imageURL = document.data['imageURL'];
         this._phoneNumber = document.data['phoneNumber'];
@@ -37,7 +38,12 @@ class User {
         this._bio = document.data['bio'];
         fetchedDataSuccessfully = true;
         Global.user = this;
+         print('User data was fetched successfully');
       }
+    }on PlatformException catch (e) {
+      print('error occured while fetching user data');
+      print(e);
+    }
       
     return fetchedDataSuccessfully;
   }

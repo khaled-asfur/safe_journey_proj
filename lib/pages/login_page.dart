@@ -92,7 +92,7 @@ class LoginPageState extends State<LoginPage> {
 
   Widget _buildEmailTextField() {
     return TextFormField(
-      initialValue: "family_safe1@hotmail.com",
+      initialValue: "family_safe@hotmail.com",
       decoration: InputDecoration(
         labelText: "Email",
         filled: true,

@@ -3,7 +3,6 @@ import 'dummy/stream_page.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'pages/signup_page.dart';
-import 'pages/show_journey.dart';
 import 'pages/notifications_page.dart';
 import 'pages/waiting_page.dart';
 import 'pages/AddPeople.dart';
@@ -52,11 +51,11 @@ class _MyAppState extends State<MyApp> {
         if (pathElements[0] != '') {
           return null;
         }
-        if (pathElements[1] == 'showJourney') {
+        /*if (pathElements[1] == 'showJourney') {
           String journeyName = pathElements[2];
           return MaterialPageRoute<bool>(
               builder: (BuildContext context) => ShowJourney(journeyName));
-        }
+        }*/
         return null;
       },
 
