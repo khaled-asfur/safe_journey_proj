@@ -59,11 +59,7 @@ class HomePageState extends State<HomePage> {
     return Global.user == null
         ? CircularProgressIndicator()
         : Header(
-            body: RefreshIndicator(
-              onRefresh: (){
-                doFetch();
-                },
-              child: ListView(
+            body: ListView(
                 children: <Widget>[
                   Container(
                       decoration: BoxDecoration(color: Colors.grey[200]),
@@ -90,7 +86,7 @@ class HomePageState extends State<HomePage> {
                   )
                 ],
               ),
-            ),
+            
           );
   }
 }

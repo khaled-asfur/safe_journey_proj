@@ -77,7 +77,7 @@ class ChatList extends StatelessWidget {
               subtitle: Text("Id"),
               onTap: () {},
               trailing: RaisedButton(
-                textColor: Colors.white,
+                textColor: Colors.white,////sdjksjdksjd
                 color: Colors.blue,
                 child: Text("Add"),
                 onPressed: () {},
