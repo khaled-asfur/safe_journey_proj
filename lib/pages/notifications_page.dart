@@ -32,12 +32,13 @@ class Notifications extends StatelessWidget {
         floatingActionButton: new FloatingActionButton(
         child: new Icon(Icons.add),
         onPressed: () {
-          Firestore.instance.collection('notifications').document().setData(
+          Firestore.instance.collection('notifications').add(
             {
-              'journeyName': 'Al-bathan journey',
-              'userId': 'NQxMofkgqibUl9gbUqt25S3ZPMw1',
-              'senderId':'X0t4DtD5i5XnlgTzdZuwTzfW1ri1',
-              'type':'attendenceRequest'
+              'journeyId': 'IHJA4sYuIreak96nQpOP',
+              'userId': '3tjm0pfPBGO8kEGJH62tyLjtoF42',
+              'senderId':'NQxMofkgqibUl9gbUqt25S3ZPMw1',
+              'type':'JOURNEY_INVITATION',
+              'time':DateTime.now()
             },
           );
         },
@@ -46,19 +47,3 @@ class Notifications extends StatelessWidget {
   }
 
 }
-/****
-  new ListView(
-              children: snapshot.data.documents.map((document) {
-                
-               
-                 /*return Text(
-                    "attitude=${document['type']} and lattitude = ${document['userId']}");*/
-                   MyNotification notification=MyNotification(document['senderId'],document['type'],'17/5/2019',document['journeyName']);
-                notification.getSenderData().then((onValue){
-                   return NotificationsBuilder(notification);
-                });
-               /* MyNotification notificaton=MyNotification(document['senderId'],document['type'],'17/5/2019',document['journeyName']);
-              return Text(document['senderId']);*/
-              }).toList(),
-            );
- */

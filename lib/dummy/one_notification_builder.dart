@@ -43,10 +43,10 @@ class NotificationsBuilder1 extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          _buildNotificationText(notification),
+                         // _buildNotificationText(notification),
                           Container(
                             child: Text(
-                              notification.time,
+                              notification.time.toString(),
                               textAlign: TextAlign.left,
                               style: TextStyle(fontSize: 10),
                             ),
@@ -73,7 +73,7 @@ class NotificationsBuilder1 extends StatelessWidget {
               ));
           
   }
-
+/*
   Widget _buildNotificationText(MyNotification notification) {
     Widget text = Text('error');
     if (notification.type == 'journeyInvitation')
@@ -83,5 +83,5 @@ class NotificationsBuilder1 extends StatelessWidget {
       text = Text(
           '${notification.senderName} requested from you to to be his attendent in the  journey \'${notification.journeyName}\' do you accept?');
     return text;
-  }
+  }*/
 }

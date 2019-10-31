@@ -94,7 +94,6 @@ class Journey {
       if (allDocuments.isEmpty) {
         result =FetchResult.EMPTY;
       }
-      print(allDocuments.length);
       for(int i=0;i<allDocuments.length;i++){
         DocumentSnapshot doc=allDocuments[i];
         journey['id'] = doc['journeyId'];
@@ -144,8 +143,8 @@ class Journey {
         journey['id'],
         journey['name'],
         journey['description'],
-        DateTime.parse(journey['startTime']),
-        DateTime.parse(journey['endTime']),
+        journey['startTime'].toDate(),
+       journey['endTime'].toDate(),
         journey['places'],
         journey['invitedUsers'],
         journey['role'],

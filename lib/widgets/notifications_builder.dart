@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:safe_journey/models/global.dart';
 import 'my_raised_button.dart';
 import '../models/notification.dart';
 
 class NotificationsBuilder extends StatefulWidget {
-//  final L
   final AsyncSnapshot<QuerySnapshot> snapshots;
 
   NotificationsBuilder(this.snapshots);
@@ -13,67 +13,27 @@ class NotificationsBuilder extends StatefulWidget {
 }
 
 class _NotificationsBuilderState extends State<NotificationsBuilder> {
-  int _startingDocumentsLength;
   List<MyNotification> notifications;
-  bool dataRetrieved;
+  //bool dataRetrieved;
 
   @override
   void initState() {
-    _startingDocumentsLength = widget.snapshots.data.documents.length;
-    print('in initState');
-    dataRetrieved = false;
-  //  _fillNotificationList();
-    super.initState();
-  }
-
-  _fillNotificationList() {
-    int i = 0;
-    dataRetrieved = false;
     notifications = List<MyNotification>();
-    widget.snapshots.data.documents.forEach((document) {
-      /*  print('in initstate ***************************');
-          print(document['type']);
-       print(document['senderId']);
-          print(document['journeyName']);*/
-
-      MyNotification notification = MyNotification(document['senderId'],
-          document['type'], '17/5/2019', document['journeyName']);
-      notification.getSenderData().then((x) {
-        notifications.add(notification);
-        print(
-            'index= $i and length = ${widget.snapshots.data.documents.length}');
-        i++;
-        if (i == widget.snapshots.data.documents.length) {
-          setState(() {
-            dataRetrieved = true;
-            print(dataRetrieved);
-          });
-        }
-      });
-    });
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    /* widget.snapshots.data.documentChanges.any((x) {
-    //  _fillNotificationList();
-    print('document changed');
-    });*/
-
+    print('in notification builder build');
     if (widget.snapshots.data.documents.length > 0) {
-      if (dataRetrieved == false || _startingDocumentsLength !=
-                widget.snapshots.data.documents.length) {
-                  _startingDocumentsLength = widget.snapshots.data.documents.length;
+      //اذا السناب شوت الي وصلت الصفحة فيها داتا
+      if (notifications.length != widget.snapshots.data.documents.length) {
         _fillNotificationList();
-        return Text('fetching...');
+        return Center(child: CircularProgressIndicator());
       } else
         return ListView.builder(
           itemCount: widget.snapshots.data.documents.length,
           itemBuilder: (BuildContext context, int index) {
-            print(
-                'index= $index and length = ${widget.snapshots.data.documents.length} ***');
-            print('index= $index and length = ${notifications.length} ***');
-
             MyNotification notification = notifications[index];
             return Card(
                 child: Row(
@@ -102,7 +62,7 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                         _buildNotificationText(notification),
                         Container(
                           child: Text(
-                            notification.time,
+                            notification.time.toString(),
                             textAlign: TextAlign.left,
                             style: TextStyle(fontSize: 10),
                           ),
@@ -113,7 +73,18 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
                             MyRaisedButton('Accept', () {
-                              //delete notification from notifications collection
+                              notifications.removeAt(index);
+                              notification.deleteNotificationFromFireStore();
+                              if (notification.type == 'JOURNEY_INVITATION') {
+                                Firestore.instance
+                                    .collection('journey_user')
+                                    .add({
+                                  'userId': Global.user.id,
+                                  'journeyId': notification.journeyid,
+                                  'role': 'USER',
+                                  'attendents': [],
+                                });
+                              }
                               //add data to users_journeis collection
                               //remove from attendents array on journey collection
                             }),
@@ -130,17 +101,39 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
           },
         );
     }
-    return Center(child: Text('You don\'t have any notifications'));
+    return Center(child: Text('You don\'t have any notification'));
   }
+  //****************** fUNCTIONS  ******************* */
 
   Widget _buildNotificationText(MyNotification notification) {
     Widget text = Text('error');
-    if (notification.type == 'journeyInvitation')
+    if (notification.type == 'JOURNEY_INVITATION')
       text = Text(
-          '${notification.senderName} added you to is journey \'${notification.journeyName}\' do you want to join it?');
-    else if (notification.type == 'attendenceRequest')
+          '${notification.senderName} added you to journey \'${notification.journeyName}\' do you want to join it?');
+    else if (notification.type == 'ATTENDENCE_REQUEST')
       text = Text(
           '${notification.senderName} requested from you to to be his attendent in the  journey \'${notification.journeyName}\' do you accept?');
     return text;
+  }
+
+  _fillNotificationList() async {
+    print('in fill notification list');
+    int i = 0;
+    notifications = List<MyNotification>();
+    widget.snapshots.data.documents.forEach((document) {
+      MyNotification notification = MyNotification(
+          document.documentID,
+          document['senderId'],
+          document['type'],
+          document['time'].toDate(),
+          document['journeyId']);
+      notification.getSenderData().then((x) {
+        notification.getJourneyName(document['journeyId']).then((l) {
+          notifications.add(notification);
+          i++;
+          if (i == widget.snapshots.data.documents.length) setState(() {});
+        });
+      });
+    });
   }
 }
