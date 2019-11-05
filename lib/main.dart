@@ -1,18 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'dummy/stream_page.dart';
+import 'package:safe_journey/models/global.dart';
+
+import 'pages/waiting_page.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'pages/signup_page.dart';
 import 'pages/notifications_page.dart';
-import 'pages/waiting_page.dart';
-import 'pages/AddPeople.dart';
 import 'pages/creat.dart';
 import 'pages/peopleList.dart';
-
-// import 'models/auth.dart';
 //import 'package:flutter/rendering.dart';
+
 void main() {
   //debugPaintSizeEnabled =true;
+  
   runApp(MyApp());
 }
 
@@ -34,15 +35,13 @@ class _MyAppState extends State<MyApp> {
       ),
       routes: {
         '/': (BuildContext context) => WaitingPage(),
-        //'/': (BuildContext context) => AuthPage(),
         'homePage': (BuildContext context) => HomePage(),
         'loginPage': (BuildContext context) => LoginPage(),
         'signupPage': (BuildContext context) => SignupPage(),
         'notifications': (BuildContext context) => Notifications(),
-        'stream': (BuildContext context) => MyHomePage(),
         'createJourney': (BuildContext context) => Create(),
-        'addPeople': (BuildContext context) => ChatList(),
         'peopleList': (BuildContext context) => PeopleList(),
+        //'addPeople': (BuildContext context) => AddPeople('journeyId'),
       },
       onGenerateRoute: (RouteSettings settings) {
         //هون بضيف نيمد راوت جديدة شرط ما تكون موجودة فوق بالبروبرتي روتس
@@ -62,8 +61,7 @@ class _MyAppState extends State<MyApp> {
       // لما ادخل رابط خطأ شو يعمل
       onUnknownRoute: (RouteSettings settings) {
         //هيك بروح عالصفحة الرئيسية
-        return MaterialPageRoute(
-            builder: (BuildContext context) => MyHomePage());
+        return MaterialPageRoute(builder: (BuildContext context) => HomePage());
       },
     );
   }

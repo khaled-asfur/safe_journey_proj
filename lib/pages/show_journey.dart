@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:safe_journey/pages/add_people.dart';
+import 'package:safe_journey/widgets/my_raised_button.dart';
 import '../models/journey.dart';
 
 class ShowJourney extends StatelessWidget {
@@ -10,9 +12,21 @@ class ShowJourney extends StatelessWidget {
       appBar: AppBar(
         title: Text(_journey.name),
       ),
-      body: Center(
-          child: Text('Welcome to show journey page of id : ${_journey.id}')),
+      body: Column(
+        children: <Widget>[
+          MyRaisedButton('add people', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (BuildContext context) {
+                return AddPeople(_journey);
+              }),
+            );
+          }),
+          Center(
+            child: Text('Welcome to show journey page of id : ${_journey.id}'),
+          ),
+        ],
+      ),
     );
   }
-  
 }

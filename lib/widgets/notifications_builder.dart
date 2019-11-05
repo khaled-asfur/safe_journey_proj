@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
+import 'package:safe_journey/models/helpers.dart';
 import 'my_raised_button.dart';
 import '../models/notification.dart';
 
@@ -14,20 +15,23 @@ class NotificationsBuilder extends StatefulWidget {
 
 class _NotificationsBuilderState extends State<NotificationsBuilder> {
   List<MyNotification> notifications;
-  //bool dataRetrieved;
+  bool isFetching = false;
 
   @override
   void initState() {
     notifications = List<MyNotification>();
+    _fillNotificationList();
+    isFetching = true;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('in notification builder build');
     if (widget.snapshots.data.documents.length > 0) {
       //اذا السناب شوت الي وصلت الصفحة فيها داتا
-      if (notifications.length != widget.snapshots.data.documents.length) {
+      if (isFetching) return Center(child: CircularProgressIndicator());
+      if (notifications.length != widget.snapshots.data.documents.length &&
+          !isFetching) {
         _fillNotificationList();
         return Center(child: CircularProgressIndicator());
       } else
@@ -52,14 +56,14 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                               /*'https://murtahil.com/wp-content/uploads/2018/07/IMG_43073.jpg'*/)),
                     ),
                   ),
-                ), //*************** */
+                ),
                 Expanded(
                   flex: 3,
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        _buildNotificationText(notification),
+                        notification.buildNotificationText(),
                         Container(
                           child: Text(
                             notification.time.toString(),
@@ -73,18 +77,16 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
                             MyRaisedButton('Accept', () {
-                              notifications.removeAt(index);
-                              notification.deleteNotificationFromFireStore();
                               if (notification.type == 'JOURNEY_INVITATION') {
-                                Firestore.instance
-                                    .collection('journey_user')
-                                    .add({
-                                  'userId': Global.user.id,
-                                  'journeyId': notification.journeyid,
-                                  'role': 'USER',
-                                  'attendents': [],
-                                });
+                                _addCurrentUserToJourney(
+                                    notification.journeyId);
+                                    notifications.removeAt(index);
+                              notification.deleteNotificationFromFireStore();
                               }
+                              if (notification.type == 'ATTENDENCE_REQUEST') {
+                                _doAttendence(notification, index);
+                              }
+                              
                               //add data to users_journeis collection
                               //remove from attendents array on journey collection
                             }),
@@ -103,21 +105,76 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
     }
     return Center(child: Text('You don\'t have any notification'));
   }
-  //****************** fUNCTIONS  ******************* */
 
-  Widget _buildNotificationText(MyNotification notification) {
-    Widget text = Text('error');
-    if (notification.type == 'JOURNEY_INVITATION')
-      text = Text(
-          '${notification.senderName} added you to journey \'${notification.journeyName}\' do you want to join it?');
-    else if (notification.type == 'ATTENDENCE_REQUEST')
-      text = Text(
-          '${notification.senderName} requested from you to to be his attendent in the  journey \'${notification.journeyName}\' do you accept?');
-    return text;
+  //****************** fUNCTIONS  ******************* */
+  _addCurrentUserToJourney(String journeyId) {
+    Firestore.instance.collection('journey_user').add({
+      'userId': Global.user.id,
+      'journeyId': journeyId,
+      'role': 'USER',
+      'attendents': [],
+    });
+  }
+
+  Future<bool> _doAttendence(MyNotification notification, int index) async {
+    bool x1 = await _addSenderToUserAttendentsList(notification);
+    bool x2 = await _addUserToSenderAttendentsList(notification);
+    if (x1 && x2) {
+      notifications.removeAt(index);
+      notification.deleteNotificationFromFireStore();
+      return true;
+    }
+    Helpers.showErrorDialog(context, 'failed to accomplsh attendence');
+    return false;
+  }
+
+  Future<bool> _addSenderToUserAttendentsList(MyNotification not) async {
+    bool result = false;
+    var snapshot = await Firestore.instance
+        .collection('journey_user')
+        .where('userId', isEqualTo: Global.user.id)
+        .where('journeyId', isEqualTo: not.journeyId)
+        .limit(1)
+        .getDocuments();
+    if (snapshot.documents.length > 0) {
+      String documentId = snapshot.documents[0].documentID;
+      print(snapshot.documents[0].documentID);
+      await Firestore.instance
+          .collection('journey_user')
+          .document(documentId)
+          .updateData({
+        'attendents': FieldValue.arrayUnion([not.senderId]),
+      }).then((x) {
+        result = true;
+      });
+    }
+    return result;
+  }
+
+  _addUserToSenderAttendentsList(MyNotification not) async {
+    bool result = false;
+    var snapshot = await Firestore.instance
+        .collection('journey_user')
+        .where('userId', isEqualTo: not.senderId)
+        .where('journeyId', isEqualTo: not.journeyId)
+        .limit(1)
+        .getDocuments();
+    if (snapshot.documents.length > 0) {
+      String documentId = snapshot.documents[0].documentID;
+      print(snapshot.documents[0].documentID);
+      await Firestore.instance
+          .collection('journey_user')
+          .document(documentId)
+          .updateData({
+        'attendents': FieldValue.arrayUnion([Global.user.id]),
+      }).then((void x) {
+        result = true;
+      });
+    }
+    return result;
   }
 
   _fillNotificationList() async {
-    print('in fill notification list');
     int i = 0;
     notifications = List<MyNotification>();
     widget.snapshots.data.documents.forEach((document) {
@@ -131,9 +188,17 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
         notification.getJourneyName(document['journeyId']).then((l) {
           notifications.add(notification);
           i++;
-          if (i == widget.snapshots.data.documents.length) setState(() {});
+          if (i == widget.snapshots.data.documents.length)
+            setState(() {
+              isFetching = false;
+            });
         });
       });
     });
   }
 }
+/***
+ * add user to invited users
+ * add notification to the user notifications
+ * 
+ */

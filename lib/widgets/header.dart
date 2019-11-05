@@ -1,30 +1,72 @@
 import 'package:flutter/material.dart';
+import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/widgets/drawer.dart';
+import 'package:safe_journey/widgets/notification_icon.dart';
+
 class Header extends StatelessWidget {
   final Widget body;
-  Header({this.body});
+  final Widget floatingActionButton;
+  Header({@required this.body,this.floatingActionButton});
   @override
   Widget build(BuildContext context) {
+
+    
+
     return Scaffold(
-            drawer: MyDrawer(),
-            appBar: new AppBar(
-              actions: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.notifications),
-                  onPressed: () {
-                    Navigator.pushNamed(context, 'notifications');
-                  },
+        drawer: MyDrawer(),
+        appBar: new AppBar(
+          actions: <Widget>[
+            NotificationIcon(),
+            IconButton(
+              icon: Icon(Icons.person),
+              onPressed: () {},
+            )
+          ],
+          title: _buildSearchTextField(),
+        ),
+        body: body,
+        floatingActionButton: this.floatingActionButton==null?null:this.floatingActionButton,
+        );
+  }
+
+  Widget buildNotificationsIcon(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        new IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              Global.notificationsCount = 0;
+              Navigator.pushNamed(context, 'notifications');
+            }),
+        Global.notificationsCount != 0
+            ? new Positioned(
+                right: 11,
+                top: 11,
+                child: new Container(
+                  padding: EdgeInsets.all(2),
+                  decoration: new BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  constraints: BoxConstraints(
+                    minWidth: 14,
+                    minHeight: 14,
+                  ),
+                  child: Text(
+                    '${Global.notificationsCount}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.person),
-                  onPressed: () {},
-                )
-              ],
-              title: _buildSearchTextField(),
-            ),
-            body:body
+              )
+            : new Container()
+      ],
     );
   }
+
   Widget _buildSearchTextField() {
     return Container(
       padding: EdgeInsets.all(5),

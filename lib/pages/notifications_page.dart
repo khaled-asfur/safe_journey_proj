@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/user.dart';
+import 'package:safe_journey/widgets/header.dart';
 import '../models/global.dart';
 import '../widgets/notifications_builder.dart';
 //TODO:show number of notifications in the main page
@@ -11,10 +12,7 @@ class Notifications extends StatelessWidget {
   Widget build(BuildContext context) {
     print('in notification page builder');
     User user = Global.user;
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Notifications'),
-        ),
+    return Header(
         body: StreamBuilder(  
           stream: Firestore.instance
               .collection('notifications')
@@ -23,9 +21,6 @@ class Notifications extends StatelessWidget {
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) return Text('Loading...');
-            
-            /*MyNotification notification=MyNotification(document['senderId'],document['type'],'17/5/2019',document['journeyName']);
-                notification.getSenderData()*/
             return NotificationsBuilder(snapshot);
           },
         ) ,
@@ -37,7 +32,7 @@ class Notifications extends StatelessWidget {
               'journeyId': 'IHJA4sYuIreak96nQpOP',
               'userId': '3tjm0pfPBGO8kEGJH62tyLjtoF42',
               'senderId':'NQxMofkgqibUl9gbUqt25S3ZPMw1',
-              'type':'JOURNEY_INVITATION',
+              'type':'ATTENDENCE_REQUEST',
               'time':DateTime.now()
             },
           );

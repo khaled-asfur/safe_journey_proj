@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:safe_journey/pages/add_people.dart';
 
 import '../models/auth.dart';
 import '../models/global.dart';
 import '../models/user.dart';
 
-
 class MyDrawer extends StatelessWidget {
-  final Map<String, dynamic>  userData = {
+  final Map<String, dynamic> userData = {
     'name': 'fetching..',
     'email': 'fetching..',
     'imageURL': null,
@@ -36,14 +36,6 @@ class MyDrawer extends StatelessWidget {
           title: Text("create journey"),
           onTap: () {
             Navigator.pushNamed(context, 'createJourney');
-          },
-        ),
-        Divider(),
-        ListTile(
-          leading: Icon(Icons.create),
-          title: Text("Add people"),
-          onTap: () {
-            Navigator.pushNamed(context, 'addPeople');
           },
         ),
         Divider(),
@@ -93,8 +85,9 @@ class MyDrawer extends StatelessWidget {
   }
 
   _buildProfile(deviceWidth, deviceHeight) {
-    bool havaAvalidUrl =
-        (userData['imageURL'] != null && userData['imageURL'] != 'noURL' && userData['imageURL'] !='');
+    bool havaAvalidUrl = (userData['imageURL'] != null &&
+        userData['imageURL'] != 'noURL' &&
+        userData['imageURL'] != '');
     return Center(
         child: Column(
       children: <Widget>[
@@ -111,16 +104,16 @@ class MyDrawer extends StatelessWidget {
       ],
     ));
   }
-  fillUserData(){
-    User user= Global.user;
-    userData['name']=user.name;
-    userData['email']=user.email;
-    userData['imageURL']=user.imageURL;
+
+  fillUserData() {
+    User user = Global.user;
+    userData['name'] = user.name;
+    userData['email'] = user.email;
+    userData['imageURL'] = user.imageURL;
     /*print('looooooooooooool');
     print(user.toString());*/
     //print(userData['imageURL']);
     //print(user.bio +"  "+user.background);
     /**/
-
   }
 }

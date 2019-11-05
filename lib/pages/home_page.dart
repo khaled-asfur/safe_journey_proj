@@ -32,61 +32,62 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<bool> doFetch() async {
-    bool result=false;
-   await Journey.fetchJoinedJournies().then((jour) {
-
-      print('in then');
+    bool result = false;
+    await Journey.fetchJoinedJournies().then((jour) {
       setState(() {
-        print('in set state');
         _loadedJournies = true;
-        print(jour['result'].toString());
+
         if (jour['result'] == FetchResult.SUCCESS) {
           _journies = jour['journies'];
-          print(_journies.length);
           userJoinedJournies = true;
-          
         }
       });
-     
     });
-     return result;
+    return result;
   }
 
   @override
   Widget build(BuildContext context) {
     //fetchJoinedJournies();;
     print('in homepage build');
+    // final sub=rx.PublishSubject<int>();
+
+    //     sub.stream.listen((int count){
+    //       print('loool');
+    //       print(count);
+    //     });
+    //     sub.add(2);
+
     return Global.user == null
         ? CircularProgressIndicator()
         : Header(
             body: ListView(
-                children: <Widget>[
-                  Container(
-                      decoration: BoxDecoration(color: Colors.grey[200]),
-                      child: MySlideShow()),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Journeys you joined',
-                      style: TextStyle(
-                          color: Colors.teal[600],
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20),
-                    ),
+              children: <Widget>[
+                Container(
+                    decoration: BoxDecoration(color: Colors.grey[200]),
+                    child: MySlideShow()),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Journeys you joined',
+                    style: TextStyle(
+                        color: Colors.teal[600],
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20),
                   ),
-                  _loadedJournies
-                      ? userJoinedJournies
-                          ? MyCardsGrid(_journies)
-                          : Center(
-                              child: Text("You didn't join any journey yet."))
-                      : Center(child: CircularProgressIndicator()),
-                  SizedBox(
-                    height: 30,
-                  )
-                ],
-              ),
-            
+                ),
+                _loadedJournies
+                    ? userJoinedJournies
+                        ? MyCardsGrid(_journies)
+                        : Center(
+                            child: Text("You didn't join any journey yet."))
+                    : Center(child: CircularProgressIndicator()),
+                SizedBox(
+                  height: 30,
+                )
+              ],
+            ),
           );
   }
 }
