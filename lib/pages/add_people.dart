@@ -101,7 +101,7 @@ class _AddPeopleState extends State<AddPeople> {
     try {
       QuerySnapshot snap = await Firestore.instance
           .collection('journey_user')
-          .where('journeyId', isEqualTo: widget._journey.id)
+          .where('journeyId', isEqualTo: journeyId)
           .getDocuments();
       if (snap.documents.isNotEmpty) {
         snap.documents.forEach((DocumentSnapshot document) {

@@ -72,10 +72,10 @@ class MyNotification {
     Global.notificationObservable=rx.PublishSubject<int>();
     Firestore.instance
         .collection('notifications')
-        .where('userId', isEqualTo: '3tjm0pfPBGO8kEGJH62tyLjtoF42')
+        .where('userId', isEqualTo: Global.user.id)
         .snapshots()
         .listen((QuerySnapshot snapshot) {
-
+          print(snapshot.documents.length);
           Global.notificationsCount=snapshot.documents.length;
           Global.notificationObservable.add(snapshot.documents.length);
           print(snapshot.documents.length);
