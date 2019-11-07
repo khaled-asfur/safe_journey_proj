@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:safe_journey/models/global.dart';
+
 import 'pages/waiting_page.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
-import 'package:safe_journey/models/notification.dart';
 
 import '../models/Enum.dart';
 import '../widgets/slide_show.dart';
@@ -9,10 +8,6 @@ import '../widgets/cards_grid.dart';
 import '../widgets/header.dart';
 import '../models/journey.dart';
 //import '../widgets/my_raised_button.dart';
-
-//TODO: ازالة اليوزر من الاتندنتس لست
-//TODO: تحديث الصفحة
-
 
 class HomePage extends StatefulWidget {
   //from vs code
@@ -32,8 +27,6 @@ class HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    
-    MyNotification.setNotificationListener();
     doFetch();
     super.initState();
   }
@@ -68,11 +61,8 @@ class HomePageState extends State<HomePage> {
     return Global.user == null
         ? CircularProgressIndicator()
         : Header(
-            body:  RefreshIndicator(onRefresh:(){
-      return doFetch();
-      },child:ListView(
+            body: ListView(
               children: <Widget>[
-               
                 Container(
                     decoration: BoxDecoration(color: Colors.grey[200]),
                     child: MySlideShow()),
@@ -98,6 +88,6 @@ class HomePageState extends State<HomePage> {
                 )
               ],
             ),
-          ),);
+          );
   }
 }
