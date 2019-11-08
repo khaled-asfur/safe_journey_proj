@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:safe_journey/pages/add_people.dart';
 
 import '../models/auth.dart';
 import '../models/global.dart';

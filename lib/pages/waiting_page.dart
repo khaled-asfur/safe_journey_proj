@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/global.dart';
 import '../models/helpers.dart';
-import '../models/notification.dart';
 import '../models/user.dart';
 
 class WaitingPage extends StatelessWidget {

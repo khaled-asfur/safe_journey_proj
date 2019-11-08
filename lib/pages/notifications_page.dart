@@ -4,7 +4,6 @@ import 'package:safe_journey/models/user.dart';
 import 'package:safe_journey/widgets/header.dart';
 import '../models/global.dart';
 import '../widgets/notifications_builder.dart';
-//TODO:show number of notifications in the main page
 //TODO:send notification to the mobile while app isn't running
 
 class Notifications extends StatelessWidget {

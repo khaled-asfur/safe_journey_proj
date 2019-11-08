@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/helpers.dart';
 import 'my_raised_button.dart';
@@ -80,18 +81,36 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                               if (notification.type == 'JOURNEY_INVITATION') {
                                 _addCurrentUserToJourney(
                                     notification.journeyId);
-                                    notifications.removeAt(index);
-                              notification.deleteNotificationFromFireStore();
+                                notifications.removeAt(index);
+                                removeCurrentUserFrominvitedUsers(notification);
+                                notification.deleteNotificationFromFireStore();
                               }
                               if (notification.type == 'ATTENDENCE_REQUEST') {
                                 _doAttendence(notification, index);
                               }
-                              
+
                               //add data to users_journeis collection
                               //remove from attendents array on journey collection
                             }),
                             RaisedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                if (notification.type == 'JOURNEY_INVITATION') {
+                                  notifications.removeAt(index);
+                                  removeCurrentUserFrominvitedUsers(
+                                      notification);
+                                  notification
+                                      .deleteNotificationFromFireStore();
+                                }
+                                if (notification.type == 'ATTENDENCE_REQUEST') {
+                                  _doAttendence(notification, index);
+                                  notifications.removeAt(index);
+                                  notification
+                                      .deleteNotificationFromFireStore();
+                                }
+
+                                //add data to users_journeis collection
+                                //remove from attendents array on journey collection
+                              },
                               child: Text('Decline'),
                             )
                           ],
@@ -107,13 +126,32 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
   }
 
   //****************** fUNCTIONS  ******************* */
-  _addCurrentUserToJourney(String journeyId) {
+  void _addCurrentUserToJourney(String journeyId) {
     Firestore.instance.collection('journey_user').add({
       'userId': Global.user.id,
       'journeyId': journeyId,
       'role': 'USER',
       'attendents': [],
     });
+  }
+
+  Future<bool> removeCurrentUserFrominvitedUsers(MyNotification not) async {
+    bool succeeded = false;
+    try {
+      await Firestore.instance
+          .collection('journies')
+          .document(not.journeyId)
+          .updateData({
+        'invitedUsers': FieldValue.arrayRemove([Global.user.id]),
+      });
+      succeeded = true;
+    } on PlatformException catch (error) {
+      succeeded = false;
+      print(
+          'error occured while removing user${Global.user.name} from ${not.journeyName} invited users');
+      print(error);
+    }
+    return succeeded;
   }
 
   Future<bool> _doAttendence(MyNotification notification, int index) async {

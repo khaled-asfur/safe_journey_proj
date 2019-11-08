@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
+
 class NotificationIcon extends StatefulWidget {
-@override
+  @override
   _NotificationIconState createState() => _NotificationIconState();
 }
 
 class _NotificationIconState extends State<NotificationIcon> {
-
   @override
   Widget build(BuildContext context) {
-    
-     Global.notificationObservable.listen((int) {
-      setState(() {});
-     });
+    Global.notificationObservable.listen((int) {
+     if (this.mounted) {
+        setState(() {});
+      }
+    });
     return Stack(
       children: <Widget>[
         new IconButton(
             icon: Icon(Icons.notifications),
             onPressed: () {
-             Global.notificationsCount = 0;
+              Global.notificationsCount = 0;
               Navigator.pushNamed(context, 'notifications');
             }),
         Global.notificationsCount != 0

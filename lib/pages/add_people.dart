@@ -11,7 +11,7 @@ import '../widgets/header.dart';
 import '../models/Enum.dart';
 
 class AddPeople extends StatefulWidget {
-  Journey _journey ;
+  final Journey _journey;
   AddPeople(this._journey);
   @override
   _AddPeopleState createState() => _AddPeopleState();
@@ -23,27 +23,34 @@ class _AddPeopleState extends State<AddPeople> {
   FetchState state;
   String searchItem;
   List invitedUsers;
+  Journey _journey;
   @override
   void initState() {
+    _journey = widget._journey;
+    _fetchData();
+    super.initState();
+  }
+
+  Future<void> _fetchData() async {
+    invitedUsers = List();
     _fetchAllUsersData();
-    _fetchUsersJoinsJourney(widget._journey.id);
-    invitedUsers=List();
-    
-    widget._journey.invitedUsers.forEach((user){
+    _journey = await Journey.fetchOneJourneyDetails(widget._journey.id);
+    _journey.invitedUsers.forEach((user) {
       invitedUsers.add(user);
     });
-    print(invitedUsers);
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Header(
-      body: ListView(
-        children: <Widget>[
-          buildSearchField(),
-          _buildBody(),
-        ],
+      body: RefreshIndicator(
+        onRefresh: _fetchData,
+        child: ListView(
+          children: <Widget>[
+            buildSearchField(),
+            _buildBody(),
+          ],
+        ),
       ),
     );
   }
@@ -78,15 +85,16 @@ class _AddPeopleState extends State<AddPeople> {
   }
 
   _fetchAllUsersData() async {
+    //fetches the data of all the users in the firebase
     try {
       state = FetchState.FETCHING_IN_PROGRESS;
       QuerySnapshot users = await Firestore.instance
           .collection("users")
           .orderBy('name')
           .getDocuments();
-       List<String> usersIDs=await _fetchUsersJoinsJourney(widget._journey.id);
+      List<String> usersIDs = await Journey.fetchUsersJoinsJourney(_journey.id);
       setState(() {
-        usersJoinsThisJourney=usersIDs;
+        usersJoinsThisJourney = usersIDs;
         userDocs = users;
         state = FetchState.FETCHING_COMPLETED;
       });
@@ -96,54 +104,36 @@ class _AddPeopleState extends State<AddPeople> {
     }
   }
 
-  Future<List<String>> _fetchUsersJoinsJourney(String journeyId) async {
-    List<String> usersIDS = [];
-    try {
-      QuerySnapshot snap = await Firestore.instance
-          .collection('journey_user')
-          .where('journeyId', isEqualTo: journeyId)
-          .getDocuments();
-      if (snap.documents.isNotEmpty) {
-        snap.documents.forEach((DocumentSnapshot document) {
-          usersIDS.add(document['userId']);
-        });
-      }
-    } on PlatformException catch (error) {
-      print('error occured while fetching users joins jorney$journeyId');
-      print(error);
-    }
-    return usersIDS;
-  }
-
   List<UserSearchItem> doSearch(String searchValue) {
     searchItem = searchValue;
     List<User> users = _findUsersMatchsearchValue(searchValue, userDocs);
     List<UserSearchItem> userSearchItems = [];
     if (users != null && users.isNotEmpty) {
       users.forEach((User user) {
-        UserSearchItem searchItem = UserSearchItem(user,_sendJoinJourneyRequest,invitedUsers,usersJoinsThisJourney);
+        UserSearchItem searchItem = UserSearchItem(
+            user, _sendJoinJourneyRequest, invitedUsers, usersJoinsThisJourney);
         userSearchItems.add(searchItem);
       });
     }
     return userSearchItems;
   }
-  void _sendJoinJourneyRequest(String userID){
+
+  void _sendJoinJourneyRequest(String userID) {
     setState(() {
       invitedUsers.add(userID);
     });
     Firestore.instance.collection('notifications').add(
-            {
-              'journeyId': widget._journey.id,
-              'userId': userID,
-              'senderId': Global.user.id,
-              'type':'JOURNEY_INVITATION',
-              'time':DateTime.now()
-            },
-          );
-          Firestore.instance.collection('journies').document(widget._journey.id)
-          .updateData({
-        'invitedUsers': FieldValue.arrayUnion([userID]),
-      });
+      {
+        'journeyId': _journey.id,
+        'userId': userID,
+        'senderId': Global.user.id,
+        'type': 'JOURNEY_INVITATION',
+        'time': DateTime.now()
+      },
+    );
+    Firestore.instance.collection('journies').document(_journey.id).updateData({
+      'invitedUsers': FieldValue.arrayUnion([userID]),
+    });
   }
 
   List<User> _findUsersMatchsearchValue(

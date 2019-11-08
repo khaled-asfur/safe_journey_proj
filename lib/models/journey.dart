@@ -28,7 +28,6 @@ class Journey {
       this._attendents,
       this._imageURL);
 //fetches the details of all the journies this user is joining now & still not ended yet
-  
 
   String get id {
     return _id;
@@ -57,22 +56,56 @@ class Journey {
   List<Object> get invitedUsers {
     return _invitedUsers;
   }
-  String get role{
+
+  String get role {
     return this._role;
   }
-  List<String> get attendents{
+
+  List<String> get attendents {
     return this._attendents;
   }
-  String get imageURL{
+
+  String get imageURL {
     return this._imageURL;
   }
 
 //جلب جميع الرحلات التي انضم لها اليوزر
-  static Future<Map<String,dynamic>> fetchJoinedJournies() async {
-    FetchResult result; 
+  static Future<Map<String, dynamic>> fetchJoinedJournies() async {
+    FetchResult result;
     List<Journey> myJournies = List<Journey>();
+
+    try {
+      QuerySnapshot docs = await Firestore.instance
+          .collection('journey_user')
+          .where('userId', isEqualTo: Global.user.id)
+          .getDocuments();
+
+      List<DocumentSnapshot> allDocuments = docs.documents;
+      if (allDocuments.isEmpty) {
+        result = FetchResult.EMPTY;
+      }
+      for (int i = 0; i < allDocuments.length; i++) {
+        Journey jour = await fetchOneJourneyDetails(
+            allDocuments[i]['journeyId'],
+            firestoreDocument: allDocuments[i]);
+        myJournies.add(jour);
+      }
+      result = FetchResult.SUCCESS;
+    } on PlatformException catch (error) {
+      print("Error occured while fetching journey details ${error.toString()}");
+      result = FetchResult.ERROR_OCCURED;
+    }
+    return {'result': result, 'journies': myJournies};
+  }
+
+//fetch one journey using its journey id..
+//if error occured or journey not found, this method returns null
+  static Future<Journey> fetchOneJourneyDetails(String journeyId,
+      {DocumentSnapshot firestoreDocument}) async {
+        Journey journeyObject;
+    DocumentSnapshot document;
     Map<String, dynamic> journey = {
-      'id': " ",
+      'id': "-1",
       'name': ' ',
       'description': ' ',
       'startTime': DateTime.now(),
@@ -83,42 +116,35 @@ class Journey {
       'attendents': List<String>(),
       'imageURL': ''
     };
-    try {
-      QuerySnapshot docs = await Firestore.instance
+    try{
+    if (firestoreDocument != null)
+      document = firestoreDocument;
+    else {
+      QuerySnapshot snapshot = await Firestore.instance
           .collection('journey_user')
           .where('userId', isEqualTo: Global.user.id)
-          //.where('endTime',isGreaterThan: DateTime.now())
+          .limit(1)
           .getDocuments();
-
-      List<DocumentSnapshot> allDocuments = docs.documents;
-      if (allDocuments.isEmpty) {
-        result =FetchResult.EMPTY;
-      }
-      for(int i=0;i<allDocuments.length;i++){
-        DocumentSnapshot doc=allDocuments[i];
-        journey['id'] = doc['journeyId'];
-        journey['role'] = doc['role'];
-        journey['attendents'] = doc['attendents'];
-         //fetch the details of each journey
-         await _fetchJourneyDetails(doc['journeyId'],journey);
-          Journey jour = _convertMapToJourneyObject(journey);
-          result=FetchResult.SUCCESS;
-          myJournies.add(jour);
-      }
-    } on PlatformException catch (error) {
-      print("Error occured while fetching journey details ${error.toString()}");
-      result=FetchResult.ERROR_OCCURED;
+      if (snapshot.documents.isNotEmpty) document = snapshot.documents[0];
     }
-    return {
-      'result':result,
-      'journies':myJournies
-    };
+    if(document!=null){//if no error occured && the journey found
+    journey['id'] = document['journeyId'];
+    journey['role'] = document['role'];
+    journey['attendents'] = document['attendents'];
+    await _fetchDetailsFromJourniesCollection(document['journeyId'], journey);
+    journeyObject = _convertMapToJourneyObject(journey);
+    }
+    }on PlatformException catch(error ) {
+      print('error occured while fetching one journey details');
+      print(error);
+    }
+    return journeyObject;
   }
 
 //****************************************************************************
-//fetch one journey using its journey id
-  static Future<void> _fetchJourneyDetails(
-      String journeyId,Map<String,dynamic> journey) async {
+
+  static Future<void> _fetchDetailsFromJourniesCollection(
+      String journeyId, Map<String, dynamic> journey) async {
     try {
       DocumentSnapshot journeyDocument = await Firestore.instance
           .collection('journies')
@@ -144,13 +170,31 @@ class Journey {
         journey['name'],
         journey['description'],
         journey['startTime'].toDate(),
-       journey['endTime'].toDate(),
+        journey['endTime'].toDate(),
         journey['places'],
         journey['invitedUsers'],
         journey['role'],
         journey['attendents'],
         journey['imageURL']);
     return journeyObj;
+  }
+  static Future<List<String>> fetchUsersJoinsJourney(String journeyId) async {
+    List<String> usersIDS = [];
+    try {
+      QuerySnapshot snap = await Firestore.instance
+          .collection('journey_user')
+          .where('journeyId', isEqualTo: journeyId)
+          .getDocuments();
+      if (snap.documents.isNotEmpty) {
+        snap.documents.forEach((DocumentSnapshot document) {
+          usersIDS.add(document['userId']);
+        });
+      }
+    } on PlatformException catch (error) {
+      print('error occured while fetching users joins jorney$journeyId');
+      print(error);
+    }
+    return usersIDS;
   }
 
   @override
@@ -159,4 +203,3 @@ class Journey {
         ("  id: $_id -- name: $_name  --description: $_description -- startTime: $_startTime  --endTime: $_endTime -- places: $_places -- invitedUsers: $_invitedUsers -- role: $_role -- attendents: $_attendents --imageURL: $_imageURL ");
   }
 }
- 

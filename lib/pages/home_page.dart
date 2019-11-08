@@ -8,14 +8,9 @@ import '../widgets/slide_show.dart';
 import '../widgets/cards_grid.dart';
 import '../widgets/header.dart';
 import '../models/journey.dart';
-//import '../widgets/my_raised_button.dart';
-
-//TODO: ازالة اليوزر من الاتندنتس لست
-//TODO: تحديث الصفحة
 
 
 class HomePage extends StatefulWidget {
-  //from vs code
 
   @override
   State<StatefulWidget> createState() {
@@ -55,15 +50,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    //fetchJoinedJournies();;
     print('in homepage build');
-    // final sub=rx.PublishSubject<int>();
-
-    //     sub.stream.listen((int count){
-    //       print('loool');
-    //       print(count);
-    //     });
-    //     sub.add(2);
 
     return Global.user == null
         ? CircularProgressIndicator()

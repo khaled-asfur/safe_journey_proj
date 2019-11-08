@@ -6,4 +6,8 @@ class Global {
   static bool visitedWaitingPage=false;
   static int notificationsCount=5;
   static rx.PublishSubject<int> notificationObservable;
+
+  static closeNotificationObservable(){
+    notificationObservable.close();
+  }
 }
