@@ -14,6 +14,7 @@ class Journey {
   final List _invitedUsers;
   final String _role;
   final List _attendents;
+  final List _pendingAttendents;
   final String _imageURL;
 
   Journey(
@@ -26,6 +27,7 @@ class Journey {
       this._invitedUsers,
       this._role,
       this._attendents,
+      this._pendingAttendents,
       this._imageURL);
 //fetches the details of all the journies this user is joining now & still not ended yet
 
@@ -61,8 +63,11 @@ class Journey {
     return this._role;
   }
 
-  List<String> get attendents {
+  List get attendents {
     return this._attendents;
+  }
+  List get pendingAttendents {
+    return this._pendingAttendents;
   }
 
   String get imageURL {
@@ -114,6 +119,7 @@ class Journey {
       'invitedUsers': List<String>(),
       'role': ' ',
       'attendents': List<String>(),
+      'pendingAttendents': List<String>(),
       'imageURL': ''
     };
     try{
@@ -131,6 +137,7 @@ class Journey {
     journey['id'] = document['journeyId'];
     journey['role'] = document['role'];
     journey['attendents'] = document['attendents'];
+     journey['pendingAttendents'] = document['pendingAttendents'];
     await _fetchDetailsFromJourniesCollection(document['journeyId'], journey);
     journeyObject = _convertMapToJourneyObject(journey);
     }
@@ -175,6 +182,7 @@ class Journey {
         journey['invitedUsers'],
         journey['role'],
         journey['attendents'],
+        journey['pendingAttendents'],
         journey['imageURL']);
     return journeyObj;
   }
@@ -200,6 +208,6 @@ class Journey {
   @override
   String toString() {
     return super.toString() +
-        ("  id: $_id -- name: $_name  --description: $_description -- startTime: $_startTime  --endTime: $_endTime -- places: $_places -- invitedUsers: $_invitedUsers -- role: $_role -- attendents: $_attendents --imageURL: $_imageURL ");
+        ("  id: $_id -- name: $_name  --description: $_description -- startTime: $_startTime  --endTime: $_endTime -- places: $_places -- invitedUsers: $_invitedUsers -- role: $_role -- attendents: $_attendents -- pendingAttendents: $pendingAttendents--imageURL: $_imageURL ");
   }
 }

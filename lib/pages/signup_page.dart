@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import "package:flutter/material.dart";
+import 'package:safe_journey/models/global.dart';
 import '../models/auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:rxdart/subjects.dart' as rx ;
 
 class SignupPage extends StatefulWidget {
   @override
@@ -13,8 +15,9 @@ class SignupPage extends StatefulWidget {
 }
 
 class SignupPageState extends State<SignupPage> {
+  bool _isLoading=false;
   File sampleImage;
-  bool isLoading=false;
+ 
   final Map<String, dynamic> _formData = {
     "name": null,
     "phoneNumber": null,
@@ -23,7 +26,12 @@ class SignupPageState extends State<SignupPage> {
     "confirm_password": null
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  initState(){
+    //_setlodingObservable();
+    super.initState();
+  }
   Widget build(BuildContext context) {
+    _setlodingObservable();
    // print(Auth().currentUser);
     double deviceHeight = MediaQuery.of(context).size.width;
    // print("in signup build");
@@ -72,7 +80,7 @@ class SignupPageState extends State<SignupPage> {
                       ),
               ),
               _buildSignupButton(),
-              Center(child:isLoading==true?CircularProgressIndicator():Container() ,)
+              Center(child:_isLoading==true?CircularProgressIndicator():Container() ,)
               
             ],
           ),
@@ -205,20 +213,10 @@ class SignupPageState extends State<SignupPage> {
   }
 
   void _submitForm() {
-    setState(() {
-     isLoading=true; 
-    });
     if (_formKey.currentState.validate() != true) return;
     _formKey.currentState.save();
     Auth().signup(
-        _formData['name'],_formData['phoneNumber'],_formData['email'], _formData['password'], context, sampleImage)
-        .then((bool result){
-          if(result==false){
-            setState(() {
-             isLoading=false; //to stop the loading circle 
-            });
-          }
-        });
+        _formData['name'],_formData['phoneNumber'],_formData['email'], _formData['password'], context, sampleImage);
   }
 
   Future getImage() async {
@@ -250,6 +248,21 @@ class SignupPageState extends State<SignupPage> {
         child: Text("Signup"),
         color: Theme.of(context).accentColor,
         textColor: Colors.white,
-        onPressed: _submitForm);
+        onPressed:_isLoading?null :(){
+          _submitForm();
+          setState(() {
+            _isLoading=true;
+          });
+          });
+  }
+    _setlodingObservable(){
+    Global.loadingObservable=rx.PublishSubject<bool>();
+    Global.loadingObservable.listen((bool value) {
+     if (this.mounted) {//if this page is  opened now(still in the widget tree)
+        setState(() {
+          _isLoading=value;
+        });
+      }
+    });
   }
 }

@@ -1,6 +1,9 @@
 //import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
+import 'package:safe_journey/models/global.dart';
+import 'package:safe_journey/widgets/my_raised_button.dart';
 import '../models/auth.dart';
+import 'package:rxdart/subjects.dart' as rx ;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -9,31 +12,24 @@ class LoginPage extends StatefulWidget {
   }
 }
 
+
 class LoginPageState extends State<LoginPage> {
+  bool _isLoading = false;
   final Map<String, dynamic> _formData = {
     "email": null,
     "password": null,
   };
-
-  /*final Map<String, dynamic> pageContext = {
-    "pageContext": null,
-    'loginFormKey':GlobalKey<FormState>(),
-  };*/
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     print('login page build');
-    // if (MediaQuery.of(context).orientation == Orientation.landscape)
-    //   print("landscape");
-    /* double deviceWidth = MediaQuery.of(context).size.width;
-
-    final double targetWidth =
-        deviceWidth > 550 ? deviceWidth * 0.7 : deviceWidth * 0.85;*/
+    _setlodingObservable();
     return Scaffold(
       appBar: new AppBar(
         title: Text("Login page"),
@@ -55,14 +51,17 @@ class LoginPageState extends State<LoginPage> {
                     SizedBox(height: 10.0),
                     _buildPasswordTextField(),
                     SizedBox(height: 10.0),
-                    RaisedButton(
-                        child: Text("Login"),
-                        color: Theme.of(context).accentColor,
-                        textColor: Colors.white,
-                        onPressed: () {
-                          _submitForm(context);
-                        }),
-                    FlatButton(
+                    MyRaisedButton(
+                        "Login",
+                        _isLoading
+                            ? null
+                            : () {
+                                _submitForm(context);
+                                setState(() {
+                                  _isLoading=true;
+                                });
+                              }),
+                   _isLoading?Center(child:CircularProgressIndicator()):FlatButton(
                       child: Text(
                         "swith to signup page",
                         style: TextStyle(color: Colors.white),
@@ -70,7 +69,7 @@ class LoginPageState extends State<LoginPage> {
                       onPressed: () {
                         Navigator.pushNamed(context, "signupPage");
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -79,6 +78,16 @@ class LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+  _setlodingObservable(){
+    Global.loadingObservable=rx.PublishSubject<bool>();
+    Global.loadingObservable.listen((bool value) {
+     if (this.mounted) {//if this page is opened now(still in the widget tree)
+        setState(() {
+          _isLoading=value;
+        });
+      }
+    });
   }
 
   DecorationImage _buildBackground() {

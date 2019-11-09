@@ -18,6 +18,7 @@ class _MyRaisedButtonState extends State<MyRaisedButton> {
       child: Text(widget.text),
       onPressed: widget.onPressed,
       color: color,
+     // disabledColor: Colors.grey[300],
       textColor: Colors.white,
     );
   }

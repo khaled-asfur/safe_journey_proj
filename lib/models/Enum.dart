@@ -9,6 +9,11 @@ enum FetchState{
   FETCHING_COMPLETED,
   FETCHING_FAILED,
 }
+enum SearchingFor{
+  ATTENDENT,
+  PARENT,
+  USER
+}
 
 
 
@@ -18,6 +23,6 @@ journies_users{
   role: ADMIN - USER
 }
 notifications{
-  type : JOURNEY_INVITATION - ATTENDENCE_REQUEST
+  type : JOURNEY_INVITATION - ATTENDENCE_REQUEST - PARENT_REQUEST
 }
 */

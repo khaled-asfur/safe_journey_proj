@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/journey.dart';
 import 'dart:async';
@@ -57,9 +56,11 @@ class _AddPeopleState extends State<AddPeople> {
 
   Widget _buildBody() {
     if (userDocs == null) {
-      return Center(child: Text('Please check your internet connection'));
-    }
-    if (searchItem == null || searchItem == '') {
+      return MyStyledText('Please check your internet connection');
+    } /*else if (_journey.role != 'ADMIN') {
+      return new MyStyledText(
+          'Your role is not \'ADMIN\', so you are not authorized to add users to this journey.');
+    } */else if (searchItem == null || searchItem == '') {
       //اليوزر ما بحث عن اشي
       return Container();
     } else if (state == FetchState.FETCHING_IN_PROGRESS && searchItem != null) {
@@ -69,19 +70,15 @@ class _AddPeopleState extends State<AddPeople> {
       //اليوزر عامل بحث وجبت النتيجة بنجاح
       if (userDocs.documents.isEmpty) {
         //لا يوجد يوزرز بالداتا بيس
-        return Center(
-          child: Text('No users found in the database!'),
-        );
+        return MyStyledText('No users found in the database!');
       }
 
       List<UserSearchItem> items = doSearch(searchItem);
       return items.isNotEmpty
           ? Column(children: items)
-          : Center(
-              child: Text('No users match your search.'),
-            );
+          : MyStyledText('No users match your search.');
     }
-    return Center(child: Text("Error occured while fetching data"));
+    return MyStyledText("Error occured while fetching data");
   }
 
   _fetchAllUsersData() async {
@@ -108,10 +105,12 @@ class _AddPeopleState extends State<AddPeople> {
     searchItem = searchValue;
     List<User> users = _findUsersMatchsearchValue(searchValue, userDocs);
     List<UserSearchItem> userSearchItems = [];
+    Map<String,dynamic> searchItemConfig;
     if (users != null && users.isNotEmpty) {
       users.forEach((User user) {
+        searchItemConfig= _fillSearchItemConfig(user,invitedUsers, usersJoinsThisJourney);
         UserSearchItem searchItem = UserSearchItem(
-            user, _sendJoinJourneyRequest, invitedUsers, usersJoinsThisJourney);
+            user, _sendJoinJourneyRequest,searchItemConfig);
         userSearchItems.add(searchItem);
       });
     }
@@ -165,5 +164,54 @@ class _AddPeopleState extends State<AddPeople> {
     setState(() {
       searchItem = value;
     });
+  }
+}
+Map<String, dynamic> _fillSearchItemConfig(User user,List invitedUsers, List usersJoinsThisJourney) {
+    Map<String, dynamic> searchItemConfig = {
+      'icon': null,
+      'message': '',
+      'buttonEnabled': false
+    };
+    if (invitedUsers != null && invitedUsers.contains(user.id)) {
+      searchItemConfig['icon'] = Icon(
+        Icons.hourglass_full,
+        size: 30,
+      );
+      searchItemConfig['message'] = 'Invitation was sent before';
+    } else if (usersJoinsThisJourney.contains(user.id)) {
+      searchItemConfig['icon'] = Icon(
+        Icons.done,
+        size: 30,
+      );
+      searchItemConfig['message'] =
+          'This user is already a member in this journey';
+    } else {
+      searchItemConfig['icon'] = Icon(
+        Icons.person_add,
+        size: 30,
+      );
+      searchItemConfig['message'] = 'Successfullly sended invitation ';
+      searchItemConfig['buttonEnabled'] = true;
+    }
+
+    return searchItemConfig;
+  }
+
+class MyStyledText extends StatelessWidget {
+  final String text;
+  MyStyledText(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.all(10),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.red[900], fontSize: 18),
+        ),
+      ),
+    );
   }
 }

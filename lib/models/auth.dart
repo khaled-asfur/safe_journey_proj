@@ -27,11 +27,13 @@ class Auth {
       dataFitched
           ? Navigator.pushReplacementNamed(context, 'homePage')
           : Helpers.showErrorDialog(context, 'error while fetching user data');
-
+          Global.loadingObservable.add(false);
+          Global.closeLoadingObservable();
       return dataFitched;
-    } on PlatformException catch (e) {
+    } catch (e) {
       print(e);
       Helpers.showErrorDialog(context, e.message);
+      Global.loadingObservable.add(false);
     }
     return result;
   }
@@ -80,11 +82,15 @@ class Auth {
           imageURL: imageURL,
           );
       result = true;
+          Global.loadingObservable.add(false);
+          Global.closeLoadingObservable();
       Navigator.pushReplacementNamed(context, 'homePage');
     } on PlatformException catch (e) {
+      Global.loadingObservable.add(false);
       print('error occured');
       print(e);
       Helpers.showErrorDialog(context, e.message);
+       
     }
     return result;
   }
