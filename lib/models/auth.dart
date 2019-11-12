@@ -145,4 +145,150 @@ class Auth {
       'background':imageURL
     });
   }
+  Future<bool> doit(String initial, String description, DateTime endTime,
+      String name, DateTime startTime, BuildContext context, File image) async {
+    bool result = false;
+    try {
+      /* /* AuthResult authResult = */ await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: name, password: startTime);*/
+
+      // Global.currentUser=await currentUser;
+      /*print('curent signed up user =');
+          print(Global.currentUser);*/
+      String imageURL;
+      if (image != null) {
+        Map<String, dynamic> result = await uploadImage(image, context);
+        // print('result from signup= $result');
+        if (result['success']) imageURL = result['imageURL'];
+      }
+
+      result = true;
+      final fireStoreInstance = Firestore.instance;
+      fireStoreInstance.collection('journies').document("$initial").setData({
+        'description': description,
+        'endTime': endTime,
+        'imageURL': imageURL,
+        'name': name,
+        'startTime': startTime,
+      });
+
+//************ */
+   User user= Global.user;
+
+ fireStoreInstance.collection('journey_user').document().setData({
+        'attendents': [],
+        'journeyId': initial,
+        'role': "ADMIN",
+        'userId': user.id,
+        'pendingAttendents':[],
+      });
+
+
+
+      // Navigator.pushReplacementNamed(context, 'homePage');
+
+    } on PlatformException catch (e) {
+      print(e);
+      Helpers.showErrorDialog(context, e.message);
+    }
+    return result;
+  }
+    Future<void> update(String name, String pio, String phone, String email,
+      BuildContext context, File imagepro, File imageback) async {
+    try {
+      //for profile
+      String imageURL;
+      if (imagepro != null) {
+        Map<String, dynamic> result = await uploadImage(imagepro, context);
+        print('result from signup= $result');
+        if (result['success']) imageURL = result['imageURL'];
+      }
+      //for background
+      String imageURL1;
+      if (imageback != null) {
+        Map<String, dynamic> result1 = await uploadback(imageback, context);
+        // print('result from signup= $result');
+        if (result1['success']) imageURL1 = result1['imageURL'];
+      }
+
+      FirebaseUser user = await FirebaseAuth.instance.currentUser();
+
+      user.updateEmail("family_safe@hotmail.com");
+
+      if (imageback != null && imagepro != null) {
+        Firestore.instance.collection('users').document(user.uid).updateData({
+          "background": imageURL1,
+          "bio": pio,
+          'imageURL': imageURL,
+          'name': name,
+          "phoneNumber": phone
+        });
+      } else if (imageback != null && imagepro == null) {
+        Firestore.instance.collection('users').document(user.uid).updateData({
+          "background": imageURL1,
+          "bio": pio,
+          'name': name,
+          "phoneNumber": phone
+        });
+      } else if (imageback == null && imagepro != null) {
+        Firestore.instance.collection('users').document(user.uid).updateData({
+          "bio": pio,
+          'imageURL': imageURL,
+          'name': name,
+          "phoneNumber": phone
+        });
+      } else {
+        Firestore.instance
+            .collection('users')
+            .document(user.uid)
+            .updateData({"bio": pio, 'name': name, "phoneNumber": phone});
+      }
+
+      // Navigator.pushReplacementNamed(context, 'homePage');
+
+    } on PlatformException catch (e) {
+      print(e);
+      Helpers.showErrorDialog(context, e.message);
+    }
+
+  }
+    Future<Map<String, dynamic>> uploadback(
+      File image, BuildContext context) async {
+    Map<String, dynamic> result = {'success': false, 'uploadURL': null};
+    try {
+      User user = Global.user;
+      String email = user.email + "back";
+      final StorageReference storageRef =
+          FirebaseStorage.instance.ref().child(email);
+      final StorageUploadTask task = storageRef.putFile(image);
+      result['success'] = true;
+      result['imageURL'] = await (await task.onComplete).ref.getDownloadURL();
+      // print('complete upload');
+      // print(task);
+    } catch (e) {
+      Helpers.showErrorDialog(context, e.message);
+    }
+    // print('result= $result');
+    return result;
+  }
+   Future<bool> cheak(
+      String email, String password, BuildContext context) async {
+    bool result = false;
+   
+    try {
+      /* AuthResult auth0Result = */ await _instance.signInWithEmailAndPassword(
+          email: email, password: password);
+     // Navigator.pushReplacementNamed(context, 'homePage');
+    //  Global.currentUser=await  FirebaseAuth.instance.currentUser();
+      /*print('curent logged in user =');
+          print(Global.currentUser);*/
+
+      return true;
+    } on PlatformException catch (e) {
+      print(e);
+      Helpers.showErrorDialog(context, "Your Ennterd password is error");
+    }
+    return result;
+  }
+
 }

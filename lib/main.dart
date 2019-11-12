@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safe_journey/pages/setting.dart';
 import 'pages/waiting_page.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
@@ -38,6 +39,7 @@ class _MyAppState extends State<MyApp> {
         'notifications': (BuildContext context) => Notifications(),
         'createJourney': (BuildContext context) => Create(),
         'peopleList': (BuildContext context) => PeopleList(),
+        'settings': (BuildContext context) => EditProfile(),
         //'addPeople': (BuildContext context) => AddPeople('journeyId'),
       },
       onGenerateRoute: (RouteSettings settings) {

@@ -6,7 +6,6 @@ import '../models/global.dart';
 import '../widgets/notifications_builder.dart';
 //TODO: send notification to the mobile while app isn't running
 //TODO: rebuild classes 
-//TODO: prevent user from pressing twice on the button
 
 class Notifications extends StatelessWidget {
   @override
