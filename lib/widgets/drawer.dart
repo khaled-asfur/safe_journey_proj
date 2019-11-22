@@ -47,14 +47,6 @@ class MyDrawer extends StatelessWidget {
         ),
         Divider(),
         ListTile(
-          leading: Icon(Icons.inbox),
-          title: Text("Not finished journeis"),
-          onTap: () {
-            Navigator.pushReplacementNamed(context, '/');
-          },
-        ),
-        Divider(),
-        ListTile(
           leading: Icon(Icons.add),
           title: Text("Add dangerous area"),
           onTap: () {

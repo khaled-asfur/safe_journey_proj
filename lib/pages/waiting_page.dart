@@ -14,7 +14,7 @@ class WaitingPage extends StatelessWidget {
       if (currentFBuser != null) {
         user.getUserData(currentFBuser).then((fetchedSuccessfully) {
           if (fetchedSuccessfully) {
-            Navigator.pushReplacementNamed(context, 'addPeople');
+            Navigator.pushReplacementNamed(context, 'homePage');
           } else
             Helpers.showErrorDialog(context, 'error occured');
         });

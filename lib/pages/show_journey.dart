@@ -3,6 +3,8 @@ import 'package:safe_journey/pages/add_attendents.dart';
 import 'package:safe_journey/pages/add_people.dart';
 import 'package:safe_journey/widgets/my_raised_button.dart';
 import '../models/journey.dart';
+import '../pages/realtime_screen.dart';
+
 
 class ShowJourney extends StatelessWidget {
   final Journey _journey;
@@ -28,6 +30,14 @@ class ShowJourney extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (BuildContext context) {
                 return AddAttendents(_journey);
+              }),
+            );
+          }),
+          MyRaisedButton('show members locations', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (BuildContext context) {
+                return RealTimeScreen(_journey);
               }),
             );
           }),
