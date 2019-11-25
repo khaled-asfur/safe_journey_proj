@@ -108,7 +108,7 @@ class Auth {
   }
 
   Future<Map<String, dynamic>> uploadImage(
-      File image, BuildContext context) async {
+      File image, BuildContext context,{String imageTitle}) async {
     Map<String, dynamic> result = {'success': false, 'uploadURL': null};
     try {
       User user = Global.user;
@@ -119,7 +119,7 @@ class Auth {
       } else
         email = user.email;
       final StorageReference storageRef =
-          FirebaseStorage.instance.ref().child(email);
+          FirebaseStorage.instance.ref().child(imageTitle==null? email:imageTitle);
       final StorageUploadTask task = storageRef.putFile(image);
       result['success'] = true;
       result['imageURL'] = await (await task.onComplete).ref.getDownloadURL();
@@ -157,7 +157,7 @@ class Auth {
           print(Global.currentUser);*/
       String imageURL;
       if (image != null) {
-        Map<String, dynamic> result = await uploadImage(image, context);
+        Map<String, dynamic> result = await uploadImage(image, context,imageTitle:name);
         // print('result from signup= $result');
         if (result['success']) imageURL = result['imageURL'];
       }

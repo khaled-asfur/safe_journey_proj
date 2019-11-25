@@ -34,6 +34,7 @@ class _AddPeopleState extends State<AddPeople> {
     invitedUsers = List();
     _fetchAllUsersData();
     _journey = await Journey.fetchOneJourneyDetails(widget._journey.id);
+    if(_journey.invitedUsers!=null)
     _journey.invitedUsers.forEach((user) {
       invitedUsers.add(user);
     });

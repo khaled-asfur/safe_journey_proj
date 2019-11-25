@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:safe_journey/models/global.dart';
-import 'package:safe_journey/models/journey.dart';
+//import 'package:safe_journey/models/helpers.dart';
+
+import '../models/global.dart';
+import '../models/journey.dart';
 
 class RealTimeScreen extends StatefulWidget {
   final Journey _journey;
@@ -13,17 +17,49 @@ class RealTimeScreen extends StatefulWidget {
 }
 
 class _RealTimeScreenState extends State<RealTimeScreen> {
+  List<Marker> markers = [];
+  CameraPosition cameraPosition;
+  bool loaded = false;
+  //List<User> _users = [];
+  Geolocator _geolocator;
+  LocationOptions locationOptions;
+  Position myPosition;
+  StreamSubscription<DocumentSnapshot> _usersLocationsStream;
+  Map<String, dynamic> _myLocation = {'latitude': null, 'longitude': null};
+  double allowedDistance = 15;
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  Timer timer;
+  bool allowedToSendCoordinates = true;
+  Firestore _instance = Firestore.instance;
+  StreamSubscription<Position> _sendLocationStream ;
+  double _distance =0;
+
+  @override
+  void initState() {
+    super.initState();
+    //print('in realtime initstate');
+    _geolocator = Geolocator();
+    locationOptions = LocationOptions(
+      accuracy: LocationAccuracy.best,
+    );
+    _setmyLocationStream(); //send my location to DB
+    _checkPermission();
+    _usersLocationsStream =
+        _getUsersLocationsStream(); //read other users locations from DB
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('in map build');
-    print(markers.length);
-
+    // print("in map build${markers.length}");
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
-        title: Text('Monitoring All Locations'),
+        /*'$_myLocation', style: TextStyle(fontSize: 10)*/
+        title: Text('$_distance'),
       ),
       body: (loaded)
           ? GoogleMap(
+              mapType: MapType.hybrid,
               initialCameraPosition: cameraPosition,
               markers: markers.toSet(),
             )
@@ -33,41 +69,76 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    print('in initstate');
-    _geolocator = Geolocator();
-    locationOptions = LocationOptions(
-      accuracy: LocationAccuracy.high,
-    );
-    _setmyLocationStream();
-    _checkPermission();
-    Firestore.instance
+  StreamSubscription<DocumentSnapshot> _getUsersLocationsStream() {
+    //Listen to changes on other users locations, and set state to show changes on screen
+
+    return Firestore.instance
         .collection('realtimeLocations')
+        .document(widget._journey.id)
         .snapshots()
-        .listen((QuerySnapshot snapshot) {
+        .listen((DocumentSnapshot snapshot) {
       markers = [];
-      for (var doc in snapshot.documents) {
-        if (doc != null) {
-          if (doc.documentID.trim() != 'IHJA4sYuIreak96nQpOP'.trim()) {//مشان ما اجبيب بيانات الدكيومنت الخربان 
-             print(doc.documentID);
-            print('looooooooooooooooooooooooooooooooool');
-            print(doc.data);
-            
-            _users.add(User(doc.documentID));
-            markers.add(Marker(
-                markerId: MarkerId(doc.documentID),
-                position: LatLng(
-                  doc['latitude'],
-                  doc['longitude'],
-                ),
-                infoWindow: InfoWindow(title: doc.documentID)));
-            setState(() {});
-          }
-        }
+      if (snapshot != null) {
+        // print('snap sata =');
+        // print(snapshot.data);
+        snapshot.data.forEach((String userId, dynamic coordinates) {
+          //_users.add(User(userId));
+          markers.add(Marker(
+              // icon: BitmapDescriptor() ,
+              markerId: MarkerId(userId),
+              position: LatLng(
+                coordinates['latitude'],
+                coordinates['longitude'],
+              ),
+              infoWindow: InfoWindow(title: userId)));
+        });
       }
+
+      /// print('finished getting other users locations');
+      _checkIfUsersInSafeDistance();
+      setState(() {});
     });
+  }
+
+  _checkIfUsersInSafeDistance() async {
+    SnackBar snackBar;
+
+    //print('in check');
+    String usersIds = "";
+    String distances = '';
+    bool unsafeUsersExist = false;
+    for (Marker marker in markers) {
+      String x = marker.markerId.value;
+      // String y=Global.user.id;
+      //  print("x="+x);
+      // print("y="+y);
+      if (_myLocation['latitude'] != null && x != Global.user.id) {
+        //  print('in lat != null  ${ marker.position}$_myLocation');
+        await Geolocator()
+            .distanceBetween(
+                marker.position.latitude,
+                marker.position.longitude,
+                _myLocation['latitude'],
+                _myLocation['longitude'])
+            .then((distance) {
+              _distance=distance;
+          //  print(distance);
+
+          if (distance > allowedDistance) {
+            usersIds += "${marker.markerId.value}, ";
+            distances += "$distance, ";
+            unsafeUsersExist = true;
+          }
+        });
+      }
+    }
+    if (unsafeUsersExist) {
+      snackBar = SnackBar(
+          content: Text(
+              'The users with id\'s ($usersIds) are out side the allowed area' +
+                  '\n and far from you the following distances($distances)'));
+      scaffoldKey.currentState.showSnackBar(snackBar);
+    }
   }
 
   void _checkPermission() {
@@ -80,27 +151,51 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
         .then((status) {
       print('always status: $status');
     });
-    _geolocator.checkGeolocationPermissionStatus(
-        locationPermission: GeolocationPermission.locationWhenInUse)
-      ..then((status) {
-        print('whenInUse status: $status');
-      });
+    _geolocator
+        .checkGeolocationPermissionStatus(
+            locationPermission: GeolocationPermission.locationWhenInUse)
+        .then((status) {
+      print('whenInUse status: $status');
+    });
   }
 
-  void _sendUserLocationToDB(double latitude, double longitude) {
+  _sendUserLocationToDB(
+    //send my coordinates to database
+    double latitude,
+    double longitude,
+    String journeyId) async {
     String uid = Global.user.id;
-    print(uid);
-    Firestore.instance
+    print('in send to db $journeyId');
+    print(allowedToSendCoordinates);
+    if(allowedToSendCoordinates){
+      print('allowed');
+      allowedToSendCoordinates=false;
+      timer = Timer(Duration(seconds:5), () {
+        print('timer done');
+      allowedToSendCoordinates=true;
+    });
+
+    await _instance
         .collection('realtimeLocations')
-        .document(uid)
-        .setData({'latitude': latitude, 'longitude': longitude});
+        .document(journeyId)
+        .updateData({
+      uid: {'latitude': latitude, 'longitude': longitude}
+      
+    }).catchError((s){
+      print(s);
+    });
+    
+    print(' my position senttttttttt $uid $latitude $longitude');
+    }
   }
 
   _setmyLocationStream() {
-    _geolocator.getPositionStream(locationOptions).listen((Position pos) {
-      print('sending my positions');
+    //Listen to changes on my location, and send my coordinates to database
+
+  _sendLocationStream= _geolocator.getPositionStream(locationOptions).listen((Position pos) {
+      // print('in send Stream');
+      _myLocation = {'latitude': pos.latitude, 'longitude': pos.longitude};
       if (!loaded) {
-        print('in not loaded');
         cameraPosition = CameraPosition(
             target: LatLng(
               pos.latitude,
@@ -112,19 +207,17 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
           loaded = true;
         });
       }
-      print(pos);
 
-      _sendUserLocationToDB(pos.latitude, pos.longitude);
+      _sendUserLocationToDB(pos.latitude, pos.longitude, widget._journey.id);
     });
   }
 
-  List<Marker> markers = [];
-  CameraPosition cameraPosition;
-  bool loaded = false;
-  List<User> _users = [];
-  Geolocator _geolocator;
-  LocationOptions locationOptions;
-  Position myPosition;
+  @override
+  void dispose() {
+    _usersLocationsStream.cancel();
+    _sendLocationStream.cancel();
+    super.dispose();
+  }
 }
 
 class User {

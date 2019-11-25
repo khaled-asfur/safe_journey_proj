@@ -1,7 +1,7 @@
 //import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:safe_journey/pages/show_journey.dart';
+import 'package:safe_journey/pages/showJourney.dart';
 import '../models/journey.dart';
 
 class MyCardsGrid extends StatefulWidget {
