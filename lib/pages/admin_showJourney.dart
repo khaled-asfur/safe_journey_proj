@@ -12,16 +12,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-class admin_showJourney extends StatefulWidget {
+class AdminShowJourney extends StatefulWidget {
   final Journey _journey;
-  admin_showJourney(this._journey);
+  AdminShowJourney(this._journey);
   @override
   State<StatefulWidget> createState() {
-    return showJourneyStaet();
+    return ShowJourneyState();
   }
 }
 
-class showJourneyStaet extends State<admin_showJourney> {
+class ShowJourneyState extends State<AdminShowJourney> {
   var firstColor = Colors.blueAccent, secondColor = Color(0xff36d1dc);
   String name, description, imageUrl;
   List<String> places;

@@ -59,17 +59,6 @@ class HomePageState extends State<HomePage> {
               },
               child: ListView(
                 children: <Widget>[
-                  MyRaisedButton('add', () {
-                    Firestore.instance
-                        .collection('realtimeLocations')
-                        .document('IHJA4sYuIreak96nQpOP')
-                        .setData({
-                      'xHb09Tu8uWcxzjIsJ02Vu19cGBO2': {
-                        'latitude': 1,
-                        'longitude': 2
-                      }
-                    });
-                  }),
                   Container(
                       decoration: BoxDecoration(color: Colors.grey[200]),
                       child: MySlideShow()),

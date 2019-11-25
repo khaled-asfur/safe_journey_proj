@@ -84,7 +84,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
         snapshot.data.forEach((String userId, dynamic coordinates) {
           //_users.add(User(userId));
           markers.add(Marker(
-              // icon: BitmapDescriptor() ,
+              icon: BitmapDescriptor.defaultMarkerWithHue(30),
               markerId: MarkerId(userId),
               position: LatLng(
                 coordinates['latitude'],

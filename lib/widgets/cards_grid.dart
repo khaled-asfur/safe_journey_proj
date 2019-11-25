@@ -1,6 +1,7 @@
 //import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:safe_journey/pages/admin_showJourney.dart';
 import 'package:safe_journey/pages/showJourney.dart';
 import '../models/journey.dart';
 
@@ -30,10 +31,11 @@ class _MyCardsGridState extends State<MyCardsGrid> {
             return GestureDetector(
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute<bool>(
-                        builder: (BuildContext context) =>
-                            ShowJourney(journey)));
+                  context,
+                  MaterialPageRoute<bool>(
+                    builder: (BuildContext context) => journey.role=='ADMIN'?AdminShowJourney(journey):ShowJourney(journey),
+                  ),
+                );
               },
               child: Card(
                 semanticContainer: true,
