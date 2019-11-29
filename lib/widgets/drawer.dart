@@ -39,22 +39,6 @@ class MyDrawer extends StatelessWidget {
         ),
         Divider(),
         ListTile(
-          leading: Icon(Icons.create),
-          title: Text("People list"),
-          onTap: () {
-            Navigator.pushNamed(context, 'peopleList');
-          },
-        ),
-        Divider(),
-        ListTile(
-          leading: Icon(Icons.add),
-          title: Text("Add dangerous area"),
-          onTap: () {
-            Navigator.pushReplacementNamed(context, '/');
-          },
-        ),
-        Divider(),
-        ListTile(
           leading: Icon(Icons.settings),
           title: Text("Settings"),
           onTap: () {
@@ -101,10 +85,5 @@ class MyDrawer extends StatelessWidget {
     userData['name'] = user.name;
     userData['email'] = user.email;
     userData['imageURL'] = user.imageURL;
-    /*print('looooooooooooool');
-    print(user.toString());*/
-    //print(userData['imageURL']);
-    //print(user.bio +"  "+user.background);
-    /**/
   }
 }

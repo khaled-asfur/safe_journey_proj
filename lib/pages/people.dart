@@ -8,7 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:safe_journey/models/journey.dart';
 import '../widgets/show_user.dart';
 import 'dart:async';
-import 'package:safe_journey/models/journey.dart';
 import '../models/Enum.dart';
 
 class People extends StatefulWidget {
@@ -25,7 +24,7 @@ class _PeopleState extends State<People> {
   List<User> final_value;
   QuerySnapshot userDocs;
   FetchState state;
-  List<show_user> showUser = [];
+  List<ShowUser> showUser = [];
   List<String> usersIDS = [];
   QuerySnapshot userDocs1;
 
@@ -46,7 +45,7 @@ class _PeopleState extends State<People> {
 
   Widget _buildUserList() {
     match();
-    List<show_user> items = showUser;
+    List<ShowUser> items = showUser;
     if (state == FetchState.FETCHING_IN_PROGRESS) {
       return Center(child: CircularProgressIndicator());
     } else if (items == null) {
@@ -151,7 +150,7 @@ class _PeopleState extends State<People> {
         if (id.contains(userId)) {
           //print(userId);
           User user = User.fromDocument(document);
-          show_user __user = show_user(user,widget._journey);
+          ShowUser __user = ShowUser(user,widget._journey);
           showUser.add(__user);
            
            // final_value.add(user);

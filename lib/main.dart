@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:safe_journey/pages/setting.dart';
+
+import 'pages/setting.dart';
 import 'pages/waiting_page.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'pages/signup_page.dart';
 import 'pages/notifications_page.dart';
 import 'pages/creat.dart';
-import 'pages/peopleList.dart';
+import 'pages/showProfile.dart';
+
 //import 'package:flutter/rendering.dart';
 
 void main() {
@@ -38,9 +40,9 @@ class _MyAppState extends State<MyApp> {
         'signupPage': (BuildContext context) => SignupPage(),
         'notifications': (BuildContext context) => Notifications(),
         'createJourney': (BuildContext context) => Create(),
-        'peopleList': (BuildContext context) => PeopleList(),
         'settings': (BuildContext context) => EditProfile(),
-        //'addPeople': (BuildContext context) => AddPeople('journeyId'),
+        'profilePage':(BuildContext context)=>ShowProfile(),
+        
       },
       onGenerateRoute: (RouteSettings settings) {
         //هون بضيف نيمد راوت جديدة شرط ما تكون موجودة فوق بالبروبرتي روتس

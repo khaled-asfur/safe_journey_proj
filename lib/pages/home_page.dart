@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/notification.dart';
-import 'package:safe_journey/widgets/my_raised_button.dart';
 
 import '../models/Enum.dart';
 import '../widgets/slide_show.dart';

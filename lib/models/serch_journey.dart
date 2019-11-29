@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Journyf {
+class SearchJourny{
   
   
   final String photoUrl;
@@ -10,7 +10,7 @@ class Journyf {
   final DateTime startDate;
   final String id;
 
-  const Journyf(
+  const SearchJourny(
       {this.name,
       this.photoUrl,
       this.description,
@@ -20,8 +20,8 @@ class Journyf {
     
     });
 
-  factory Journyf.fromDocument(DocumentSnapshot document) {
-    return Journyf(
+  factory SearchJourny.fromDocument(DocumentSnapshot document) {
+    return SearchJourny(
       
       name: document['name'],
       photoUrl: document['imageURL'],

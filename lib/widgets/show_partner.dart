@@ -5,12 +5,12 @@ import 'package:safe_journey/models/journey.dart';
 import '../models/user.dart';
 
 
-class show_partner extends StatelessWidget{
+class ShowPartner extends StatelessWidget{
   final User _user;
   final Journey _journey;
- List<String> partnersIDS = [];
+  final List<String> partnersIDS = [];
 
-  show_partner(this._user,this._journey);
+  ShowPartner(this._user,this._journey);
   
   @override
   Widget build(BuildContext context) {

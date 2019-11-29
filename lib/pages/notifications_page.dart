@@ -23,21 +23,7 @@ class Notifications extends StatelessWidget {
             if (!snapshot.hasData) return Text('Loading...');
             return NotificationsBuilder(snapshot);
           },
-        ) ,
-        floatingActionButton: new FloatingActionButton(
-        child: new Icon(Icons.add),
-        onPressed: () {
-          Firestore.instance.collection('notifications').add(
-            {
-              'journeyId': 'IHJA4sYuIreak96nQpOP',
-              'userId': '3tjm0pfPBGO8kEGJH62tyLjtoF42',
-              'senderId':'NQxMofkgqibUl9gbUqt25S3ZPMw1',
-              'type':'ATTENDENCE_REQUEST',
-              'time':DateTime.now()
-            },
-          );
-        },
-      )
+        ),
         );
   }
 

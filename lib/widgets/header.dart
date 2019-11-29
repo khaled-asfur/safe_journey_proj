@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
-import 'package:safe_journey/models/journyf.dart';
+import 'package:safe_journey/models/serch_journey.dart';
 import 'package:safe_journey/widgets/drawer.dart';
 import 'package:safe_journey/widgets/notification_icon.dart';
 //import 'package:safe_journey/widgets/user_search_item.dart';
@@ -31,7 +31,9 @@ class _HeaderState extends State<Header> {
             NotificationIcon(),
             IconButton(
               icon: Icon(Icons.person),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, 'profilePage');
+              },
             )
           ],
           title: _buildSearchTextField(),
@@ -62,7 +64,7 @@ class _HeaderState extends State<Header> {
     List<UserSearchItem1> userSearchItems = [];
 
     docs.forEach((DocumentSnapshot doc) {
-      Journyf user = Journyf.fromDocument(doc);
+      SearchJourny user = SearchJourny.fromDocument(doc);
       UserSearchItem1 searchItem = UserSearchItem1(user);
       
       userSearchItems.add(searchItem);
@@ -162,7 +164,7 @@ class _HeaderState extends State<Header> {
   }
 }
 class UserSearchItem1 extends StatelessWidget {
-  final Journyf user;
+  final SearchJourny user;
 
   const UserSearchItem1(this.user);
 

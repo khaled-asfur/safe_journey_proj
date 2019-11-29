@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:safe_journey/models/journey.dart';
 import 'package:safe_journey/models/user.dart';
 
 import '../models/helpers.dart';
@@ -182,11 +183,9 @@ class Auth {
         'userId': user.id,
         'pendingAttendents':[],
       });
-
-
-
-      // Navigator.pushReplacementNamed(context, 'homePage');
-
+      //By khaled
+      Journey.addRealtimeDocumentforJourney(initial);
+      
     } on PlatformException catch (e) {
       print(e);
       Helpers.showErrorDialog(context, e.message);

@@ -191,8 +191,6 @@ class ShowJourneyState extends State<AdminShowJourney> {
   }
 
   updateData(newValues) {
-    final fireStoreInstance = Firestore.instance;
-
     print(name);
     Firestore.instance
         .collection('journies')

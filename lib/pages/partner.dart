@@ -21,7 +21,7 @@ class Partner extends StatefulWidget{
 }
 
 class PartnerState extends State<Partner>{
-  List<show_partner> showUser = [];
+  List<ShowPartner> showUser = [];
   List<String> partnersIDS = [];
   QuerySnapshot userDocs;
   FetchState state;
@@ -45,7 +45,7 @@ class PartnerState extends State<Partner>{
 
   Widget _buildUserList() {
     match();
-    List<show_partner> items = showUser;
+    List<ShowPartner> items = showUser;
     if (state == FetchState.FETCHING_IN_PROGRESS) {
       return Center(child: CircularProgressIndicator());
     } else if (items == null || items == []) {
@@ -132,7 +132,7 @@ Future<QuerySnapshot> _fetchUsers() async {
           .orderBy('name')
           .getDocuments();
       
-      List<String> PartnersIDS =
+      List<String> partnersIDS =
           await _fetchPartners(widget._journey.id);
       setState(() {
         
@@ -160,7 +160,7 @@ Future<QuerySnapshot> _fetchUsers() async {
         String userId = f.toLowerCase();
         if (id.contains(userId)) {
           User user = User.fromDocument(document);
-          show_partner __user = show_partner(user,widget._journey);
+          ShowPartner __user = ShowPartner(user,widget._journey);
             
            showUser.add(__user);
            print("////////////////////////");

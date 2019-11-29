@@ -4,10 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-//import 'package:safe_journey/models/helpers.dart';
 
 import '../models/global.dart';
 import '../models/journey.dart';
+import '../models/map_user.dart';
 
 class RealTimeScreen extends StatefulWidget {
   final Journey _journey;
@@ -31,13 +31,16 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   Timer timer;
   bool allowedToSendCoordinates = true;
   Firestore _instance = Firestore.instance;
-  StreamSubscription<Position> _sendLocationStream ;
-  double _distance =0;
+  StreamSubscription<Position> _sendLocationStream;
+  double _distance = 0;
+  List<MapUser> _usersJoinsJourney;
 
   @override
   void initState() {
     super.initState();
-    //print('in realtime initstate');
+    widget._journey.getUsersJoinsJourney().then((List<MapUser> allUsers) {
+      _usersJoinsJourney = allUsers;
+    });
     _geolocator = Geolocator();
     locationOptions = LocationOptions(
       accuracy: LocationAccuracy.best,
@@ -50,11 +53,9 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // print("in map build${markers.length}");
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
-        /*'$_myLocation', style: TextStyle(fontSize: 10)*/
         title: Text('$_distance'),
       ),
       body: (loaded)
@@ -71,48 +72,66 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
 
   StreamSubscription<DocumentSnapshot> _getUsersLocationsStream() {
     //Listen to changes on other users locations, and set state to show changes on screen
-
+   
     return Firestore.instance
         .collection('realtimeLocations')
         .document(widget._journey.id)
         .snapshots()
         .listen((DocumentSnapshot snapshot) {
+           bool usersDataLoaded =
+        _usersJoinsJourney != null && _usersJoinsJourney.length > 0;
       markers = [];
       if (snapshot != null) {
-        // print('snap sata =');
-        // print(snapshot.data);
         snapshot.data.forEach((String userId, dynamic coordinates) {
-          //_users.add(User(userId));
-          markers.add(Marker(
+          markers.add(
+            Marker(
               icon: BitmapDescriptor.defaultMarkerWithHue(30),
               markerId: MarkerId(userId),
               position: LatLng(
                 coordinates['latitude'],
                 coordinates['longitude'],
               ),
-              infoWindow: InfoWindow(title: userId)));
+              infoWindow: InfoWindow(
+                title: usersDataLoaded ? getUserName(userId) : " ",
+                snippet:
+                    usersDataLoaded ? getDistanceFromCurrentUser(userId) : " ",
+              ),
+            ),
+          );
         });
       }
-
-      /// print('finished getting other users locations');
       _checkIfUsersInSafeDistance();
       setState(() {});
     });
   }
 
+  String getDistanceFromCurrentUser(String userId) {
+    if (userId == Global.user.id) {
+          return "This is your marker";
+        }
+    return _usersJoinsJourney
+        .lastWhere((user) => user.id == userId)
+        .distanceFromCurrentUser
+        .toString()+" m";
+  }
+
+  String getUserName(String userId) {
+    String name = '';
+    _usersJoinsJourney.forEach((MapUser user) {
+      if (user.id == userId) name = user.name;
+    });
+    return name;
+  }
+
   _checkIfUsersInSafeDistance() async {
     SnackBar snackBar;
 
-    //print('in check');
     String usersIds = "";
     String distances = '';
     bool unsafeUsersExist = false;
     for (Marker marker in markers) {
-      String x = marker.markerId.value;
-      // String y=Global.user.id;
-      //  print("x="+x);
-      // print("y="+y);
-      if (_myLocation['latitude'] != null && x != Global.user.id) {
+      String userId = marker.markerId.value;
+      if (_myLocation['latitude'] != null && userId != Global.user.id) {
         //  print('in lat != null  ${ marker.position}$_myLocation');
         await Geolocator()
             .distanceBetween(
@@ -121,9 +140,8 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
                 _myLocation['latitude'],
                 _myLocation['longitude'])
             .then((distance) {
-              _distance=distance;
-          //  print(distance);
-
+          _distance = distance;
+          _addDistanceToUserObject(distance, userId);
           if (distance > allowedDistance) {
             usersIds += "${marker.markerId.value}, ";
             distances += "$distance, ";
@@ -138,6 +156,17 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
               'The users with id\'s ($usersIds) are out side the allowed area' +
                   '\n and far from you the following distances($distances)'));
       scaffoldKey.currentState.showSnackBar(snackBar);
+    }
+  }
+
+  _addDistanceToUserObject(distance, userId) {
+    if (_usersJoinsJourney != null && _usersJoinsJourney.length != null) {
+      _usersJoinsJourney.forEach((MapUser user) {
+        if (user.id == userId) {
+          user.distanceFromCurrentUser = distance;
+        }
+        
+      });
     }
   }
 
@@ -160,39 +189,39 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   }
 
   _sendUserLocationToDB(
-    //send my coordinates to database
-    double latitude,
-    double longitude,
-    String journeyId) async {
+      //send my coordinates to database
+      double latitude,
+      double longitude,
+      String journeyId) async {
     String uid = Global.user.id;
-    print('in send to db $journeyId');
-    print(allowedToSendCoordinates);
-    if(allowedToSendCoordinates){
-      print('allowed');
-      allowedToSendCoordinates=false;
-      timer = Timer(Duration(seconds:5), () {
-        print('timer done');
-      allowedToSendCoordinates=true;
-    });
+    //print('in send to db $journeyId');
+    //print(allowedToSendCoordinates);
+    if (allowedToSendCoordinates) {
+      // print('allowed');
+      allowedToSendCoordinates = false;
+      timer = Timer(Duration(seconds: 5), () {
+        // print('timer done');
+        allowedToSendCoordinates = true;
+      });
 
-    await _instance
-        .collection('realtimeLocations')
-        .document(journeyId)
-        .updateData({
-      uid: {'latitude': latitude, 'longitude': longitude}
-      
-    }).catchError((s){
-      print(s);
-    });
-    
-    print(' my position senttttttttt $uid $latitude $longitude');
+      await _instance
+          .collection('realtimeLocations')
+          .document(journeyId)
+          .updateData({
+        uid: {'latitude': latitude, 'longitude': longitude}
+      }).catchError((s) {
+        print(s);
+      });
+
+      print(' my position senttttttttt $uid $latitude $longitude');
     }
   }
 
   _setmyLocationStream() {
     //Listen to changes on my location, and send my coordinates to database
 
-  _sendLocationStream= _geolocator.getPositionStream(locationOptions).listen((Position pos) {
+    _sendLocationStream =
+        _geolocator.getPositionStream(locationOptions).listen((Position pos) {
       // print('in send Stream');
       _myLocation = {'latitude': pos.latitude, 'longitude': pos.longitude};
       if (!loaded) {
