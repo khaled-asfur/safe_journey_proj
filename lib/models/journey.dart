@@ -11,7 +11,7 @@ class Journey {
   final String _description;
   final DateTime _startTime;
   final DateTime _endTime;
-  final List _places;
+  final String _places;
   final List _invitedUsers;
   final String _role;
   final List _attendents;
@@ -52,7 +52,7 @@ class Journey {
     return _endTime;
   }
 
-  List<Object> get places {
+  String get places {
     return _places;
   }
 
@@ -90,6 +90,7 @@ class Journey {
       List<DocumentSnapshot> allDocuments = docs.documents;
       if (allDocuments.isEmpty) {
         result = FetchResult.EMPTY;
+        return {'result': result, 'journies': myJournies};
       }
       for (int i = 0; i < allDocuments.length; i++) {
         Journey jour = await fetchOneJourneyDetails(
@@ -117,11 +118,11 @@ class Journey {
       'description': ' ',
       'startTime': DateTime.now(),
       'endTime': DateTime.now(),
-      'places': List<String>(),
-      'invitedUsers': List<String>(),
+      'places': String,
+      'invitedUsers': List(),
       'role': ' ',
-      'attendents': List<String>(),
-      'pendingAttendents': List<String>(),
+      'attendents': List(),
+      'pendingAttendents': List(),
       'imageURL': ''
     };
     try {
@@ -167,6 +168,7 @@ class Journey {
       journey['endTime'] = journeyDocument.data['endTime'];
       journey['imageURL'] = journeyDocument.data['imageURL'];
       journey['places'] = journeyDocument.data['places'];
+     
       journey['invitedUsers'] = journeyDocument.data['invitedUsers'];
     } on PlatformException catch (error) {
       print('An error occured in fetchJourneyDetails method');
@@ -176,6 +178,7 @@ class Journey {
 
 //converts the details of the journey from a Map into a journey object
   static Journey _convertMapToJourneyObject(Map<String, dynamic> journey) {
+    print(journey['id']);
     Journey journeyObj = Journey(
         journey['id'],
         journey['name'],

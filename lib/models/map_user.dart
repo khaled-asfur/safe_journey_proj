@@ -1,5 +1,3 @@
-import 'user.dart';
-
 class MapUser{
   String id;
   String name;

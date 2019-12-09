@@ -39,7 +39,9 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   void initState() {
     super.initState();
     widget._journey.getUsersJoinsJourney().then((List<MapUser> allUsers) {
-      _usersJoinsJourney = allUsers;
+      setState(() {
+        _usersJoinsJourney = allUsers;
+      });
     });
     _geolocator = Geolocator();
     locationOptions = LocationOptions(
@@ -92,9 +94,9 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
                 coordinates['longitude'],
               ),
               infoWindow: InfoWindow(
-                title: usersDataLoaded ? getUserName(userId) : " ",
+                title: usersDataLoaded ? getUserName(userId) : "Fetching..",
                 snippet:
-                    usersDataLoaded ? getDistanceFromCurrentUser(userId) : " ",
+                    usersDataLoaded ? getDistanceFromCurrentUser(userId) : "Fetching..",
               ),
             ),
           );

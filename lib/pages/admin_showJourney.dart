@@ -24,7 +24,7 @@ class AdminShowJourney extends StatefulWidget {
 class ShowJourneyState extends State<AdminShowJourney> {
   var firstColor = Colors.blueAccent, secondColor = Color(0xff36d1dc);
   String name, description, imageUrl;
-  List<String> places;
+  String places;
   DateTime startDate, endDate;
   TextEditingController _controllerName = TextEditingController();
   TextEditingController _controllerDes = TextEditingController();
@@ -168,7 +168,7 @@ class ShowJourneyState extends State<AdminShowJourney> {
                     description = widget._journey.description;
                   }
                   if (_controllerPlaces.text != null) {
-                    places = _controllerName.text as List<String>;
+                    places = _controllerName.text;
                   } else {
                     places = widget._journey.places;
                   }

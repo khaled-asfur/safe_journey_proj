@@ -73,208 +73,210 @@ class _EditpassState extends State<Editpass> {
     "password": null,
     "confirm_password": null
   };
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-        final GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
-bool cnewpass=false;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
+  bool cnewpass = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(),
-      body:  
-        Container(
-          
-               // key: _formKey,
+      body: Container(
 
-      child:  ListView(children: <Widget>[
+          // key: _formKey,
+
+          child: ListView(children: <Widget>[
         SizedBox(height: 15.0),
         //******************************************************* */
         Form(
-                    key: _formKey,
-
-          child:new Column(
-          children:[ 
-        new ListTile(
-          title: new TextFormField(
-            controller: currentpassController,
-            decoration: new InputDecoration(
-                labelText: "Current Password",
-                labelStyle: TextStyle(
-                    fontFamily: "Caveat",
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey),
-                suffixIcon:
-                    IconButton(icon: Icon(Icons.cancel), onPressed: () {
-                      currentpassController.clear();
-                    }),
+            key: _formKey,
+            child: new Column(children: [
+              new ListTile(
+                title: new TextFormField(
+                  controller: currentpassController,
+                  decoration: new InputDecoration(
+                    labelText: "Current Password",
+                    labelStyle: TextStyle(
+                        fontFamily: "Caveat",
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey),
+                    suffixIcon: IconButton(
+                        icon: Icon(Icons.cancel),
+                        onPressed: () {
+                          currentpassController.clear();
+                        }),
+                  ),
+                  obscureText: true,
+                  validator: (String value) {
+                    _formData["password"] = value;
+                    if (value.isEmpty) {
+                      return " current passwoed must be enter";
+                    } else if (value.length < 5) {
+                      return "Passwords value must be 5+ characters";
+                    } else
+                      return null;
+                  },
+                  onSaved: (String value) {
+                    _formData["password"] = value;
+                  },
                 ),
-            obscureText: true,
-                   validator: (String value) {
-        _formData["password"] = value;
-        if(value.isEmpty){return " current passwoed must be enter";}
-      else  if (value.length < 5){return "Passwords value must be 5+ characters";}
-        
-        else return null;
-      },
-      onSaved: (String value) {
-        _formData["password"] = value;
-      },
-            
-          ),
-        ),
-        //***************************************************************** */
-        SizedBox(height: 15.0),
+              ),
+              //***************************************************************** */
+              SizedBox(height: 15.0),
 
-        new ListTile(
-          title: new TextFormField(
-            controller: newpassController,
-            decoration: new InputDecoration(
-                labelText: "new Password",
-                labelStyle: TextStyle(
-                    fontFamily: "Caveat",
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey),
-                suffixIcon:
-                    IconButton(icon: Icon(Icons.cancel), onPressed: () {
-                      newpassController.clear();
-                    }),
-                    
-                    ),
-            obscureText: true,
-            validator: (String value) {
-        _formData["password"] = value;
-        if(value.isEmpty){return " new passwoed must be enter";}
-      else  if (value.length < 5){return "Passwords value must be 5+ characters";}
-        
-        else return null;
-      },
-      onSaved: (String value) {
-        _formData["password"] = value;
-      },
-          ),
-        ),
-        //***************************************************************** */
-        new FlatButton.icon(
-            icon: Icon(
-              Icons.vpn_key,
-              color: Colors.blueAccent,
-            ),
-            label: Text("Change passsword "),
-            onPressed: () {
-              
-                 if (_formKey.currentState.validate() != true) return;
-    _formKey.currentState.save();
-    
-              if (currentpassController.text.isEmpty ||
-                  newpassController.text.isEmpty) {
-                _onAlertButtonPressed1(context);
-              } else {
-                new Auth()
-                    .cheak(emailuser, currentpassController.text, context)
-                    .then((bool result) {
-                  if (result == true) {
-                    setState(() async {
-                      FirebaseUser user =
-                          await FirebaseAuth.instance.currentUser();
+              new ListTile(
+                title: new TextFormField(
+                  controller: newpassController,
+                  decoration: new InputDecoration(
+                    labelText: "new Password",
+                    labelStyle: TextStyle(
+                        fontFamily: "Caveat",
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey),
+                    suffixIcon: IconButton(
+                        icon: Icon(Icons.cancel),
+                        onPressed: () {
+                          newpassController.clear();
+                        }),
+                  ),
+                  obscureText: true,
+                  validator: (String value) {
+                    _formData["password"] = value;
+                    if (value.isEmpty) {
+                      return " new passwoed must be enter";
+                    } else if (value.length < 5) {
+                      return "Passwords value must be 5+ characters";
+                    } else
+                      return null;
+                  },
+                  onSaved: (String value) {
+                    _formData["password"] = value;
+                  },
+                ),
+              ),
+              //***************************************************************** */
+              new FlatButton.icon(
+                  icon: Icon(
+                    Icons.vpn_key,
+                    color: Colors.blueAccent,
+                  ),
+                  label: Text("Change passsword "),
+                  onPressed: () {
+                    if (_formKey.currentState.validate() != true) return;
+                    _formKey.currentState.save();
 
-                      user.updatePassword(newpassController.text);
-                    });
-                  }else {cnewpass=false;}
-                });
-              }
-            }),])),
+                    if (currentpassController.text.isEmpty ||
+                        newpassController.text.isEmpty) {
+                      _onAlertButtonPressed1(context);
+                    } else {
+                      new Auth()
+                          .cheak(emailuser, currentpassController.text, context)
+                          .then((bool result) {
+                        if (result == true) {
+                          FirebaseAuth.instance
+                              .currentUser()
+                              .then((FirebaseUser user) {
+                            user.updatePassword(newpassController.text);
+                          });
+                          setState(() {});
+                        } else {
+                          cnewpass = false;
+                        }
+                      });
+                    }
+                  }),
+            ])),
         SizedBox(height: 15.0),
         //******************************************************************************* */
-       
-       Form( 
-                             key: _formKey1,
 
-         child:new Column(
-           children:[
-        new ListTile(
-          title: new TextFormField(
-            controller: newemailController,
-            decoration: new InputDecoration(
-                labelText: "new Email",
-                labelStyle: TextStyle(
-                    fontFamily: "Caveat",
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey),
-                suffixIcon:
-                    IconButton(icon: Icon(Icons.cancel), onPressed: () {})),
-            validator: (String value) {
-        if (value.length < 5 ||
-            !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                .hasMatch(value)) //هاي جاهزة لفحص اذا كان ايميل او لا
-          return "please enter a valid email!";
-        return null; //لما يرجع نل معناها ما في مشكلة
-      },
-      keyboardType: TextInputType.emailAddress,
-      onSaved: (String value) {
-        _formData["email"] = value;
-      },
-          ),
-        ),
-        new FlatButton.icon(
-            icon: Icon(
-              Icons.email,
-              color: Colors.blueAccent,
-            ),
-            label: Text("Change Email "),
-            onPressed: () async {
-
-                 if (_formKey1.currentState.validate() != true) return;
-   _formKey1.currentState.save();
-              Alert(
-                  context: context,
-                  title: "Enter Current password",
-                  content: Column(
-                    children: <Widget>[
-                      TextField(
-                        controller: currentpassController1,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          icon: Icon(Icons.lock),
-                          labelText: 'current Password',
-                        ),
-                      ),
-                    ],
+        Form(
+            key: _formKey1,
+            child: new Column(children: [
+              new ListTile(
+                title: new TextFormField(
+                  controller: newemailController,
+                  decoration: new InputDecoration(
+                      labelText: "new Email",
+                      labelStyle: TextStyle(
+                          fontFamily: "Caveat",
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey),
+                      suffixIcon: IconButton(
+                          icon: Icon(Icons.cancel), onPressed: () {})),
+                  validator: (String value) {
+                    if (value.length < 5 ||
+                        !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                            .hasMatch(
+                                value)) //هاي جاهزة لفحص اذا كان ايميل او لا
+                      return "please enter a valid email!";
+                    return null; //لما يرجع نل معناها ما في مشكلة
+                  },
+                  keyboardType: TextInputType.emailAddress,
+                  onSaved: (String value) {
+                    _formData["email"] = value;
+                  },
+                ),
+              ),
+              new FlatButton.icon(
+                  icon: Icon(
+                    Icons.email,
+                    color: Colors.blueAccent,
                   ),
-                  buttons: [
-                    DialogButton(
-                      onPressed: () {
-                     
-                        new Auth()
-                            .cheak(
-                                emailuser, currentpassController1.text, context)
-                            .then((bool result) {
-                          if (result == true) {
-                            setState(() async {
-                              FirebaseUser user =
-                                  await FirebaseAuth.instance.currentUser();
+                  label: Text("Change Email "),
+                  onPressed: () async {
+                    if (_formKey1.currentState.validate() != true) return;
+                    _formKey1.currentState.save();
+                    Alert(
+                        context: context,
+                        title: "Enter Current password",
+                        content: Column(
+                          children: <Widget>[
+                            TextField(
+                              controller: currentpassController1,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                icon: Icon(Icons.lock),
+                                labelText: 'current Password',
+                              ),
+                            ),
+                          ],
+                        ),
+                        buttons: [
+                          DialogButton(
+                            onPressed: () {
+                              new Auth()
+                                  .cheak(emailuser, currentpassController1.text,
+                                      context)
+                                  .then((bool result) {
+                                if (result == true) {
+                                  FirebaseAuth.instance
+                                      .currentUser()
+                                      .then((FirebaseUser user) {
+                                    user.updateEmail(newemailController.text);
+                                  });
 
-                              user.updateEmail(newemailController.text);
-                            });
-                          }
-                        });
-                       /* Navigator.push(
+                                  setState(() {});
+                                }
+                              });
+                              /* Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => ChangePass()),
                         );*/
-                      },
-                      child: Text(
-                        "confirm",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                    )
-                  ]).show();
+                            },
+                            child: Text(
+                              "confirm",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          )
+                        ]).show();
 
-              // FirebaseUser user = await FirebaseAuth.instance.currentUser();
+                    // FirebaseUser user = await FirebaseAuth.instance.currentUser();
 
-              // user.updateEmail(newemailController.text);
-            }),]))
-      ])
-      ),
+                    // user.updateEmail(newemailController.text);
+                  }),
+            ]))
+      ])),
     );
   }
 
