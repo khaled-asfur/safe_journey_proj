@@ -41,7 +41,6 @@ class _AddAttendentsState extends State<AddAttendents> {
   Widget build(BuildContext context) {
     _attendenceSwitch['value'] = addingattendents;
     _parentSwitch['value'] = !addingattendents;
-    print('in builddddddddddddddd');
     return Header(
       body: RefreshIndicator(
         onRefresh: _fetchData,
@@ -162,7 +161,6 @@ class _AddAttendentsState extends State<AddAttendents> {
   }
 
   void _sendAttendenceRequest(String userID) {
-    // print(userID);
     setState(() {
       _pendingAttendents.add(userID);
     });

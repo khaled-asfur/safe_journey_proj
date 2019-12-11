@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
 
-import 'package:rxdart/subjects.dart' as rx ;
+import 'package:rxdart/subjects.dart' as rx;
 
 class MyNotification {
   String id;
@@ -29,6 +29,9 @@ class MyNotification {
     else if (this.type == 'EXIT_JOURNEY')
       text = Text(
           '${this.senderName} requested from you to leave the journey \'${this.journeyName}\' do you accept?');
+    else if (this.type == 'PARENT_REQUEST')
+      text = Text(
+          '${this.senderName} requested from you to be his parent in the  journey \'${this.journeyName}\' do you accept?');
 
     return text;
   }
@@ -69,16 +72,16 @@ class MyNotification {
   }
 
   static void setNotificationListener() {
-    Global.notificationObservable=rx.PublishSubject<int>();
+    Global.notificationObservable = rx.PublishSubject<int>();
     Firestore.instance
         .collection('notifications')
         .where('userId', isEqualTo: Global.user.id)
         .snapshots()
         .listen((QuerySnapshot snapshot) {
-          print(snapshot.documents.length);
-          Global.notificationsCount=snapshot.documents.length;
-          Global.notificationObservable.add(snapshot.documents.length);
-          print(snapshot.documents.length);
+      print(snapshot.documents.length);
+      Global.notificationsCount = snapshot.documents.length;
+      Global.notificationObservable.add(snapshot.documents.length);
+     // print(snapshot.documents.length);
       /*snapshot.documentChanges.forEach((DocumentChange change) {
       /*  if (change.type == DocumentChangeType.added)
           Global.notificationsCount++;

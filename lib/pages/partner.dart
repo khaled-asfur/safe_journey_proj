@@ -57,6 +57,7 @@ class PartnerState extends State<Partner>{
       print(items);
       return Column(children: items);
     }
+    return null;
   }
 
   Widget _build() {
@@ -132,7 +133,7 @@ Future<QuerySnapshot> _fetchUsers() async {
           .orderBy('name')
           .getDocuments();
       
-      List<String> partnersIDS =
+      
           await _fetchPartners(widget._journey.id);
       setState(() {
         

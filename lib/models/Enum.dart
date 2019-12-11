@@ -14,15 +14,19 @@ enum SearchingFor{
   PARENT,
   USER
 }
+enum Relation{
+  ATTENDENT,
+  USER
+}
 
 
 
 /*
 Data base collections
 journies_users{
-  role: ADMIN - USER
+  role: ADMIN - USER - PARENT
 }
 notifications{
-  type : JOURNEY_INVITATION - ATTENDENCE_REQUEST - PARENT_REQUEST
+  type : JOURNEY_INVITATION - ATTENDENCE_REQUEST - PARENT_REQUEST - JOIN_JOURNEY_REQUEST
 }
 */

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:safe_journey/models/Enum.dart';
 
 import '../models/global.dart';
 import '../models/journey.dart';
@@ -20,7 +21,6 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   List<Marker> markers = [];
   CameraPosition cameraPosition;
   bool loaded = false;
-  //List<User> _users = [];
   Geolocator _geolocator;
   LocationOptions locationOptions;
   Position myPosition;
@@ -40,6 +40,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     super.initState();
     widget._journey.getUsersJoinsJourney().then((List<MapUser> allUsers) {
       setState(() {
+        print("users loadeddddddddddddddddddddddddddddddddddddd");
         _usersJoinsJourney = allUsers;
       });
     });
@@ -49,12 +50,14 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     );
     _setmyLocationStream(); //send my location to DB
     _checkPermission();
-    _usersLocationsStream =
-        _getUsersLocationsStream(); //read other users locations from DB
+    //read other users locations from DB
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_usersLocationsStream == null && _usersJoinsJourney != null)
+      _usersLocationsStream = _getUsersLocationsStream();
+
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
@@ -74,32 +77,29 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
 
   StreamSubscription<DocumentSnapshot> _getUsersLocationsStream() {
     //Listen to changes on other users locations, and set state to show changes on screen
-   
+
     return Firestore.instance
         .collection('realtimeLocations')
         .document(widget._journey.id)
         .snapshots()
         .listen((DocumentSnapshot snapshot) {
-           bool usersDataLoaded =
-        _usersJoinsJourney != null && _usersJoinsJourney.length > 0;
       markers = [];
-      if (snapshot != null) {
+      print("trying to get markersssssssssssssssssssssssssssssssssss");
+      if (snapshot != null && _usersJoinsJourney != null) {
         snapshot.data.forEach((String userId, dynamic coordinates) {
-          markers.add(
-            Marker(
-              icon: BitmapDescriptor.defaultMarkerWithHue(30),
-              markerId: MarkerId(userId),
-              position: LatLng(
-                coordinates['latitude'],
-                coordinates['longitude'],
-              ),
-              infoWindow: InfoWindow(
-                title: usersDataLoaded ? getUserName(userId) : "Fetching..",
-                snippet:
-                    usersDataLoaded ? getDistanceFromCurrentUser(userId) : "Fetching..",
-              ),
-            ),
-          );
+          MapUser user = _getMapUserObject(userId);
+          if (user.id == Global.user.id) {
+            //add markers only for attendents
+            _addmarkerForUser(userId, coordinates, 60.0);
+          } else if (user.relation == Relation.ATTENDENT) {
+            //add markers only for attendents
+            _addmarkerForUser(userId, coordinates, 120.0);
+          } else if (user.role == 'ADMIN') {
+            //اذا اليوزر الي بحاول اعرضه هو مسؤول الرحلة مشان يظهر لون مختلف للماركر
+            _addmarkerForUser(userId, coordinates, 240);
+          } else if (widget._journey.role == 'ADMIN')
+            //current user is admin, so add marker for all users
+            _addmarkerForUser(userId, coordinates, 0.0);
         });
       }
       _checkIfUsersInSafeDistance();
@@ -107,14 +107,45 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     });
   }
 
+  MapUser _getMapUserObject(String userId) {
+    MapUser user = _usersJoinsJourney.firstWhere((MapUser u) {
+      return u.id == userId ? true : false;
+    });
+    return user;
+  }
+
+  _addmarkerForUser(String userId, dynamic coordinates, double markerColor) {
+//marker colors: hueRed = 0.0; hueOrange = 30.0;hueYellow = 60.0;hueGreen = 120.0;hueCyan =180.0;
+//hueAzure = 210.0; hueBlue = 240.0; hueViolet = 270.0;hueMagenta = 300.0; hueRose = 330.0;
+    bool usersDataLoaded =
+        _usersJoinsJourney != null && _usersJoinsJourney.length > 0;
+    markers.add(
+      Marker(
+        icon: BitmapDescriptor.defaultMarkerWithHue(markerColor),
+        markerId: MarkerId(userId),
+        position: LatLng(
+          coordinates['latitude'],
+          coordinates['longitude'],
+        ),
+        infoWindow: InfoWindow(
+          title: usersDataLoaded ? getUserName(userId) : "Fetching..",
+          snippet: usersDataLoaded
+              ? getDistanceFromCurrentUser(userId)
+              : "Fetching..",
+        ),
+      ),
+    );
+  }
+
   String getDistanceFromCurrentUser(String userId) {
     if (userId == Global.user.id) {
-          return "This is your marker";
-        }
+      return "This is your marker";
+    }
     return _usersJoinsJourney
-        .lastWhere((user) => user.id == userId)
-        .distanceFromCurrentUser
-        .toString()+" m";
+            .lastWhere((user) => user.id == userId)
+            .distanceFromCurrentUser
+            .toString() +
+        " m";
   }
 
   String getUserName(String userId) {
@@ -167,7 +198,6 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
         if (user.id == userId) {
           user.distanceFromCurrentUser = distance;
         }
-        
       });
     }
   }
@@ -249,10 +279,4 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     _sendLocationStream.cancel();
     super.dispose();
   }
-}
-
-class User {
-  String name;
-
-  User(this.name);
 }

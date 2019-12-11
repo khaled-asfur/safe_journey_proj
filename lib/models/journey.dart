@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/map_user.dart';
+import 'package:safe_journey/models/notification.dart';
 
 import '../models/Enum.dart';
 
@@ -132,6 +133,7 @@ class Journey {
         QuerySnapshot snapshot = await Firestore.instance
             .collection('journey_user')
             .where('userId', isEqualTo: Global.user.id)
+            .where('journeyId', isEqualTo: journeyId)
             .limit(1)
             .getDocuments();
         if (snapshot.documents.isNotEmpty) document = snapshot.documents[0];
@@ -168,7 +170,7 @@ class Journey {
       journey['endTime'] = journeyDocument.data['endTime'];
       journey['imageURL'] = journeyDocument.data['imageURL'];
       journey['places'] = journeyDocument.data['places'];
-     
+
       journey['invitedUsers'] = journeyDocument.data['invitedUsers'];
     } on PlatformException catch (error) {
       print('An error occured in fetchJourneyDetails method');
@@ -233,17 +235,18 @@ class Journey {
     try {
       QuerySnapshot snap = await instance.collection('users').getDocuments();
       List<DocumentSnapshot> allUsers = snap.documents;
-      QuerySnapshot snapshot= await instance
+      QuerySnapshot snapshot = await instance
           .collection('journey_user')
           .where('journeyId', isEqualTo: id)
           .getDocuments();
       if (snapshot.documents.isNotEmpty) {
         snapshot.documents.forEach((DocumentSnapshot document) {
-          MapUser user =_getUserInfo(allUsers, document);
-         // print(user.name);
+          MapUser user = _getUserInfo(allUsers, document);
+          // print(user.name);
           usersjoinsJourney.add(user);
         });
       }
+      _setRelations(usersjoinsJourney);
     } on PlatformException catch (error) {
       print('error occured while fetching users joins jorney');
       print(error);
@@ -257,11 +260,71 @@ class Journey {
     String userId = userjourneyDocument['userId'];
     allUsers.forEach((DocumentSnapshot user) {
       if (user.documentID == userId) {
-        mapUser= MapUser(userId, user['name'], userjourneyDocument['role'],
+        mapUser = MapUser(userId, user['name'], userjourneyDocument['role'],
             userjourneyDocument['attendents']);
       }
     });
     return mapUser;
+  }
+
+  static Future<bool> addUserJourneyDocument(
+      String userId, String role, String journeyId,
+      {List attendents, List pendingAttendents}) async {
+    bool result = false;
+    try {
+      await Firestore.instance.collection('journey_user').add({
+        'userId': Global.user.id,
+        'journeyId': journeyId,
+        'role': 'PARENT',
+        'attendents': attendents != null ? attendents : [],
+        'pendingAttendents': pendingAttendents != null ? pendingAttendents : []
+      });
+      result = true;
+    } catch (error) {
+      print('error occured while adding user_journey document $error ');
+    }
+    return result;
+  }
+
+  static Future<bool> removeUserFromUsersRequestedToJoinJourney(
+      MyNotification notification) async {
+    bool succeeded = false;
+    try {
+      await Firestore.instance
+          .collection('journies')
+          .document(notification.journeyId)
+          .updateData({
+        'usersRequestedToJoinJourney':
+            FieldValue.arrayRemove([notification.senderId]),
+      });
+      succeeded = true;
+    } on PlatformException catch (error) {
+      succeeded = false;
+      print(
+          'error occured while removing user${notification.senderName} from users requested to join the journey ${notification.journeyName} ');
+      print(error);
+    }
+    return succeeded;
+  }
+
+  _setRelations(List<MapUser> usersJoinsJourney) {
+    MapUser currentUser = usersJoinsJourney.firstWhere((MapUser user) {
+      return user.id == Global.user.id ? true : false;
+    });
+    usersJoinsJourney.forEach((MapUser user) {
+      if(isAttendent(currentUser, user))
+      user.relation=Relation.ATTENDENT;
+    });
+  }
+
+  bool isAttendent(MapUser currentUser, MapUser otherUser) {
+    String result = currentUser.attendents.firstWhere((element) {
+      String attendent = element as String;
+      return otherUser.id == attendent ? true : false;
+    }, orElse: () {
+      return "NOT_CURRENT_USER_ATTENDENT";
+    });
+    return result == 'NOT_CURRENT_USER_ATTENDENT' ? false : true;
   }
 
   @override

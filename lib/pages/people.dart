@@ -11,8 +11,8 @@ import 'dart:async';
 import '../models/Enum.dart';
 
 class People extends StatefulWidget {
-  Journey _journey;
-  People(this._journey);
+  final Journey _journey;
+   People(this._journey);
 
   @override
   _PeopleState createState() => _PeopleState();
@@ -20,8 +20,6 @@ class People extends StatefulWidget {
 
 class _PeopleState extends State<People> {
   List<String> usersJoinsThisJourney;
-  List _users;
-  List<User> final_value;
   QuerySnapshot userDocs;
   FetchState state;
   List<ShowUser> showUser = [];
@@ -57,6 +55,7 @@ class _PeopleState extends State<People> {
 
       return Column(children: items);
     }
+    return null;
   }
 
   Widget _build() {

@@ -41,8 +41,7 @@ class _MyAppState extends State<MyApp> {
         'notifications': (BuildContext context) => Notifications(),
         'createJourney': (BuildContext context) => Create(),
         'settings': (BuildContext context) => EditProfile(),
-        'profilePage':(BuildContext context)=>ShowProfile(),
-        
+        'profilePage': (BuildContext context) => ShowProfile(),
       },
       onGenerateRoute: (RouteSettings settings) {
         //هون بضيف نيمد راوت جديدة شرط ما تكون موجودة فوق بالبروبرتي روتس

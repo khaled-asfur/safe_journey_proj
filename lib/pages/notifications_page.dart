@@ -12,6 +12,7 @@ class Notifications extends StatelessWidget {
   Widget build(BuildContext context) {
     print('in notification page builder');
     User user = Global.user;
+     print( Global.user.id);
     return Header(
         body: StreamBuilder(  
           stream: Firestore.instance
@@ -20,6 +21,7 @@ class Notifications extends StatelessWidget {
               .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                print(snapshot.data.documents);
             if (!snapshot.hasData) return Text('Loading...');
             return NotificationsBuilder(snapshot);
           },

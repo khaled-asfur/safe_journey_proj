@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/journey.dart';
+import 'package:safe_journey/pages/realtime_screen.dart';
 import '../widgets/header.dart';
 import 'dart:async';
 import 'dart:io';
@@ -46,6 +47,17 @@ class ShowJourneyState extends State<AdminShowJourney> {
         body: new SingleChildScrollView(
       child: new Column(
         children: <Widget>[
+          IconButton(
+                    icon: Icon(Icons.add_location),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (BuildContext context) {
+                          return RealTimeScreen(widget._journey);
+                        }),
+                      );
+                    },
+                  ),
           new Container(
             child: new Stack(
               children: <Widget>[

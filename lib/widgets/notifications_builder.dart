@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/helpers.dart';
+import 'package:safe_journey/models/journey.dart';
 import 'my_raised_button.dart';
 import '../models/notification.dart';
 
@@ -79,24 +80,26 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                           children: <Widget>[
                             MyRaisedButton('Accept', () {
                               if (notification.type == 'JOURNEY_INVITATION') {
-                                 notifications.removeAt(index);
+                                notifications.removeAt(index);
                                 _addCurrentUserToJourney(
                                     notification.journeyId);
-                               
+
                                 removeCurrentUserFrominvitedUsers(notification);
                                 notification.deleteNotificationFromFireStore();
                               }
-                              if (notification.type == 'ATTENDENCE_REQUEST') {
+                              else if (notification.type == 'ATTENDENCE_REQUEST') {
                                 _doAttendence(notification, index);
                               }
-                               if (notification.type == 'PARENT_REQUEST') {
-                               //TODO: add as parent 
+                              else if (notification.type == 'PARENT_REQUEST') {
+                                _addUserAsParentToSender(notification);
                               }
+                              else if (notification.type == 'JOIN_JOURNEY_REQUEST') {
+                                _addUserToJourney(notification);
 
-                              //add data to users_journeis collection
-                              //remove from attendents array on journey collection
+                              }
                             }),
                             RaisedButton(
+                              child: Text('Decline'),
                               onPressed: () {
                                 if (notification.type == 'JOURNEY_INVITATION') {
                                   notifications.removeAt(index);
@@ -105,18 +108,29 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                                   notification
                                       .deleteNotificationFromFireStore();
                                 }
-                                if (notification.type == 'ATTENDENCE_REQUEST') {
+                                else if (notification.type == 'ATTENDENCE_REQUEST') {
                                   notifications.removeAt(index);
-                                removeCurrentUserFromPendingAttendents(notification);
-                                  
+                                  removeCurrentUserFromPendingAttendents(
+                                      notification);
+
                                   notification
                                       .deleteNotificationFromFireStore();
                                 }
+                                else if (notification.type == 'PARENT_REQUEST') {
+                                  notifications.removeAt(index);
+                                  removeCurrentUserFromPendingAttendents(
+                                      notification);
+                                  notification
+                                      .deleteNotificationFromFireStore();
+                                }
+                                
+                              else if (notification.type == 'JOIN_JOURNEY_REQUEST') {
+                                
+                              }
 
                                 //add data to users_journeis collection
                                 //remove from attendents array on journey collection
                               },
-                              child: Text('Decline'),
                             )
                           ],
                         )
@@ -131,6 +145,12 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
   }
 
   //****************** fUNCTIONS  ******************* */
+  _addUserToJourney(MyNotification notification)async {
+    bool result=false;
+result= await Journey.addUserJourneyDocument(notification.senderId, 'user', notification.journeyId);
+result= await Journey.removeUserFromUsersRequestedToJoinJourney(notification);
+if(result == true ) notification.deleteNotificationFromFireStore();
+  }
   void _addCurrentUserToJourney(String journeyId) {
     Firestore.instance.collection('journey_user').add({
       'userId': Global.user.id,
@@ -159,18 +179,23 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
     }
     return succeeded;
   }
-  Future<bool> removeCurrentUserFromPendingAttendents(MyNotification not) async {
+
+  Future<bool> removeCurrentUserFromPendingAttendents(
+      MyNotification not) async {
     bool succeeded = false;
     try {
-      QuerySnapshot snapshot=await Firestore.instance
+      QuerySnapshot snapshot = await Firestore.instance
           .collection('journey_user')
-          .where('userId',isEqualTo:not.senderId)
-          .where('journeyId',isEqualTo:not.journeyId)
+          .where('userId', isEqualTo: not.senderId)
+          .where('journeyId', isEqualTo: not.journeyId)
           .getDocuments();
-          String documentId=snapshot.documents[0].documentID;
-          Firestore.instance.collection('journey_user').document(documentId).updateData({
-      'pendingAttendents': FieldValue.arrayRemove([Global.user.id]),
-    });
+      String documentId = snapshot.documents[0].documentID;
+      Firestore.instance
+          .collection('journey_user')
+          .document(documentId)
+          .updateData({
+        'pendingAttendents': FieldValue.arrayRemove([Global.user.id]),
+      });
       succeeded = true;
     } on PlatformException catch (error) {
       succeeded = false;
@@ -181,12 +206,11 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
     return succeeded;
   }
 
-  Future<bool> _doAttendence(MyNotification notification, int index ) async {
-     notifications.removeAt(index);
+  Future<bool> _doAttendence(MyNotification notification, int index) async {
+    notifications.removeAt(index);
     bool x1 = await _addSenderToUserAttendentsList(notification);
     bool x2 = await _addUserToSenderAttendentsList(notification);
     if (x1 && x2) {
-     
       notification.deleteNotificationFromFireStore();
       removeCurrentUserFromPendingAttendents(notification);
       return true;
@@ -220,25 +244,83 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
 
   _addUserToSenderAttendentsList(MyNotification not) async {
     bool result = false;
-    var snapshot = await Firestore.instance
-        .collection('journey_user')
-        .where('userId', isEqualTo: not.senderId)
-        .where('journeyId', isEqualTo: not.journeyId)
-        .limit(1)
-        .getDocuments();
-    if (snapshot.documents.length > 0) {
-      String documentId = snapshot.documents[0].documentID;
-      print(snapshot.documents[0].documentID);
+    try {
+      var snapshot = await Firestore.instance
+          .collection('journey_user')
+          .where('userId', isEqualTo: not.senderId)
+          .where('journeyId', isEqualTo: not.journeyId)
+          .limit(1)
+          .getDocuments();
+      if (snapshot.documents.length > 0) {
+        String documentId = snapshot.documents[0].documentID;
+        await Firestore.instance
+            .collection('journey_user')
+            .document(documentId)
+            .updateData({
+          'attendents': FieldValue.arrayUnion([Global.user.id]),
+        }).then((void x) {
+          result = true;
+        });
+      }
+    } catch (e) {
+      print('An error occured +$e');
+    }
+    return result;
+  }
+
+  Future<bool> _addUserAsParentToSender(MyNotification not) async {
+    bool result = false;
+    String documentId =
+        await _getJourneyUserDocument(Global.user.id, not.journeyId);
+    if (documentId != "NO_DOCUMENTS_FOUND") {
+      //add the child id to the parent attendents
+      result = await _addUserToAttendents(documentId, not.senderId);
+    } else {
+      //the parent has no previous children and doesn`t join the journey
+      result = await Journey.addUserJourneyDocument(Global.user.id, 'PARENT',not.journeyId,
+          attendents: [not.senderId]);
+    }
+    if (result == true) {
+      not.deleteNotificationFromFireStore();
+      removeCurrentUserFromPendingAttendents(not);
+      return true;
+    }
+    Helpers.showErrorDialog(
+        context, 'failed to make you a parent for this user');
+    return result;
+  }
+
+  Future<bool> _addUserToAttendents(
+      String documentId, String attendentId) async {
+    bool result = false;
+    try {
       await Firestore.instance
           .collection('journey_user')
           .document(documentId)
           .updateData({
-        'attendents': FieldValue.arrayUnion([Global.user.id]),
-      }).then((void x) {
-        result = true;
+        'attendents': FieldValue.arrayUnion([attendentId]),
       });
+      result = true;
+    } catch (error) {
+      print(error);
     }
     return result;
+  }
+
+  Future<String> _getJourneyUserDocument(
+      String userId, String journeyId) async {
+    Firestore _instance = Firestore.instance;
+    String documentId = "NO_DOCUMENTS_FOUND";
+    QuerySnapshot snap = await _instance
+        .collection('journey_user')
+        .where('userId', isEqualTo: userId)
+        .where('journeyId', isEqualTo: journeyId)
+        .limit(1)
+        .getDocuments();
+    if (snap.documents.length > 0) {
+      documentId = snap.documents[0].documentID;
+    }
+    return documentId;
   }
 
   _fillNotificationList() async {

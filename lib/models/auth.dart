@@ -171,6 +171,7 @@ class Auth {
         'imageURL': imageURL,
         'name': name,
         'startTime': startTime,
+        'usersRequestedToJoinJourney':[]
       });
 
 //************ */
