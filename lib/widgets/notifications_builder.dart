@@ -86,16 +86,15 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
 
                                 removeCurrentUserFrominvitedUsers(notification);
                                 notification.deleteNotificationFromFireStore();
-                              }
-                              else if (notification.type == 'ATTENDENCE_REQUEST') {
+                              } else if (notification.type ==
+                                  'ATTENDENCE_REQUEST') {
                                 _doAttendence(notification, index);
-                              }
-                              else if (notification.type == 'PARENT_REQUEST') {
+                              } else if (notification.type ==
+                                  'PARENT_REQUEST') {
                                 _addUserAsParentToSender(notification);
-                              }
-                              else if (notification.type == 'JOIN_JOURNEY_REQUEST') {
+                              } else if (notification.type ==
+                                  'JOIN_JOURNEY_REQUEST') {
                                 _addUserToJourney(notification);
-
                               }
                             }),
                             RaisedButton(
@@ -107,26 +106,28 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                                       notification);
                                   notification
                                       .deleteNotificationFromFireStore();
-                                }
-                                else if (notification.type == 'ATTENDENCE_REQUEST') {
+                                } else if (notification.type ==
+                                    'ATTENDENCE_REQUEST') {
                                   notifications.removeAt(index);
                                   removeCurrentUserFromPendingAttendents(
                                       notification);
 
                                   notification
                                       .deleteNotificationFromFireStore();
-                                }
-                                else if (notification.type == 'PARENT_REQUEST') {
+                                } else if (notification.type ==
+                                    'PARENT_REQUEST') {
                                   notifications.removeAt(index);
                                   removeCurrentUserFromPendingAttendents(
                                       notification);
                                   notification
                                       .deleteNotificationFromFireStore();
-                                }
-                                
-                              else if (notification.type == 'JOIN_JOURNEY_REQUEST') {
-                                
-                              }
+                                } else if (notification.type ==
+                                    'JOIN_JOURNEY_REQUEST') {
+                                      notifications.removeAt(index);
+                                      Journey.removeUserFromUsersRequestedToJoinJourney(notification);
+                                      notification.deleteNotificationFromFireStore();
+                                    
+                                    }
 
                                 //add data to users_journeis collection
                                 //remove from attendents array on journey collection
@@ -145,12 +146,15 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
   }
 
   //****************** fUNCTIONS  ******************* */
-  _addUserToJourney(MyNotification notification)async {
-    bool result=false;
-result= await Journey.addUserJourneyDocument(notification.senderId, 'user', notification.journeyId);
-result= await Journey.removeUserFromUsersRequestedToJoinJourney(notification);
-if(result == true ) notification.deleteNotificationFromFireStore();
+  _addUserToJourney(MyNotification notification) async {
+    bool result = false;
+    result = await Journey.addUserJourneyDocument(
+        notification.senderId, 'USER', notification.journeyId);
+    result =
+        await Journey.removeUserFromUsersRequestedToJoinJourney(notification);
+    if (result == true) notification.deleteNotificationFromFireStore();
   }
+
   void _addCurrentUserToJourney(String journeyId) {
     Firestore.instance.collection('journey_user').add({
       'userId': Global.user.id,
@@ -277,7 +281,8 @@ if(result == true ) notification.deleteNotificationFromFireStore();
       result = await _addUserToAttendents(documentId, not.senderId);
     } else {
       //the parent has no previous children and doesn`t join the journey
-      result = await Journey.addUserJourneyDocument(Global.user.id, 'PARENT',not.journeyId,
+      result = await Journey.addUserJourneyDocument(
+          Global.user.id, 'PARENT', not.journeyId,
           attendents: [not.senderId]);
     }
     if (result == true) {

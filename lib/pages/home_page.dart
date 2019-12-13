@@ -48,7 +48,6 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     print('in homepage build');
-
     return Global.user == null
         ? CircularProgressIndicator()
         : Header(

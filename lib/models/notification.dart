@@ -32,6 +32,9 @@ class MyNotification {
     else if (this.type == 'PARENT_REQUEST')
       text = Text(
           '${this.senderName} requested from you to be his parent in the  journey \'${this.journeyName}\' do you accept?');
+          else if (this.type == 'JOIN_JOURNEY_REQUEST')
+      text = Text(
+          '${this.senderName} requested to join the  journey you supervise \'${this.journeyName}\' do you accept?');
 
     return text;
   }
@@ -78,7 +81,6 @@ class MyNotification {
         .where('userId', isEqualTo: Global.user.id)
         .snapshots()
         .listen((QuerySnapshot snapshot) {
-      print(snapshot.documents.length);
       Global.notificationsCount = snapshot.documents.length;
       Global.notificationObservable.add(snapshot.documents.length);
      // print(snapshot.documents.length);

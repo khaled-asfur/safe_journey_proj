@@ -180,7 +180,6 @@ class Journey {
 
 //converts the details of the journey from a Map into a journey object
   static Journey _convertMapToJourneyObject(Map<String, dynamic> journey) {
-    print(journey['id']);
     Journey journeyObj = Journey(
         journey['id'],
         journey['name'],
@@ -242,7 +241,6 @@ class Journey {
       if (snapshot.documents.isNotEmpty) {
         snapshot.documents.forEach((DocumentSnapshot document) {
           MapUser user = _getUserInfo(allUsers, document);
-          // print(user.name);
           usersjoinsJourney.add(user);
         });
       }
@@ -273,9 +271,9 @@ class Journey {
     bool result = false;
     try {
       await Firestore.instance.collection('journey_user').add({
-        'userId': Global.user.id,
+        'userId': userId,
         'journeyId': journeyId,
-        'role': 'PARENT',
+        'role': role,
         'attendents': attendents != null ? attendents : [],
         'pendingAttendents': pendingAttendents != null ? pendingAttendents : []
       });

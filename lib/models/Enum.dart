@@ -18,6 +18,11 @@ enum Relation{
   ATTENDENT,
   USER
 }
+enum UserStateInJourney{
+  JOINED,
+  PENDING,
+  NOT_JOINED,
+}
 
 
 

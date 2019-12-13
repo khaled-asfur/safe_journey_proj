@@ -21,7 +21,6 @@ class Notifications extends StatelessWidget {
               .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                print(snapshot.data.documents);
             if (!snapshot.hasData) return Text('Loading...');
             return NotificationsBuilder(snapshot);
           },
