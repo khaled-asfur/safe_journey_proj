@@ -34,6 +34,7 @@ dependencies:
   google_maps_flutter: ^0.5.21+7
   geolocator: ^5.1.4+1
   firebase_messaging: ^6.0.3
+  audioplayers: ^0.13.5
   #*******Lana*********
   nice_button: ^0.1.7
   intl: ^0.15.0
@@ -76,6 +77,11 @@ flutter:
    - images/profile.png
    - images/journeyIcon.ico
    - images/bg_uit.jpg
+   - sounds/alert.mp3
+   - sounds/start_journey.mp3
+   - sounds/end_send_location.mp3
+   - sounds/notification.mp3
+    
 
   #  - images/a_dot_ham.jpeg
 

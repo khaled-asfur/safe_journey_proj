@@ -1,10 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:safe_journey/models/global.dart';
-import 'package:safe_journey/models/map_user.dart';
-import 'package:safe_journey/models/notification.dart';
+import 'package:http/http.dart';
+import 'package:flutter/material.dart';
 
+import '../models/global.dart';
+import '../models/map_user.dart';
+import '../models/notification.dart';
 import '../models/Enum.dart';
+import '../models/push_notification.dart';
 
 class Journey {
   final String _id;
@@ -18,6 +22,7 @@ class Journey {
   final List _attendents;
   final List _pendingAttendents;
   final String _imageURL;
+  final int _distance;
 
   Journey(
       this._id,
@@ -30,7 +35,8 @@ class Journey {
       this._role,
       this._attendents,
       this._pendingAttendents,
-      this._imageURL);
+      this._imageURL,
+      this._distance);
 //fetches the details of all the journies this user is joining now & still not ended yet
 
   String get id {
@@ -75,6 +81,9 @@ class Journey {
 
   String get imageURL {
     return this._imageURL;
+  }
+  int get distance {
+    return this._distance;
   }
 
 //جلب جميع الرحلات التي انضم لها اليوزر
@@ -124,7 +133,8 @@ class Journey {
       'role': ' ',
       'attendents': List(),
       'pendingAttendents': List(),
-      'imageURL': ''
+      'imageURL': '',
+      'allowedDistance' :"0"
     };
     try {
       if (firestoreDocument != null)
@@ -170,7 +180,7 @@ class Journey {
       journey['endTime'] = journeyDocument.data['endTime'];
       journey['imageURL'] = journeyDocument.data['imageURL'];
       journey['places'] = journeyDocument.data['places'];
-
+      journey['allowedDistance']=journeyDocument.data['allowedDistance'];
       journey['invitedUsers'] = journeyDocument.data['invitedUsers'];
     } on PlatformException catch (error) {
       print('An error occured in fetchJourneyDetails method');
@@ -191,7 +201,8 @@ class Journey {
         journey['role'],
         journey['attendents'],
         journey['pendingAttendents'],
-        journey['imageURL']);
+        journey['imageURL'],
+        journey['allowedDistance'],);
     return journeyObj;
   }
 
@@ -343,6 +354,34 @@ class Journey {
     print(journies);
     return journies;
   }
+  static startJourney(String journeyId,BuildContext context) async {
+    Response response = await PushNotification.sendToTopic(
+        title: "The admin started the journey",
+        body: journeyId,
+        topic: journeyId,
+        type:"START_JOURNEY");
+    if (response.statusCode != 200) {
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content:
+            Text('[${response.statusCode}] Error message: ${response.body}'),
+      ));
+    }
+  }
+  static endJourney(String journeyId,BuildContext context) async {
+    MapUser.closeSendLocationtoDBStream();
+    Response response = await PushNotification.sendToTopic(
+        title: "The admin stopped the journey",
+        body: journeyId,
+        topic: journeyId,
+        type:"END_JOURNEY");
+    if (response.statusCode != 200) {
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content:
+            Text('[${response.statusCode}] Error message: ${response.body}'),
+      ));
+    }
+  }
+
 
   @override
   String toString() {

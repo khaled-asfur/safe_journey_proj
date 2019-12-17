@@ -295,30 +295,8 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   //*********************************************** */
-                  SizedBox(height: 15),
-                  new ListTile(
-                    
-                    title: new TextField(
-                                        enabled: false,
-
-                      controller: emailController,
-                      decoration: new InputDecoration(
-                          labelText: "email adress",
-                          labelStyle: TextStyle(
-                              fontFamily: "Caveat",
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey),
-                          suffixIcon: IconButton(
-                              icon: Icon(Icons.cancel),
-                              onPressed: () {
-                                emailController.clear();
-                              })),
-                            
-                    ),
-                  ),
+                 
                   //********************************************** */
-               
-                  //************************************************************** */
                   new FlatButton.icon(
                       icon: Icon(
                         Icons.settings,

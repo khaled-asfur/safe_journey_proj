@@ -28,7 +28,7 @@ enum UserStateInJourney{
 
 /*
 Data base collections
-journies_users{
+journies_users{ٍ
   role: ADMIN - USER - PARENT
 }
 notifications{
@@ -37,4 +37,7 @@ notifications{
 users{
    'token': "NO_TOKEN" - or a token from user device
 }
+
+push notification types:
+START_JOURNEY - END_JOURNEY - EXCCEEDED_ALLOWED_DISTANCE
 */

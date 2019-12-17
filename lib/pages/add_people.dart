@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/journey.dart';
 import 'package:safe_journey/models/push_notification.dart';
+import 'package:safe_journey/widgets/show_journey_members.dart';
 import 'dart:async';
 
 import '../widgets/user_search_item.dart';
@@ -64,7 +65,7 @@ class _AddPeopleState extends State<AddPeople> {
           'Your role is not \'ADMIN\', so you are not authorized to add users to this journey.');
     } */else if (searchItem == null || searchItem == '') {
       //اليوزر ما بحث عن اشي
-      return Container();
+      return ShowJourneyMembers(usersJoinsThisJourney,userDocs,widget._journey.id);
     } else if (state == FetchState.FETCHING_IN_PROGRESS && searchItem != null) {
       //اذا قاعد بعمل بحث على اشي بس داتا اليوزرز بعدها مش واصلة
       return Center(child: CircularProgressIndicator());

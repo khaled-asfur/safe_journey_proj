@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:rxdart/subjects.dart' as rx;
@@ -15,8 +16,7 @@ class MapUser {
   double distanceFromCurrentUser;
   Relation relation; // علاقة اليوزر باليوزر الحالي
   static bool _allowedToSendCoordinates = true;
-  static Timer _timer;
-  static String activeJourneyId; //for the stream to speecify for what journey
+  //static String activeJourneyId; //for the stream to speecify for what journey
   static StreamSubscription<Position> sendLocationStream;
   static rx.PublishSubject<Map<String, dynamic>> myLocationObservable;
 
@@ -29,8 +29,8 @@ class MapUser {
   );
   static setmyLocationStream(String journeyId) async {
     //Listen to changes on my location, and send my coordinates to database
-    if (sendLocationStream != null)  await sendLocationStream.cancel();
-    activeJourneyId = journeyId;
+    if (sendLocationStream != null) await sendLocationStream.cancel();
+    //activeJourneyId = journeyId;
     LocationOptions locationOptions = LocationOptions(
       accuracy: LocationAccuracy.best,
     );
@@ -53,7 +53,7 @@ class MapUser {
     String uid = Global.user.id;
     if (_allowedToSendCoordinates) {
       _allowedToSendCoordinates = false;
-      _timer = Timer(Duration(seconds: 5), () {
+      Timer(Duration(seconds: 5), () {
         _allowedToSendCoordinates = true;
       });
 
@@ -69,6 +69,7 @@ class MapUser {
       }).catchError((s) {
         print(s);
       });
+      SystemSound.play(SystemSoundType.click);
       print(' my position sentttttt id: $uid  jour: $journeyId ');
     }
   }
@@ -81,6 +82,7 @@ class MapUser {
     print('in close locatin stream');
     if (sendLocationStream != null) {
       await sendLocationStream.cancel();
+      sendLocationStream = null;
       print('sendLocationStream cancelled');
     }
   }

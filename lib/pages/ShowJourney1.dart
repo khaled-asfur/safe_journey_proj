@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/journey.dart';
+import 'package:safe_journey/pages/add_attendents.dart';
 import 'package:safe_journey/pages/realtime_screen.dart';
-import 'add_attendents.dart';
+import 'people.dart';
 import '../widgets/header.dart';
 import 'package:intl/intl.dart';
 
@@ -48,33 +49,28 @@ class ShowJourneyState extends State<ShowJourney> {
                 children: <Widget>[
                   IconButton(
                     icon: Icon(Icons.description),
-                    color: Colors.blueAccent,
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (BuildContext context) {
-                          return ShowJourney(widget._journey);
+                          return AddAttendents(widget._journey);
                         }),
                       );
                     },
                   ),
                   IconButton(
                     icon: Icon(Icons.group),
-                    color: Colors.blueAccent,
                     onPressed: () {
                       //Navigator.pushNamed(context, 'people');
                       Navigator.push(
                           context,
                           MaterialPageRoute<bool>(
                               builder: (BuildContext context) =>
-                                //People(widget._journey)
-                                 AddAttendents(widget._journey)
-                                  ));
+                                  People(widget._journey)));
                     },
                   ),
                   IconButton(
                     icon: Icon(Icons.add_location),
-                    color: Colors.blueAccent,
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -93,39 +89,23 @@ class ShowJourneyState extends State<ShowJourney> {
                   children: <Widget>[*/
                     Container(
                       child: new DataTable(columns: [
-                        DataColumn(label:  Text('Journey Name',style:TextStyle(
-                        fontFamily: "Chilanka",
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF197278) ,))),
                         DataColumn(label: Text('${widget._journey.name}')),
+                        DataColumn(label: Text('${widget._journey.id}')),
                       ], rows: [
                         DataRow(cells: [
-                          DataCell(Text('Journey Start Date',style:TextStyle(
-                        fontFamily: "Chilanka",
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF197278) ,))),
+                          DataCell(Text('Start Date')),
                           DataCell(Text('$formattedStartTime')),
                         ]),
                         DataRow(cells: [
-                          DataCell(Text('Journey End Date',style:TextStyle(
-                        fontFamily: "Chilanka",
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF197278) ,))),
+                          DataCell(Text('End Date')),
                           DataCell(Text('$formattedEndTime')),
                         ]),
                         DataRow(cells: [
-                          DataCell(Text( 'Journey Description',style:TextStyle(
-                        fontFamily: "Chilanka",
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF197278) ,))),
+                          DataCell(Text('Description')),
                           DataCell(Text('${widget._journey.description}')),
                         ]),
                         DataRow(cells: [
-                          DataCell(Text('Journey Places',
-                          style:TextStyle(
-                        fontFamily: "Chilanka",
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF197278) ,))),
+                          DataCell(Text('Places')),
                           DataCell(Text('${widget._journey.places}')),
                         ]),
                       ]),

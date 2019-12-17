@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:safe_journey/models/journey.dart';
-import 'package:safe_journey/pages/creat.dart';
+import 'package:safe_journey/models/sounds.dart';
 
 import '../models/map_user.dart';
 
@@ -25,24 +26,32 @@ class PushNotification {
   }
 
   static Future<Response> sendToTopic(
-      {@required String title, @required String body, @required String topic}) {
-    return sendTo(title: title, body: body, fcmToken: '/topics/$topic');
+      {@required String title,
+      @required String body,
+      @required String topic,
+      String type}) {
+    return type == null
+        ? sendTo(title: title, body: body, fcmToken: '/topics/$topic')
+        : sendTo(
+            title: title, body: body, fcmToken: '/topics/$topic', type: type);
   }
 
-  static Future<Response> sendTo({
-    @required String title,
-    @required String body,
-    @required String fcmToken,
-  }) {
+  static Future<Response> sendTo(
+      {@required String title,
+      @required String body,
+      @required String fcmToken,
+      String type}) {
     return client.post(
       'https://fcm.googleapis.com/fcm/send',
       body: json.encode({
         'notification': {'body': '$body', 'title': '$title'},
         'priority': 'high',
+        'click_action': 'FLUTTER_NOTIFICATION_CLICK',
         'data': {
           'click_action': 'FLUTTER_NOTIFICATION_CLICK',
           'id': '1',
           'status': 'done',
+          'type': type,
         },
         'to': '$fcmToken',
       }),
@@ -54,34 +63,47 @@ class PushNotification {
   }
 
   static setPushNotificationSettings(BuildContext context) {
-            _fcm.configure(
+    _fcm.configure(
       onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message");
-        final notification = message['notification'];
-        if (notification['title'] == "Send location notification")
-          MapUser.setmyLocationStream(notification['body']);
-        else
-          Navigator.pushNamed(context, 'notifications');
+        _onNotificationRecieved('onMessage', message, context);
       },
       onResume: (Map<String, dynamic> message) async {
-        //the body has journey id
-        final notification = message['notification'];
-        if (notification['title'] == "Send location notification")
-          MapUser.setmyLocationStream(notification['body']);
-        else
-          Navigator.pushNamed(context, 'notifications');
-        print(" on resume $message");
+        _onNotificationRecieved('onResume', message, context);
       },
       onLaunch: (Map<String, dynamic> message) async {
-        print(" on launch $message");
-        final notification = message['notification'];
-        if (notification['title'] == "Send location notification")
-          MapUser.setmyLocationStream(notification['body']);
-        else
-          Navigator.pushNamed(context, 'notifications');
+        _onNotificationRecieved('onLaunch', message, context);
       },
     );
     _fcm.getToken().then((String token) {});
+  }
+
+  static _onNotificationRecieved(
+      String text, Map<String, dynamic> message, BuildContext context) {
+    print("$text: $message");
+    final data = message['data'];
+    if (data['type'] != null) {
+      print('1111111111');
+      if (data['type'] == "START_JOURNEY"){
+         print('2222222222222');
+        MapUser.setmyLocationStream(message['notification']['body']);
+        Sounds.playSound('../sounds/start_journey.mp3');
+        SnackBar snack=SnackBar(content:Text('journey started by admin'),);
+        Scaffold.of(context).showSnackBar(snack);
+      }
+      else if (data['type'] == "END_JOURNEY"){
+         print('33333333');
+        MapUser.closeSendLocationtoDBStream();
+        Sounds.playSound('../sounds/end_send_location.mp3');
+        SnackBar snack=SnackBar(content:Text('journey was ended by admin'),);
+        Scaffold.of(context).showSnackBar(snack);
+      }
+    } else{
+      print("data type = null");
+      Sounds.playSound('../sounds/notification.mp3');
+
+      Navigator.pushNamed(context, 'notifications');
+      
+    }
   }
 
   static subscribeToCloudMessagingTopic(String topic) {
@@ -140,7 +162,8 @@ class PushNotification {
   }
 
   static Future<bool> sendNotificationToUser(
-      String userId, String notificationTitle, String notificationBody) async {
+      String userId, String notificationTitle, String notificationBody,
+      {String type}) async {
     bool result = false;
     try {
       DocumentSnapshot doc =
@@ -148,9 +171,19 @@ class PushNotification {
       String token = doc['token'];
       if (token == "NO_TOKEN")
         print("This user is currently not signed in to any device!");
-      else
-        sendTo(
-            fcmToken: token, title: notificationTitle, body: notificationBody);
+      else {
+        type == null
+            ? sendTo(
+                fcmToken: token,
+                title: notificationTitle,
+                body: notificationBody,
+              )
+            : sendTo(
+                fcmToken: token,
+                title: notificationTitle,
+                body: notificationBody,
+                type: type);
+      }
       result = true;
     } catch (error) {
       print(

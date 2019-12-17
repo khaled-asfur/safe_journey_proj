@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:safe_journey/models/Enum.dart';
+import 'package:safe_journey/models/helpers.dart';
+import 'package:safe_journey/models/push_notification.dart';
+import 'package:safe_journey/models/sounds.dart';
 
 import '../models/global.dart';
 import '../models/journey.dart';
@@ -26,9 +29,11 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   StreamSubscription<DocumentSnapshot> _usersLocationsStream;
   Map<String, dynamic> _myLocation = {'latitude': null, 'longitude': null};
   double allowedDistance = 15;
-  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  //GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   double _distance = 0;
   List<MapUser> _usersJoinsJourney;
+  bool userStartedSendLocation = false;
+  bool _allowedToSendNotifications = true;
 
   @override
   void initState() {
@@ -40,10 +45,9 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
         _usersJoinsJourney = allUsers;
       });
     });
-
-    if (MapUser.sendLocationStream == null ||
-        MapUser.activeJourneyId != widget._journey.id) {
+    if (MapUser.sendLocationStream == null) {
       MapUser.setmyLocationStream(widget._journey.id);
+      userStartedSendLocation = true;
     }
 
     setCamerPosition();
@@ -51,6 +55,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('in map build');
     MapUser.myLocationObservable.listen((Map<String, dynamic> location) {
       _myLocation = location;
     });
@@ -58,7 +63,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
       _usersLocationsStream = _getUsersLocationsStream();
 
     return Scaffold(
-      key: scaffoldKey,
+      // key: scaffoldKey,
       appBar: AppBar(
         title: Text('$_distance'),
       ),
@@ -114,7 +119,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
             _addmarkerForUser(userId, data, 0.0);
         });
       }
-      if (widget._journey.role == "ADMIN") _checkIfUsersInSafeDistance();
+      _checkIfUsersInSafeDistance();
       setState(() {});
     });
   }
@@ -174,9 +179,8 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   }
 
   _checkIfUsersInSafeDistance() async {
-    SnackBar snackBar;
-
     String usersIds = "";
+    List<String> _usersIdsList = [];
     String distances = '';
     bool unsafeUsersExist = false;
     for (Marker marker in markers) {
@@ -194,19 +198,38 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
           _addDistanceToUserObject(distance, userId);
           if (distance > allowedDistance) {
             usersIds += "${marker.markerId.value}, ";
+            _usersIdsList.add(marker.markerId.value);
             distances += "$distance, ";
             unsafeUsersExist = true;
           }
         });
       }
     }
-    if (unsafeUsersExist) {
-      snackBar = SnackBar(
-          content: Text(
-              'The users with id\'s ($usersIds) are out side the allowed area' +
-                  '\n and far from you the following distances($distances)'));
-      scaffoldKey.currentState.showSnackBar(snackBar);
+
+    if (unsafeUsersExist && widget._journey.role == "ADMIN") {
+      String message =
+          'The users with id\'s ($usersIds) are out side the allowed area' +
+              '\n and far from you the following distances($distances)';
+      if (_allowedToSendNotifications) {
+        _allowedToSendNotifications = false;
+        _notifyAdminAboutUSersOutOfRange(message, _usersIdsList);
+        Timer(Duration(minutes: 1), () {
+          _allowedToSendNotifications = true;
+        });
+      }
     }
+  }
+
+  _notifyAdminAboutUSersOutOfRange(String message, List<String> usersIds) {
+    Helpers.showErrorDialog(context, message);
+    Sounds.playSound('../sounds/alert.mp3');
+    usersIds.forEach((String userId) {
+      PushNotification.sendNotificationToUser(
+          userId,
+          "Caution!, you went so far",
+          'you ara out of the range allowed for you to be in, please go back and be close to the admin.',
+          type: 'EXCCEEDED_ALLOWED_DISTANCE');
+    });
   }
 
   _addDistanceToUserObject(distance, userId) {
@@ -240,7 +263,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   @override
   void dispose() {
     _usersLocationsStream.cancel();
-    MapUser.closeSendLocationtoDBStream();
+    if (userStartedSendLocation) MapUser.closeSendLocationtoDBStream();
     MapUser.closeMyLocationObservable();
     super.dispose();
   }

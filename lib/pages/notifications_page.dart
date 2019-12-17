@@ -4,8 +4,6 @@ import 'package:safe_journey/models/user.dart';
 import 'package:safe_journey/widgets/header.dart';
 import '../models/global.dart';
 import '../widgets/notifications_builder.dart';
-//TODO: send notification to the mobile while app isn't running
-//TODO: rebuild classes 
 
 class Notifications extends StatelessWidget {
   @override

@@ -1,40 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/journey.dart';
-import 'package:safe_journey/models/push_notification.dart';
-import 'package:safe_journey/pages/add_people.dart';
-import 'package:safe_journey/pages/realtime_screen.dart';
-import 'package:safe_journey/widgets/my_raised_button.dart';
 import '../widgets/header.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nice_button/nice_button.dart';
-//import 'admin_people.dart';
 import 'home_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-import 'package:http/http.dart';
-
-class AdminShowJourney extends StatefulWidget {
+class EditJourney extends StatefulWidget {
   final Journey _journey;
-  AdminShowJourney(this._journey);
+  EditJourney(this._journey);
   @override
   State<StatefulWidget> createState() {
-    return ShowJourneyState();
+    return EditJourneyState();
   }
 }
 
-class ShowJourneyState extends State<AdminShowJourney> {
+class EditJourneyState extends State<EditJourney> {
   var firstColor = Colors.blueAccent, secondColor = Color(0xff36d1dc);
   String name, description, imageUrl;
   String places;
+  int distance;
   DateTime startDate, endDate;
-  TextEditingController _controllerName = TextEditingController();
-  TextEditingController _controllerDes = TextEditingController();
-  TextEditingController _controllerPlaces = TextEditingController();
+  TextEditingController _controllerName; //= TextEditingController();
+  TextEditingController _controllerDes; // = TextEditingController();
+  TextEditingController _controllerPlaces; //= TextEditingController();
+  TextEditingController _controllerDistance;
 
   File backgroundImageFile;
   Future getImage(bool isBackground) async {
@@ -46,51 +41,21 @@ class ShowJourneyState extends State<AdminShowJourney> {
     });
   }
 
-  _requestLocationsFromUsers(String journeyId) async {
-    Response response = await PushNotification.sendToTopic(
-        title: "Send location notification",
-        body: journeyId,
-        topic: journeyId);
-    if (response.statusCode != 200) {
-      Scaffold.of(context).showSnackBar(SnackBar(
-        content:
-            Text('[${response.statusCode}] Error message: ${response.body}'),
-      ));
-    }
-  }
-  
-
   @override
   Widget build(BuildContext context) {
+    name = widget._journey.name;
+    description = widget._journey.description;
+    places = widget._journey.places;
+    distance = widget._journey.distance;
+    _controllerName = TextEditingController(text: name);
+    _controllerDes = TextEditingController(text: description);
+    _controllerPlaces = TextEditingController(text: places);
+    String distanceString = distance.toString();
+    _controllerDistance = TextEditingController(text: distanceString);
     return Header(
         body: new SingleChildScrollView(
       child: new Column(
         children: <Widget>[
-          MyRaisedButton("Start sending location", () {
-            _requestLocationsFromUsers(widget._journey.id);
-          }),
-          IconButton(
-            icon: Icon(Icons.add_location),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (BuildContext context) {
-                  return RealTimeScreen(widget._journey);
-                }),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.whatshot),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (BuildContext context) {
-                  return AddPeople(widget._journey);
-                }),
-              );
-            },
-          ),
           new Container(
             child: new Stack(
               children: <Widget>[
@@ -116,6 +81,7 @@ class ShowJourneyState extends State<AdminShowJourney> {
                         //icon image for profile
                         child: new IconButton(
                           icon: new Image.network(
+                            // widget._journey.imageURL,
                             'https://cdn1.iconfinder.com/data/icons/iconmart-web-icons-2/64/camera-512.png',
                             width: 30.0,
                             height: 30.0,
@@ -146,11 +112,13 @@ class ShowJourneyState extends State<AdminShowJourney> {
               new ListTile(
                 title: new TextField(
                   decoration: new InputDecoration(
-                      labelText: '${widget._journey.name}',
-                      labelStyle: TextStyle(
-                          fontFamily: "Caveat",
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey)),
+                    labelText: "Journy Name",
+                    hintText: '${widget._journey.name}',
+                    labelStyle: TextStyle(
+                        fontFamily: "Chilanka",
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF197278)),
+                  ),
                   controller: _controllerName,
                 ),
               ),
@@ -158,23 +126,41 @@ class ShowJourneyState extends State<AdminShowJourney> {
               new ListTile(
                 title: new TextField(
                   decoration: new InputDecoration(
-                      labelText: '${widget._journey.description}',
-                      labelStyle: TextStyle(
-                          fontFamily: "Caveat",
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey)),
+                    labelText: 'Journy Description',
+                    hintText: '${widget._journey.description}',
+                    labelStyle: TextStyle(
+                        fontFamily: "Chilanka",
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF197278)),
+                  ),
                   controller: _controllerDes,
                 ),
               ),
               new ListTile(
                 title: new TextField(
                   decoration: new InputDecoration(
-                      labelText: '${widget._journey.places}',
-                      labelStyle: TextStyle(
-                          fontFamily: "Caveat",
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey)),
+                    labelText: 'Places',
+                    hintText: '${widget._journey.places}',
+                    labelStyle: TextStyle(
+                        fontFamily: "Chilanka",
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF197278)),
+                  ),
                   controller: _controllerPlaces,
+                ),
+              ),
+              SizedBox(height: 15),
+              new ListTile(
+                title: new TextField(
+                  decoration: new InputDecoration(
+                    labelText: 'Allowad Distance',
+                    // hintText:'${widget._journey.distance}' ,
+                    labelStyle: TextStyle(
+                        fontFamily: "Chilanka",
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF197278)),
+                  ),
+                  controller: _controllerDistance,
                 ),
               ),
               SizedBox(height: 15),
@@ -204,25 +190,36 @@ class ShowJourneyState extends State<AdminShowJourney> {
                 onPressed: () {
                   if (_controllerName.text != null) {
                     name = _controllerName.text;
-                  } else {
+                  } else if (_controllerName.text == null) {
                     name = widget._journey.name;
                   }
                   if (_controllerDes.text != null) {
-                    description = _controllerName.text;
-                  } else {
+                    description = _controllerDes.text;
+                  } else if (_controllerDes.text == null) {
                     description = widget._journey.description;
                   }
                   if (_controllerPlaces.text != null) {
-                    places = _controllerName.text;
+                    places = _controllerPlaces.text;
                   } else {
                     places = widget._journey.places;
                   }
-
-                  updateData({
-                    'name': this.name,
+                  if (_controllerDistance.text != null) {
+                    distanceString = _controllerDistance.text;
+                  } else {
+                    distanceString = widget._journey.distance.toString();
+                  }
+                  Firestore.instance
+                      .collection('journies')
+                      .document(widget._journey.id)
+                      .updateData({
+                    'name': name,
                     'description': description,
-                    'places': places
+                    'places': places,
+                    'allowedDistance': distanceString,
+                  }).catchError((e) {
+                    print(e);
                   });
+                  //  updateData();
                 },
                 background: null,
               )
@@ -235,16 +232,22 @@ class ShowJourneyState extends State<AdminShowJourney> {
     ));
   }
 
-  updateData(newValues) {
+  /* updateData() {
+    //final fireStoreInstance = Firestore.instance;
+
     print(name);
     Firestore.instance
         .collection('journies')
         .document(widget._journey.id)
-        .updateData(newValues)
+        .updateData({
+                    'name':name,
+                    'description': description,
+                    //'places': places
+                  })
         .catchError((e) {
       print(e);
     });
-  }
+  }*/
 }
 
 class BasicDateTimeStartField extends StatelessWidget {

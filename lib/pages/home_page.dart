@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
-import 'package:safe_journey/models/map_user.dart';
 import 'package:safe_journey/models/notification.dart';
-import 'package:safe_journey/models/push_notification.dart';
 import 'package:safe_journey/widgets/my_raised_button.dart';
+import 'package:safe_journey/widgets/titleText.dart';
 
 import '../models/Enum.dart';
 import '../widgets/slide_show.dart';
@@ -23,7 +22,6 @@ class HomePageState extends State<HomePage> {
   final databaseReference = Firestore.instance;
   bool _loadedJournies = false;
   List<Journey> _journies;
-
   bool userJoinedJournies = false;
 
   @override
@@ -59,9 +57,9 @@ class HomePageState extends State<HomePage> {
               },
               child: ListView(
                 children: <Widget>[
-                  MyRaisedButton("stop sending Location to DB",(){
-                    MapUser.closeSendLocationtoDBStream();
-                    PushNotification.subscribeToCloudMessagingTopic('2018496');
+                  MyRaisedButton("sound ",(){
+                   
+                    
                   }),
                   Container(
                       decoration: BoxDecoration(color: Colors.grey[200]),
@@ -69,13 +67,9 @@ class HomePageState extends State<HomePage> {
                   Container(
                     padding: EdgeInsets.all(10),
                     alignment: Alignment.center,
-                    child: Text(
+                    child: TitleText(
                       'Journeys you joined',
-                      style: TextStyle(
-                          color: Colors.teal[600],
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20),
-                    ),
+                    )
                   ),
                   _loadedJournies
                       ? userJoinedJournies

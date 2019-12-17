@@ -94,7 +94,7 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                                 
                                 _addUserAsParentToSender(notification);
                               } else if (notification.type ==
-                                  'JOIN_JOURNEY_REQUEST') {//TODO 55555
+                                  'JOIN_JOURNEY_REQUEST') {
                                 _addUserToJourney(notification);
                               }
                             }),
