@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
+import 'package:safe_journey/models/map_user.dart';
 import 'package:safe_journey/models/notification.dart';
+import 'package:safe_journey/models/push_notification.dart';
+import 'package:safe_journey/widgets/my_raised_button.dart';
 
 import '../models/Enum.dart';
 import '../widgets/slide_show.dart';
@@ -35,7 +38,6 @@ class HomePageState extends State<HomePage> {
     await Journey.fetchJoinedJournies().then((jour) {
       setState(() {
         _loadedJournies = true;
-
         if (jour['result'] == FetchResult.SUCCESS) {
           _journies = jour['journies'];
           userJoinedJournies = true;
@@ -57,6 +59,10 @@ class HomePageState extends State<HomePage> {
               },
               child: ListView(
                 children: <Widget>[
+                  MyRaisedButton("stop sending Location to DB",(){
+                    MapUser.closeSendLocationtoDBStream();
+                    PushNotification.subscribeToCloudMessagingTopic('2018496');
+                  }),
                   Container(
                       decoration: BoxDecoration(color: Colors.grey[200]),
                       child: MySlideShow()),

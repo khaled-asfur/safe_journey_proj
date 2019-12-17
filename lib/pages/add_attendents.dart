@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/journey.dart';
+import 'package:safe_journey/models/push_notification.dart';
 import 'dart:async';
 
 import '../widgets/user_search_item.dart';
@@ -164,6 +165,7 @@ class _AddAttendentsState extends State<AddAttendents> {
     setState(() {
       _pendingAttendents.add(userID);
     });
+    try{
     Firestore.instance.collection('notifications').add(
       {
         'journeyId': _journey.id,
@@ -187,7 +189,15 @@ class _AddAttendentsState extends State<AddAttendents> {
           .updateData({
         'pendingAttendents': FieldValue.arrayUnion([userID]),
       });
+
     });
+    String role=addingattendents?"attendent":"parent";
+    String userName=Global.user.name;
+    PushNotification.sendNotificationToUser(userID,
+     "Attendebce Request", '$userName requsted from you to be his $role in the journey ${_journey.name}');
+  }catch(error ){
+    print('error while sending attendence request $error');
+  }
   }
 
   List<User> _findUsersMatchsearchValue(String searchValue,

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:safe_journey/models/enum.dart';
 import 'package:safe_journey/models/global.dart';
+import 'package:safe_journey/models/push_notification.dart';
 
 class JourneySearchElement {
   final String photoUrl;
@@ -55,6 +56,20 @@ class JourneySearchElement {
       print("error ocured while fetching unfinshed journies");
     }
     return allJournies;
+  }
+  static Future<int>getNumberOfAllJournies()async {
+    int length=0;
+    try{
+    QuerySnapshot snap = await Firestore.instance
+          .collection('journies')
+          .where('endTime', isGreaterThanOrEqualTo: DateTime.now())
+          .getDocuments();
+          length=snap.documents.length;
+          }catch(error){
+            length=-1;
+      print('error occured while getting the journies this user was joined');
+    }
+    return length;
   }
 
   static Future<List<String>> getJourniesUserJoined() async {
@@ -113,10 +128,14 @@ class JourneySearchElement {
 
   static void sendJoinJourneyRequest(
     String journeyId,
+    String journeyName,
   ) async {
     String adminId = await getJourneyAdminId(journeyId);
     _addCurrentUserToJourneyPendingUsers(journeyId);
     _sendjoinJourneyNotification(journeyId, adminId);
+    String userName=Global.user.name;
+    PushNotification.sendNotificationToUser(adminId,
+     "Join journey request", '$userName requsted to join the journey you supervise $journeyName');
   }
 
   static void _addCurrentUserToJourneyPendingUsers(String journeyId) {

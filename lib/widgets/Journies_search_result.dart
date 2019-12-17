@@ -76,7 +76,7 @@ class _JourniesSearchResultState extends State<JourniesSearchResult> {
                         ? null
                         : () {
                             JourneySearchElement.sendJoinJourneyRequest(
-                                journey.id);
+                                journey.id,journey.name);
                             pendingJournies.add(journey.id);
                             Global.pendingJournies.add(journey.id);
                             setState(() {});

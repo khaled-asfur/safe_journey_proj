@@ -19,42 +19,41 @@ class RealTimeScreen extends StatefulWidget {
 
 class _RealTimeScreenState extends State<RealTimeScreen> {
   List<Marker> markers = [];
-  CameraPosition cameraPosition;
-  bool loaded = false;
+  CameraPosition _cameraPosition;
+  bool _loadedCameraPositon = false;
   Geolocator _geolocator;
-  LocationOptions locationOptions;
-  Position myPosition;
+  Position _myPosition;
   StreamSubscription<DocumentSnapshot> _usersLocationsStream;
   Map<String, dynamic> _myLocation = {'latitude': null, 'longitude': null};
   double allowedDistance = 15;
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  Timer timer;
-  bool allowedToSendCoordinates = true;
-  Firestore _instance = Firestore.instance;
-  StreamSubscription<Position> _sendLocationStream;
   double _distance = 0;
   List<MapUser> _usersJoinsJourney;
 
   @override
   void initState() {
     super.initState();
+    _geolocator = Geolocator();
+    _checkPermission();
     widget._journey.getUsersJoinsJourney().then((List<MapUser> allUsers) {
       setState(() {
-        print("users loadeddddddddddddddddddddddddddddddddddddd");
         _usersJoinsJourney = allUsers;
       });
     });
-    _geolocator = Geolocator();
-    locationOptions = LocationOptions(
-      accuracy: LocationAccuracy.best,
-    );
-    _setmyLocationStream(); //send my location to DB
-    _checkPermission();
-    //read other users locations from DB
+
+    if (MapUser.sendLocationStream == null ||
+        MapUser.activeJourneyId != widget._journey.id) {
+      MapUser.setmyLocationStream(widget._journey.id);
+    }
+
+    setCamerPosition();
   }
 
   @override
   Widget build(BuildContext context) {
+    MapUser.myLocationObservable.listen((Map<String, dynamic> location) {
+      _myLocation = location;
+    });
     if (_usersLocationsStream == null && _usersJoinsJourney != null)
       _usersLocationsStream = _getUsersLocationsStream();
 
@@ -63,16 +62,29 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
       appBar: AppBar(
         title: Text('$_distance'),
       ),
-      body: (loaded)
+      body: (_loadedCameraPositon)
           ? GoogleMap(
               mapType: MapType.hybrid,
-              initialCameraPosition: cameraPosition,
+              initialCameraPosition: _cameraPosition,
               markers: markers.toSet(),
             )
           : Center(
               child: CircularProgressIndicator(),
             ),
     );
+  }
+
+  void setCamerPosition() async {
+    _myPosition = await _geolocator.getCurrentPosition();
+    _cameraPosition = CameraPosition(
+        target: LatLng(
+          _myPosition.latitude,
+          _myPosition.longitude,
+        ),
+        zoom: 15);
+    setState(() {
+      _loadedCameraPositon = true;
+    });
   }
 
   StreamSubscription<DocumentSnapshot> _getUsersLocationsStream() {
@@ -86,23 +98,23 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
       markers = [];
       print("trying to get markersssssssssssssssssssssssssssssssssss");
       if (snapshot != null && _usersJoinsJourney != null) {
-        snapshot.data.forEach((String userId, dynamic coordinates) {
+        snapshot.data.forEach((String userId, dynamic data) {
           MapUser user = _getMapUserObject(userId);
           if (user.id == Global.user.id) {
             //add markers only for attendents
-            _addmarkerForUser(userId, coordinates, 60.0);
+            _addmarkerForUser(userId, data, 60.0);
           } else if (user.relation == Relation.ATTENDENT) {
             //add markers only for attendents
-            _addmarkerForUser(userId, coordinates, 120.0);
+            _addmarkerForUser(userId, data, 120.0);
           } else if (user.role == 'ADMIN') {
             //اذا اليوزر الي بحاول اعرضه هو مسؤول الرحلة مشان يظهر لون مختلف للماركر
-            _addmarkerForUser(userId, coordinates, 240);
+            _addmarkerForUser(userId, data, 240);
           } else if (widget._journey.role == 'ADMIN')
             //current user is admin, so add marker for all users
-            _addmarkerForUser(userId, coordinates, 0.0);
+            _addmarkerForUser(userId, data, 0.0);
         });
       }
-      _checkIfUsersInSafeDistance();
+      if (widget._journey.role == "ADMIN") _checkIfUsersInSafeDistance();
       setState(() {});
     });
   }
@@ -114,18 +126,23 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     return user;
   }
 
-  _addmarkerForUser(String userId, dynamic coordinates, double markerColor) {
+  _addmarkerForUser(String userId, dynamic data, double markerColor) {
 //marker colors: hueRed = 0.0; hueOrange = 30.0;hueYellow = 60.0;hueGreen = 120.0;hueCyan =180.0;
 //hueAzure = 210.0; hueBlue = 240.0; hueViolet = 270.0;hueMagenta = 300.0; hueRose = 330.0;
     bool usersDataLoaded =
         _usersJoinsJourney != null && _usersJoinsJourney.length > 0;
+    double inActiveUserColor = 300.0;
+    DateTime timeCoordinatesSent = data['time'].toDate();
+    double color = DateTime.now().difference(timeCoordinatesSent).inSeconds > 15
+        ? inActiveUserColor
+        : markerColor;
     markers.add(
       Marker(
-        icon: BitmapDescriptor.defaultMarkerWithHue(markerColor),
+        icon: BitmapDescriptor.defaultMarkerWithHue(color),
         markerId: MarkerId(userId),
         position: LatLng(
-          coordinates['latitude'],
-          coordinates['longitude'],
+          data['latitude'],
+          data['longitude'],
         ),
         infoWindow: InfoWindow(
           title: usersDataLoaded ? getUserName(userId) : "Fetching..",
@@ -220,63 +237,11 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     });
   }
 
-  _sendUserLocationToDB(
-      //send my coordinates to database
-      double latitude,
-      double longitude,
-      String journeyId) async {
-    String uid = Global.user.id;
-    //print('in send to db $journeyId');
-    //print(allowedToSendCoordinates);
-    if (allowedToSendCoordinates) {
-      // print('allowed');
-      allowedToSendCoordinates = false;
-      timer = Timer(Duration(seconds: 5), () {
-        // print('timer done');
-        allowedToSendCoordinates = true;
-      });
-
-      await _instance
-          .collection('realtimeLocations')
-          .document(journeyId)
-          .updateData({
-        uid: {'latitude': latitude, 'longitude': longitude}
-      }).catchError((s) {
-        print(s);
-      });
-
-      print(' my position senttttttttt $uid $latitude $longitude');
-    }
-  }
-
-  _setmyLocationStream() {
-    //Listen to changes on my location, and send my coordinates to database
-
-    _sendLocationStream =
-        _geolocator.getPositionStream(locationOptions).listen((Position pos) {
-      // print('in send Stream');
-      _myLocation = {'latitude': pos.latitude, 'longitude': pos.longitude};
-      if (!loaded) {
-        cameraPosition = CameraPosition(
-            target: LatLng(
-              pos.latitude,
-              pos.longitude,
-            ),
-            zoom: 15);
-        setState(() {
-          myPosition = pos;
-          loaded = true;
-        });
-      }
-
-      _sendUserLocationToDB(pos.latitude, pos.longitude, widget._journey.id);
-    });
-  }
-
   @override
   void dispose() {
     _usersLocationsStream.cancel();
-    _sendLocationStream.cancel();
+    MapUser.closeSendLocationtoDBStream();
+    MapUser.closeMyLocationObservable();
     super.dispose();
   }
 }

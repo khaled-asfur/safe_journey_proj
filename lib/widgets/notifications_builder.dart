@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/helpers.dart';
 import 'package:safe_journey/models/journey.dart';
+import 'package:safe_journey/models/push_notification.dart';
 import 'my_raised_button.dart';
 import '../models/notification.dart';
 
@@ -80,10 +81,9 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                           children: <Widget>[
                             MyRaisedButton('Accept', () {
                               if (notification.type == 'JOURNEY_INVITATION') {
+                                // ** */
                                 notifications.removeAt(index);
-                                _addCurrentUserToJourney(
-                                    notification.journeyId);
-
+                                _addCurrentUserToJourney(notification);
                                 removeCurrentUserFrominvitedUsers(notification);
                                 notification.deleteNotificationFromFireStore();
                               } else if (notification.type ==
@@ -91,9 +91,10 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                                 _doAttendence(notification, index);
                               } else if (notification.type ==
                                   'PARENT_REQUEST') {
+                                
                                 _addUserAsParentToSender(notification);
                               } else if (notification.type ==
-                                  'JOIN_JOURNEY_REQUEST') {
+                                  'JOIN_JOURNEY_REQUEST') {//TODO 55555
                                 _addUserToJourney(notification);
                               }
                             }),
@@ -123,11 +124,13 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                                       .deleteNotificationFromFireStore();
                                 } else if (notification.type ==
                                     'JOIN_JOURNEY_REQUEST') {
-                                      notifications.removeAt(index);
-                                      Journey.removeUserFromUsersRequestedToJoinJourney(notification);
-                                      notification.deleteNotificationFromFireStore();
-                                    
-                                    }
+                                  notifications.removeAt(index);
+                                  Journey
+                                      .removeUserFromUsersRequestedToJoinJourney(
+                                          notification);
+                                  notification
+                                      .deleteNotificationFromFireStore();
+                                }
 
                                 //add data to users_journeis collection
                                 //remove from attendents array on journey collection
@@ -152,17 +155,31 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
         notification.senderId, 'USER', notification.journeyId);
     result =
         await Journey.removeUserFromUsersRequestedToJoinJourney(notification);
-    if (result == true) notification.deleteNotificationFromFireStore();
+    if (result == true) {
+      notification.deleteNotificationFromFireStore();
+      PushNotification.subscribeToCloudMessagingTopic(notification.journeyId);
+      String userName = Global.user.name;
+      PushNotification.sendNotificationToUser(
+          notification.senderId,
+          'You are accepted to join journey ${notification.journeyName} ',
+          "Hey ${notification.senderName}, $userName accepted your request to join the journey \" ${notification.journeyName} \" ");
+    }
   }
 
-  void _addCurrentUserToJourney(String journeyId) {
+  void _addCurrentUserToJourney(MyNotification notification) {
     Firestore.instance.collection('journey_user').add({
       'userId': Global.user.id,
-      'journeyId': journeyId,
+      'journeyId': notification.journeyId,
       'role': 'USER',
       'attendents': [],
       'pendingAttendents': [],
     });
+    PushNotification.subscribeToCloudMessagingTopic(notification.journeyId);
+    String userName = Global.user.name;
+    PushNotification.sendNotificationToUser(
+        notification.senderId,
+        '$userName accepted your invitation!',
+        "Hey ${notification.senderName}, $userName acepted your invitation to \" ${notification.journeyName} \" ");
   }
 
   Future<bool> removeCurrentUserFrominvitedUsers(MyNotification not) async {
@@ -217,6 +234,12 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
     if (x1 && x2) {
       notification.deleteNotificationFromFireStore();
       removeCurrentUserFromPendingAttendents(notification);
+      String userName = Global.user.name;
+      PushNotification.sendNotificationToUser(
+          notification.senderId,
+          '$userName accepted to be youe attendent',
+          "Hey ${notification.senderName}, $userName accepted to be your attendent in journey \" ${notification.journeyName} \" ");
+
       return true;
     }
     Helpers.showErrorDialog(context, 'failed to accomplsh attendence');
@@ -288,6 +311,12 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
     if (result == true) {
       not.deleteNotificationFromFireStore();
       removeCurrentUserFromPendingAttendents(not);
+      String userName = Global.user.name;
+      PushNotification.sendNotificationToUser(
+          not.senderId,
+          '$userName accepted to be your parent',
+          "Hey ${not.senderName}, $userName accepted to be your attendent in journey \" ${not.journeyName} \" ");
+
       return true;
     }
     Helpers.showErrorDialog(

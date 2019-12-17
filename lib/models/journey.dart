@@ -215,12 +215,13 @@ class Journey {
   }
 
   static Future<void> addRealtimeDocumentforJourney(String journeyId) async {
+    String userId = Global.user.id;
     try {
       await Firestore.instance
           .collection('realtimeLocations')
           .document(journeyId)
           .setData({
-        'testing': {'latitude': 0, 'longitude': 0}
+        userId: {'latitude': 0, 'longitude': 0}
       });
     } catch (error) {
       print('error occured while adding the testing document ');
@@ -310,8 +311,7 @@ class Journey {
       return user.id == Global.user.id ? true : false;
     });
     usersJoinsJourney.forEach((MapUser user) {
-      if(isAttendent(currentUser, user))
-      user.relation=Relation.ATTENDENT;
+      if (isAttendent(currentUser, user)) user.relation = Relation.ATTENDENT;
     });
   }
 
@@ -323,6 +323,25 @@ class Journey {
       return "NOT_CURRENT_USER_ATTENDENT";
     });
     return result == 'NOT_CURRENT_USER_ATTENDENT' ? false : true;
+  }
+
+  static Future<List<String>> getJoinedJourniesIds() async {
+    //the id`s of journies you not joined as parent
+    List<String> journies = [];
+    try {
+      QuerySnapshot snap = await Firestore.instance
+          .collection('journey_user')
+          .where('userId', isEqualTo: Global.user.id)
+          .getDocuments();
+      snap.documents.forEach((DocumentSnapshot doc) {
+        if (doc.data['role'] != 'PARENT') journies.add(doc.data['journeyId']);
+        print('you joins the journey ${doc.data['journeyId']} ');
+      });
+    } catch (error) {
+      print('error occured while getting the journies this user was joined');
+    }
+    print(journies);
+    return journies;
   }
 
   @override

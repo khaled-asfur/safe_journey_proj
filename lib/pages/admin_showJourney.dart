@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/journey.dart';
+import 'package:safe_journey/models/push_notification.dart';
+import 'package:safe_journey/pages/add_people.dart';
 import 'package:safe_journey/pages/realtime_screen.dart';
+import 'package:safe_journey/widgets/my_raised_button.dart';
 import '../widgets/header.dart';
 import 'dart:async';
 import 'dart:io';
@@ -12,6 +15,8 @@ import 'home_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+
+import 'package:http/http.dart';
 
 class AdminShowJourney extends StatefulWidget {
   final Journey _journey;
@@ -41,23 +46,51 @@ class ShowJourneyState extends State<AdminShowJourney> {
     });
   }
 
+  _requestLocationsFromUsers(String journeyId) async {
+    Response response = await PushNotification.sendToTopic(
+        title: "Send location notification",
+        body: journeyId,
+        topic: journeyId);
+    if (response.statusCode != 200) {
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content:
+            Text('[${response.statusCode}] Error message: ${response.body}'),
+      ));
+    }
+  }
+  
+
   @override
   Widget build(BuildContext context) {
     return Header(
         body: new SingleChildScrollView(
       child: new Column(
         children: <Widget>[
+          MyRaisedButton("Start sending location", () {
+            _requestLocationsFromUsers(widget._journey.id);
+          }),
           IconButton(
-                    icon: Icon(Icons.add_location),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (BuildContext context) {
-                          return RealTimeScreen(widget._journey);
-                        }),
-                      );
-                    },
-                  ),
+            icon: Icon(Icons.add_location),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (BuildContext context) {
+                  return RealTimeScreen(widget._journey);
+                }),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.whatshot),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (BuildContext context) {
+                  return AddPeople(widget._journey);
+                }),
+              );
+            },
+          ),
           new Container(
             child: new Stack(
               children: <Widget>[

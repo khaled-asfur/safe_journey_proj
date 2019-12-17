@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:safe_journey/models/journey.dart';
+import 'package:safe_journey/models/map_user.dart';
+import 'package:safe_journey/models/push_notification.dart';
 import 'package:safe_journey/models/user.dart';
 
 import '../models/helpers.dart';
@@ -25,11 +28,16 @@ class Auth {
       FirebaseUser currentFBuser = authResult.user;
       User user = User.empty();
       bool dataFitched = await user.getUserData(currentFBuser);
-      dataFitched
-          ? Navigator.pushReplacementNamed(context, 'homePage')
-          : Helpers.showErrorDialog(context, 'error while fetching user data');
-          Global.loadingObservable.add(false);
-          Global.closeLoadingObservable();
+      if (dataFitched) {
+        Navigator.pushReplacementNamed(context, 'homePage');
+        PushNotification.addDeviceTokenToDatabase(user.id);
+      } else
+        Helpers.showErrorDialog(context, 'error while fetching user data');
+      Global.loadingObservable.add(false);
+      Global.closeLoadingObservable();
+      PushNotification.subscribeToCloudMessagingTopic('all');
+      PushNotification.subscribeToJourniesNotifications();
+
       return dataFitched;
     } catch (e) {
       print(e);
@@ -41,15 +49,22 @@ class Auth {
 
   //true returned means successful operation, otherwise false returned
   Future<bool> logout(BuildContext context) async {
+    await MapUser.closeSendLocationtoDBStream();
     bool result = false;
     try {
       _instance.signOut();
+      PushNotification.deleteDeviceTokenFromDatabase(Global.user.id);
+      PushNotification.unsubscribeFromJourniesNotifications();
       Global.user = null;
+      Global.numberOfcurrentFetchedJournies=0;
       return true;
     } on PlatformException catch (e) {
       print(e);
       Helpers.showErrorDialog(context, e.message);
     }
+    Global.allJournies = null;
+    Global.joinedJournies = null;
+    Global.pendingJournies = null;
     return result;
   }
 
@@ -63,7 +78,6 @@ class Auth {
     try {
       AuthResult authResult = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      
 
       String imageURL;
       if (image != null) {
@@ -72,26 +86,27 @@ class Auth {
         if (result['success']) imageURL = result['imageURL'];
       }
       FirebaseUser fbUser = authResult.user;
-            User user =
+      User user =
           User(fbUser.uid, email, name, imageURL, phoneNumber, imageURL);
       Global.user = user;
-      
+      PushNotification.addDeviceTokenToDatabase(user.id);
+      String token = await FirebaseMessaging().getToken();
       await _addUserInfoToFireStore(
-          name: name,
-          phoneNumber: phoneNumber,
-          email: email,
-          imageURL: imageURL,
-          );
+        name: name,
+        phoneNumber: phoneNumber,
+        email: email,
+        imageURL: imageURL,
+        token: token,
+      );
       result = true;
-          Global.loadingObservable.add(false);
-          Global.closeLoadingObservable();
+      Global.loadingObservable.add(false);
+      Global.closeLoadingObservable();
       Navigator.pushReplacementNamed(context, 'homePage');
     } on PlatformException catch (e) {
       Global.loadingObservable.add(false);
       print('error occured');
       print(e);
       Helpers.showErrorDialog(context, e.message);
-       
     }
     return result;
   }
@@ -108,19 +123,20 @@ class Auth {
     }
   }
 
-  Future<Map<String, dynamic>> uploadImage(
-      File image, BuildContext context,{String imageTitle}) async {
+  Future<Map<String, dynamic>> uploadImage(File image, BuildContext context,
+      {String imageTitle}) async {
     Map<String, dynamic> result = {'success': false, 'uploadURL': null};
     try {
       User user = Global.user;
       String email;
       if (user == null) {
-       FirebaseUser fbuser= await FirebaseAuth.instance.currentUser();
-          email = fbuser.email;
+        FirebaseUser fbuser = await FirebaseAuth.instance.currentUser();
+        email = fbuser.email;
       } else
         email = user.email;
-      final StorageReference storageRef =
-          FirebaseStorage.instance.ref().child(imageTitle==null? email:imageTitle);
+      final StorageReference storageRef = FirebaseStorage.instance
+          .ref()
+          .child(imageTitle == null ? email : imageTitle);
       final StorageUploadTask task = storageRef.putFile(image);
       result['success'] = true;
       result['imageURL'] = await (await task.onComplete).ref.getDownloadURL();
@@ -131,7 +147,11 @@ class Auth {
   }
 
   Future<void> _addUserInfoToFireStore(
-      {String name, String phoneNumber, String email, String imageURL}) async {
+      {String name,
+      String phoneNumber,
+      String email,
+      String imageURL,
+      String token}) async {
     if (imageURL == null) imageURL = "noURL";
     User user = Global.user;
     final fsInstance = Firestore.instance;
@@ -142,10 +162,12 @@ class Auth {
       'phoneNumber': phoneNumber,
       'imageURL': imageURL,
       'email': email,
-      'bio':'Add your bio',
-      'background':imageURL
+      'bio': 'Add your bio',
+      'background': imageURL,
+      'token': token
     });
   }
+
   Future<bool> doit(String initial, String description, DateTime endTime,
       String name, DateTime startTime, BuildContext context, File image) async {
     bool result = false;
@@ -158,7 +180,8 @@ class Auth {
           print(Global.currentUser);*/
       String imageURL;
       if (image != null) {
-        Map<String, dynamic> result = await uploadImage(image, context,imageTitle:name);
+        Map<String, dynamic> result =
+            await uploadImage(image, context, imageTitle: name);
         // print('result from signup= $result');
         if (result['success']) imageURL = result['imageURL'];
       }
@@ -171,30 +194,30 @@ class Auth {
         'imageURL': imageURL,
         'name': name,
         'startTime': startTime,
-        'usersRequestedToJoinJourney':[],
-        'invitedUsers':[]
+        'usersRequestedToJoinJourney': [],
+        'invitedUsers': []
       });
 
 //************ */
-   User user= Global.user;
+      User user = Global.user;
 
- fireStoreInstance.collection('journey_user').document().setData({
+      fireStoreInstance.collection('journey_user').document().setData({
         'attendents': [],
         'journeyId': initial,
         'role': "ADMIN",
         'userId': user.id,
-        'pendingAttendents':[],
+        'pendingAttendents': [],
       });
       //By khaled
       Journey.addRealtimeDocumentforJourney(initial);
-      
     } on PlatformException catch (e) {
       print(e);
       Helpers.showErrorDialog(context, e.message);
     }
     return result;
   }
-    Future<void> update(String name, String pio, String phone, String email,
+
+  Future<void> update(String name, String pio, String phone, String email,
       BuildContext context, File imagepro, File imageback) async {
     try {
       //for profile
@@ -251,9 +274,9 @@ class Auth {
       print(e);
       Helpers.showErrorDialog(context, e.message);
     }
-
   }
-    Future<Map<String, dynamic>> uploadback(
+
+  Future<Map<String, dynamic>> uploadback(
       File image, BuildContext context) async {
     Map<String, dynamic> result = {'success': false, 'uploadURL': null};
     try {
@@ -272,15 +295,16 @@ class Auth {
     // print('result= $result');
     return result;
   }
-   Future<bool> cheak(
+
+  Future<bool> cheak(
       String email, String password, BuildContext context) async {
     bool result = false;
-   
+
     try {
       /* AuthResult auth0Result = */ await _instance.signInWithEmailAndPassword(
           email: email, password: password);
-     // Navigator.pushReplacementNamed(context, 'homePage');
-    //  Global.currentUser=await  FirebaseAuth.instance.currentUser();
+      // Navigator.pushReplacementNamed(context, 'homePage');
+      //  Global.currentUser=await  FirebaseAuth.instance.currentUser();
       /*print('curent logged in user =');
           print(Global.currentUser);*/
 
@@ -291,5 +315,4 @@ class Auth {
     }
     return result;
   }
-
 }

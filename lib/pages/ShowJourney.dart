@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/journey.dart';
+import 'package:safe_journey/pages/add_attendents.dart';
 import 'package:safe_journey/pages/add_people.dart';
 import 'package:safe_journey/pages/realtime_screen.dart';
 import 'people.dart';
@@ -53,7 +54,7 @@ class ShowJourneyState extends State<ShowJourney> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (BuildContext context) {
-                          return AddPeople(widget._journey);
+                          return AddAttendents(widget._journey);
                         }),
                       );
                     },

@@ -8,6 +8,8 @@ import 'pages/signup_page.dart';
 import 'pages/notifications_page.dart';
 import 'pages/creat.dart';
 import 'pages/showProfile.dart';
+import 'models/push_notification.dart';
+import 'pages/cloud_messaging.dart';
 
 //import 'package:flutter/rendering.dart';
 
@@ -25,6 +27,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+    PushNotification.setPushNotificationSettings(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Safe journey',
@@ -42,6 +45,8 @@ class _MyAppState extends State<MyApp> {
         'createJourney': (BuildContext context) => Create(),
         'settings': (BuildContext context) => EditProfile(),
         'profilePage': (BuildContext context) => ShowProfile(),
+        'messaging': (BuildContext context) => CloudMessaging()
+
       },
       onGenerateRoute: (RouteSettings settings) {
         //هون بضيف نيمد راوت جديدة شرط ما تكون موجودة فوق بالبروبرتي روتس

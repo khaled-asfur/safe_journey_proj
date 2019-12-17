@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:safe_journey/pages/Place_page.dart';
 
 class MySlideShow extends StatefulWidget {
   @override
@@ -55,9 +56,9 @@ class SlideShowState extends State<MySlideShow> {
                 _current = index;
               });
             },
-            items: imgList.map((imgUrl) {
+            items: _places.map((place) {
               return Builder(builder: (BuildContext context) {
-                return _slideshowBuilder(context, imgUrl);
+                return _slideshowBuilder(context, place);
               });
             }).toList(),
           ),
@@ -110,25 +111,35 @@ class SlideShowState extends State<MySlideShow> {
         duration: Duration(milliseconds: 300), curve: Curves.decelerate);
   }
 
-  Widget _slideshowBuilder(BuildContext context, String imgUrl) {
+  Widget _slideshowBuilder(BuildContext context, Map<String, dynamic> place) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.height;
     Orientation orientation = MediaQuery.of(context).orientation;
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      margin: orientation == Orientation.landscape
-          ? EdgeInsets.symmetric(horizontal: deviceWidth * 0.07)
-          : EdgeInsets.symmetric(horizontal: deviceWidth * 0.02),
-      borderOnForeground: true,
-      color: Colors.white,
-      child: Stack(
-        alignment: Alignment.topCenter,
-        children: <Widget>[
-          _imageBuilder(deviceHeight, imgUrl),
-          _descriptionBuilder(),
-        ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) {
+            return PlacePage(place);
+          }),
+        );
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        margin: orientation == Orientation.landscape
+            ? EdgeInsets.symmetric(horizontal: deviceWidth * 0.07)
+            : EdgeInsets.symmetric(horizontal: deviceWidth * 0.02),
+        borderOnForeground: true,
+        color: Colors.white,
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: <Widget>[
+            _imageBuilder(deviceHeight, place['imageURL']),
+            _descriptionBuilder(place['name']),
+          ],
+        ),
       ),
     );
   }
@@ -164,7 +175,7 @@ class SlideShowState extends State<MySlideShow> {
     );
   }
 
-  Widget _descriptionBuilder() {
+  Widget _descriptionBuilder(String name) {
     return Container(
       alignment: Alignment.bottomCenter,
       // width: deviceWidth * 0.40,
@@ -175,9 +186,40 @@ class SlideShowState extends State<MySlideShow> {
               borderRadius: BorderRadius.all(Radius.circular(5)),
               color: Colors.black26),
           child: Text(
-            'Dead sea ',
+            name,
             textAlign: TextAlign.center,
           )),
     );
   }
+
+  List<Map<String, dynamic>> _places = [
+    {
+      "name": "Dead sea",
+      "description": "A good place for your holyday.",
+      "imageURL":
+          "https://images.memphistours.com/large/1049635127_Salt+Formations+9.jpg",
+      "address": "Jerico - north east",
+    },
+    {
+      "name": "Hisham palace",
+      "description":
+          "The Historical palace of -khalifa- Hisham bin Abd-Almalik ",
+      "imageURL":
+          "http://1remva49c8bs3jvwod2dqqqs.wpengine.netdna-cdn.com/wp-content/uploads/2015/06/Hisham-Palace-1.jpg",
+      "address": "Jericho - 5 KM to the north of the city",
+    },
+    {
+      "name": "Haddad hotel",
+      "description": "5 stars hotel for tourists",
+      "imageURL":
+          "https://www.hotelpigonnet.com/sites/hotel-pigonnet.com/files/styles/image_front/public/blocs_hp/hotel-le-pigonnet-aix-en-provence-le-chambres.jpg?itok=xU_fg98M",
+      "address": "Jenin - to the west of Jannat",
+    },
+    {
+      "name": "Banana land",
+      "description": "Many games for children",
+      "imageURL":"https://murtahil.com/wp-content/uploads/2018/07/IMG_43073.jpg",
+      "address": "Ramalla - Al-Ersal street",
+    }
+  ];
 }

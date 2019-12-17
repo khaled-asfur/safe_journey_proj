@@ -34,4 +34,7 @@ journies_users{
 notifications{
   type : JOURNEY_INVITATION - ATTENDENCE_REQUEST - PARENT_REQUEST - JOIN_JOURNEY_REQUEST
 }
+users{
+   'token': "NO_TOKEN" - or a token from user device
+}
 */

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/journey.dart';
+import 'package:safe_journey/models/push_notification.dart';
 import 'dart:async';
 
 import '../widgets/user_search_item.dart';
@@ -122,7 +123,7 @@ class _AddPeopleState extends State<AddPeople> {
     setState(() {
       invitedUsers.add(userID);
     });
-    Firestore.instance.collection('notifications').add(
+     Firestore.instance.collection('notifications').add(
       {
         'journeyId': _journey.id,
         'userId': userID,
@@ -134,6 +135,9 @@ class _AddPeopleState extends State<AddPeople> {
     Firestore.instance.collection('journies').document(_journey.id).updateData({
       'invitedUsers': FieldValue.arrayUnion([userID]),
     });
+    String userName=Global.user.name;
+    PushNotification.sendNotificationToUser(userID, 'Journey invitation',
+     '$userName invited you to join the journey ${_journey.name}');
   }
 
   List<User> _findUsersMatchsearchValue(

@@ -32,6 +32,14 @@ class MyDrawer extends StatelessWidget {
         Divider(),
         ListTile(
           leading: Icon(Icons.create),
+          title: Text("messaging"),
+          onTap: () {
+            Navigator.pushNamed(context, 'messaging');
+          },
+        ),
+        Divider(),
+        ListTile(
+          leading: Icon(Icons.create),
           title: Text("create journey"),
           onTap: () {
             Navigator.pushNamed(context, 'createJourney');

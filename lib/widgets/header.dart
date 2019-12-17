@@ -17,25 +17,31 @@ class Header extends StatefulWidget {
   _HeaderState createState() => _HeaderState();
 }
 
-
-
 class _HeaderState extends State<Header> {
   var searchController = new TextEditingController();
-String searchValue;
-List<JourneySearchElement> allJournies;
-List<String> joinedJournies;
-List<String> pendingJournies;
-FetchState dataFetchingState;
+  String searchValue;
+  List<JourneySearchElement> allJournies;
+  List<String> joinedJournies;
+  List<String> pendingJournies;
+  FetchState dataFetchingState;
   @override
   void initState() {
     super.initState();
+    dataFetchingState = FetchState.FETCHING_IN_PROGRESS;
     if (Global.allJournies == null)
       fetchData();
     else {
-      dataFetchingState=FetchState.FETCHING_COMPLETED;
-      allJournies = Global.allJournies;
-      joinedJournies = Global.joinedJournies;
-      pendingJournies = Global.pendingJournies;
+      JourneySearchElement.getNumberOfAllJournies()
+          .then((int noOfJourniesOnDatabase) {
+            if (noOfJourniesOnDatabase != Global.numberOfcurrentFetchedJournies) {
+               fetchData();
+        } else {
+          allJournies = Global.allJournies;
+          joinedJournies = Global.joinedJournies;
+          pendingJournies = Global.pendingJournies;
+          dataFetchingState = FetchState.FETCHING_COMPLETED;
+        }
+      });
     }
   }
 
@@ -57,13 +63,15 @@ FetchState dataFetchingState;
       ),
       body: (searchController.text.isEmpty)
           ? widget.body
-          : dataFetchingState==FetchState.FETCHING_COMPLETED ?JourniesSearchResult(
-              searchValue,
-              allJournies,
-              joinedJournies,
-              pendingJournies,
-              fetchData,
-            ):CircularProgressIndicator(),
+          : dataFetchingState == FetchState.FETCHING_COMPLETED
+              ? JourniesSearchResult(
+                  searchValue,
+                  allJournies,
+                  joinedJournies,
+                  pendingJournies,
+                  fetchData,
+                )
+              : CircularProgressIndicator(),
       floatingActionButton: this.widget.floatingActionButton == null
           ? null
           : this.widget.floatingActionButton,
@@ -71,7 +79,6 @@ FetchState dataFetchingState;
   }
 
   Future<bool> fetchData() async {
-    dataFetchingState=FetchState.FETCHING_IN_PROGRESS;
     allJournies = await JourneySearchElement.getUnfinishedJournies();
     joinedJournies = await JourneySearchElement.getJourniesUserJoined();
     pendingJournies = JourneySearchElement.getPendingJournies(allJournies);
@@ -80,12 +87,11 @@ FetchState dataFetchingState;
     Global.pendingJournies = pendingJournies;
     if (this.mounted) {
       setState(() {
-        dataFetchingState=FetchState.FETCHING_COMPLETED;
+        dataFetchingState = FetchState.FETCHING_COMPLETED;
       });
     }
     return true;
   }
-
 
   Widget _buildSearchTextField() {
     return Container(
