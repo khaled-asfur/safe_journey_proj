@@ -56,11 +56,8 @@ class HomePageState extends State<HomePage> {
                 return doFetch();
               },
               child: ListView(
-                children: <Widget>[
-                  MyRaisedButton("sound ",(){
-                   
-                    
-                  }),
+               children: <Widget>[
+                //   MyRaisedButton("add ",(){//   }),
                   Container(
                       decoration: BoxDecoration(color: Colors.grey[200]),
                       child: MySlideShow()),
