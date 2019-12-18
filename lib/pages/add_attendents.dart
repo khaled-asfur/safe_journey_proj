@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/journey.dart';
 import 'package:safe_journey/models/push_notification.dart';
+import 'package:safe_journey/widgets/show_attendents.dart';
 import 'dart:async';
 
 import '../widgets/user_search_item.dart';
@@ -97,7 +98,8 @@ class _AddAttendentsState extends State<AddAttendents> {
   Widget _buildBody() {
     if (searchItem == null || searchItem == '') {
       //اليوزر ما بحث عن اشي
-      return Container();
+      var attendentsList = _attendents.cast<String>().toList();
+      return ShowAttendents(attendentsList, userDocs, _journey.id);
     } else if (userDocs == null) {
       return Center(child: Text('Please check your internet connection'));
     } else if (state == FetchState.FETCHING_IN_PROGRESS && searchItem != null) {

@@ -41,8 +41,10 @@ class _MyCardsGridState extends State<MyCardsGrid> {
                 semanticContainer: true,
                 clipBehavior: Clip.antiAliasWithSaveLayer,
                 child: Container(
+                  
                   alignment: Alignment.bottomCenter,
                   decoration: new BoxDecoration(
+                    
                     image: new DecorationImage(
                       image: new NetworkImage(journey.imageURL),
                       fit: BoxFit.cover,
