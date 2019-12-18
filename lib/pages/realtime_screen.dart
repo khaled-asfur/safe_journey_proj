@@ -28,7 +28,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   Position _myPosition;
   StreamSubscription<DocumentSnapshot> _usersLocationsStream;
   Map<String, dynamic> _myLocation = {'latitude': null, 'longitude': null};
-  double allowedDistance = 15;
+  double allowedDistance = 5;
   //GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   double _distance = 0;
   List<MapUser> _usersJoinsJourney;
@@ -179,8 +179,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   }
 
   _checkIfUsersInSafeDistance() async {
-    String usersIds = "";
-    List<String> _usersIdsList = [];
+    List<String> unsafeUsers = [];
     String distances = '';
     bool unsafeUsersExist = false;
     for (Marker marker in markers) {
@@ -197,9 +196,9 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
           _distance = distance;
           _addDistanceToUserObject(distance, userId);
           if (distance > allowedDistance) {
-            usersIds += "${marker.markerId.value}, ";
-            _usersIdsList.add(marker.markerId.value);
-            distances += "$distance, ";
+            unsafeUsers.add(marker.markerId.value);
+            int intDistance=distance.round();
+            distances += "$intDistance, ";
             unsafeUsersExist = true;
           }
         });
@@ -207,12 +206,14 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     }
 
     if (unsafeUsersExist && widget._journey.role == "ADMIN") {
+      String unsafeUsersStr =MapUser.getUsersNames(_usersJoinsJourney,unsafeUsers);
+      distances=distances.substring(0,distances.length-2);
       String message =
-          'The users with id\'s ($usersIds) are out side the allowed area' +
-              '\n and far from you the following distances($distances)';
+          'The users  ($unsafeUsersStr) are out side the allowed area' +
+              '\n and far from you the following distances($distances)m.';
       if (_allowedToSendNotifications) {
         _allowedToSendNotifications = false;
-        _notifyAdminAboutUSersOutOfRange(message, _usersIdsList);
+        _notifyAdminAboutUSersOutOfRange(message, unsafeUsers);
         Timer(Duration(minutes: 1), () {
           _allowedToSendNotifications = true;
         });

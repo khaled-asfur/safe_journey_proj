@@ -86,4 +86,16 @@ class MapUser {
       print('sendLocationStream cancelled');
     }
   }
+  static String getUsersNames(List<MapUser> allUsers,List<String> unsafeUsers){
+    String unsafeUsersNames="";
+    unsafeUsers.forEach((String userId){
+     MapUser user= allUsers.firstWhere((MapUser user){
+       return  user.id==userId?true:false;
+      });
+      unsafeUsersNames+="${user.name} ,";
+      //delete the last caracter which is ','
+      unsafeUsersNames=unsafeUsersNames.substring(0,unsafeUsersNames.length-2);
+    });
+    return unsafeUsersNames;
+  }
 }
