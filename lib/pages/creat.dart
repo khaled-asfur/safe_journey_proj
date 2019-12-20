@@ -15,18 +15,13 @@ import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 //import 'package:rflutter_alert/rflutter_alert.dart';
 
-
-
-
 class Create extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return   new Scaffold(
-      
+    return new Scaffold(
       appBar: new AppBar(
         title: Text("Create Journy"),
-        ),
-      
+      ),
       body: new EditProfileScreen(),
     );
   }
@@ -41,9 +36,12 @@ bool isLoading = false;
 
 final descriptionController = new TextEditingController();
 final startController = new TextEditingController();
+final distanceController = new TextEditingController();
+final placeseController = new TextEditingController();
 final endController = new TextEditingController();
 final nameController = new TextEditingController();
-TextEditingController idController ;
+
+TextEditingController idController;
 
 //**************************************************** */
 var initial = new Random().nextInt(10000000).toString();
@@ -63,7 +61,6 @@ class EditProfileScreenState extends State<EditProfileScreen> {
       //FINDING A SPECIFICDOCUMENT IS EXISTING INSIDE A COLLECTION
 
       if (datasnapshot.exists) {
-
         setState(() {
           initial = new Random().nextInt(100000).toString();
           initState();
@@ -72,8 +69,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
         initial = initial;
       }
     });
-                idController = new TextEditingController(text: initial);
-
+    idController = new TextEditingController(text: initial);
   }
 
   var firstColor = Colors.blueAccent, secondColor = Color(0xff36d1dc);
@@ -165,7 +161,6 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                           padding: new EdgeInsets.all(0.0),
                           highlightColor: Colors.black,
                           iconSize: 40.0,
-                          
                         ),
                         borderRadius:
                             new BorderRadius.all(new Radius.circular(40.0)),
@@ -183,41 +178,34 @@ class EditProfileScreenState extends State<EditProfileScreen> {
           ),
           new Column(
             children: <Widget>[
-
               new ListTile(
-                //  leading: const Icon(Icons.person),
-                title: new Container(
-
-               padding: EdgeInsets.only(left: 30.0),
-
-              child:  new TextFormField(
+                  //  leading: const Icon(Icons.person),
+                  title: new Container(
+                padding: EdgeInsets.only(left: 30.0),
+                child: new TextFormField(
                   controller: idController,
                   enabled: false,
                   //initialValue: initial,
 
                   decoration: new InputDecoration(
-                      labelText: "Journy ID",
-                      labelStyle: TextStyle(
-                          fontFamily: "Chilanka",
-                          
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF197278)),
-                      // hintText: "Journy ID",
-                      ),
+                    labelText: "Journy ID",
+                    labelStyle: TextStyle(
+                        fontFamily: "Chilanka",
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF197278)),
+                    // hintText: "Journy ID",
+                  ),
                 ),
-                )
-                ///////////////////////////////////////////////////////////
-              ),
+              )
+                  ///////////////////////////////////////////////////////////
+                  ),
               SizedBox(height: 15),
               new ListTile(
 
-                //  leading: const Icon(Icons.phone),
-                title: new Container(
-
-               padding: EdgeInsets.only(left: 30.0),
-
-              child:
-                new TextFormField(
+                  //  leading: const Icon(Icons.phone),
+                  title: new Container(
+                padding: EdgeInsets.only(left: 30.0),
+                child: new TextFormField(
                   controller: nameController,
                   decoration: new InputDecoration(
                       labelText: "Journy Name",
@@ -228,30 +216,66 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                       suffixIcon: IconButton(
                           icon: Icon(Icons.cancel),
                           onPressed: () {
-nameController.clear();                          })
+                            nameController.clear();
+                          })
                       // hintText: "Journy ID",
                       ),
-                ),)
-              ),
+                ),
+              )),
               SizedBox(height: 15),
               new ListTile(
-                title:new Container(
-
-               padding: EdgeInsets.only(left: 30.0),
-
-              child:
-                 new TextFormField(
+                  title: new Container(
+                padding: EdgeInsets.only(left: 30.0),
+                child: new TextFormField(
                   controller: descriptionController,
                   decoration: new InputDecoration(
                       labelText: "Journy Description",
                       labelStyle: TextStyle(
                           fontFamily: "Caveat",
                           fontWeight: FontWeight.bold,
-                         color: Color(0xFF197278)),
+                          color: Color(0xFF197278)),
                       suffixIcon: IconButton(
                           icon: Icon(Icons.cancel),
                           onPressed: () {
                             descriptionController.clear();
+                          })),
+                ),
+              )),
+              SizedBox(height: 15),
+              new ListTile(
+                  title: new Container(
+                padding: EdgeInsets.only(left: 30.0),
+                child: new TextFormField(
+                  controller: placeseController,
+                  decoration: new InputDecoration(
+                      labelText: "Places",
+                      labelStyle: TextStyle(
+                          fontFamily: "Caveat",
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF197278)),
+                      suffixIcon: IconButton(
+                          icon: Icon(Icons.cancel),
+                          onPressed: () {
+                            distanceController.clear();
+                          })),
+                ),
+              )),
+              SizedBox(height: 15),
+              new ListTile(
+                  title: new Container(
+                padding: EdgeInsets.only(left: 30.0),
+                child: new TextFormField(
+                  controller: distanceController,
+                  decoration: new InputDecoration(
+                      labelText: "Allowed Distance",
+                      labelStyle: TextStyle(
+                          fontFamily: "Caveat",
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF197278)),
+                      suffixIcon: IconButton(
+                          icon: Icon(Icons.cancel),
+                          onPressed: () {
+                            distanceController.clear();
                           })),
                 ),
               )),
@@ -277,25 +301,34 @@ nameController.clear();                          })
                 width: 300.0,
                 height: 50.0,
                 child: RaisedButton.icon(
-                  //radius: 20,
-                  elevation: 20.0,
-                  label: Text("Creat Journy",style: TextStyle(color:Colors.white,)),
-                  icon: Icon(Icons.create,color: Colors.white,),
-                  splashColor: Colors.white,
-                  
-                 color:Color(0xffAB1717),
-                  onPressed:(){
-                     if(descriptionController.text.isEmpty||endController.text.isEmpty||nameController.text.isEmpty||
-                     startController.text.isEmpty||_image==null)
-    {
-_onAlertButtonPressed1(context);}
-                    
-                    else{
-                    saveData();}}
-                ),
+                    //radius: 20,
+                    elevation: 20.0,
+                    label: Text("Creat Journy",
+                        style: TextStyle(
+                          color: Colors.white,
+                        )),
+                    icon: Icon(
+                      Icons.create,
+                      color: Colors.white,
+                    ),
+                    splashColor: Colors.white,
+                    color: Color(0xffAB1717),
+                    onPressed: () {
+                      if (descriptionController.text.isEmpty ||
+                          endController.text.isEmpty ||
+                          nameController.text.isEmpty ||
+                          startController.text.isEmpty ||
+                          _image == null ||
+                          distanceController.text.isEmpty ||
+                          placeseController.text.isEmpty) {
+                        _onAlertButtonPressed1(context);
+                      } else {
+                        saveData();
+                      }
+                    }),
               ),
               SizedBox(height: 12),
-            /*  Center(
+              /*  Center(
                 child: isLoading == true
                     ? CircularProgressIndicator()
                     : Container(),
@@ -312,15 +345,22 @@ _onAlertButtonPressed1(context);}
 //****************************************** */
   void saveData() {
     // print(idController.text);
-   
 
     setState(() {
       isLoading = true;
     });
 
     Auth()
-        .doit(idController.text, descriptionController.text,DateTime.parse(endController.text),
-            nameController.text, DateTime.parse(startController.text), context, _image)
+        .doit(
+            idController.text,
+            descriptionController.text,
+            int.parse(distanceController.text),
+            DateTime.parse(endController.text),
+            nameController.text,
+            DateTime.parse(startController.text),
+            context,
+            _image,
+            placeseController.text)
         .then((bool result) {
       if (result == false) {
         setState(() {
@@ -328,11 +368,8 @@ _onAlertButtonPressed1(context);}
         });
       }
     });
-   _onAlertButtonPressed(context);
-   
- 
+    _onAlertButtonPressed(context);
   }
-  
 
   /* void addDataTofirebaseUnknown() {
     final fireStoreInstance = Firestore.instance;
@@ -345,7 +382,7 @@ _onAlertButtonPressed1(context);}
     });
   }*/
   //***************** */
-_onAlertButtonPressed(context) {
+  _onAlertButtonPressed(context) {
     Alert(
       context: context,
       type: AlertType.info,
@@ -357,25 +394,27 @@ _onAlertButtonPressed(context) {
             "OK",
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
-          onPressed: (){
+          onPressed: () {
             nameController.clear();
             startController.clear();
             endController.clear();
             descriptionController.clear();
+            distanceController.clear();
+            placeseController.clear();
             setState(() {
-             initial=new Random().nextInt(10000000).toString();
+              initial = new Random().nextInt(10000000).toString();
             });
-           
-            idController.text=initial;
-            Navigator.pop(context);},
+
+            idController.text = initial;
+            Navigator.pop(context);
+          },
           width: 120,
         )
       ],
     ).show();
   }
 
-
-_onAlertButtonPressed1(context) {
+  _onAlertButtonPressed1(context) {
     Alert(
       context: context,
       type: AlertType.error,
@@ -393,7 +432,6 @@ _onAlertButtonPressed1(context) {
       ],
     ).show();
   }
-
 }
 
 //**************************************** */ date and time widgaes
@@ -408,47 +446,47 @@ class BasicDateTimeStartField extends StatelessWidget {
         // Text('Start Date'),
         // new Icon(Icons.time_to_leave),
 
-new Container(
-
-               padding: EdgeInsets.only(right: 15.0),
-
-              child:
-        DateTimeField(
-          controller: startController,
-          decoration: new InputDecoration(
-             suffixIcon: IconButton(
-                      icon: Icon(Icons.cancel,
+        new Container(
+            padding: EdgeInsets.only(right: 15.0),
+            child: DateTimeField(
+              controller: startController,
+              decoration: new InputDecoration(
+                  suffixIcon: IconButton(
+                      icon: Icon(
+                        Icons.cancel,
                       ),
                       onPressed: () {
                         startController.clear();
                       }),
-              labelText: "ٍStart Date",
-              icon: Icon(Icons.today,                            color: Color(0xffAB1717),
-),
-              labelStyle: TextStyle(
-                  fontFamily: "Caveat",
-                  fontWeight: FontWeight.bold,
-            color: Color(0xFF197278))),
-          format: format,
-          onShowPicker: (context, currentValue) async {
-            final date = await showDatePicker(
-                context: context,
-                firstDate: DateTime(1900),
-                initialDate: currentValue ?? DateTime.now(),
-                lastDate: DateTime(2100));
-            if (date != null) {
-              final time = await showTimePicker(
-                context: context,
-                initialTime:
-                    TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
-              );
+                  labelText: "ٍStart Date",
+                  icon: Icon(
+                    Icons.today,
+                    color: Color(0xffAB1717),
+                  ),
+                  labelStyle: TextStyle(
+                      fontFamily: "Caveat",
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF197278))),
+              format: format,
+              onShowPicker: (context, currentValue) async {
+                final date = await showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1900),
+                    initialDate: currentValue ?? DateTime.now(),
+                    lastDate: DateTime(2100));
+                if (date != null) {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime:
+                        TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                  );
 
-              return DateTimeField.combine(date, time);
-            } else {
-              return currentValue;
-            }
-          },
-        )),
+                  return DateTimeField.combine(date, time);
+                } else {
+                  return currentValue;
+                }
+              },
+            )),
       ],
     );
   }
@@ -462,47 +500,46 @@ class BasicDateTimeEndField extends StatelessWidget {
     return Column(
       children: <Widget>[
         new Container(
-
-               padding: EdgeInsets.only(right: 15.0),
-
-              child:
-        DateTimeField(
-          controller: endController,
-          decoration: new InputDecoration(
-             suffixIcon: IconButton(
-                      icon: Icon(Icons.cancel,
+            padding: EdgeInsets.only(right: 15.0),
+            child: DateTimeField(
+              controller: endController,
+              decoration: new InputDecoration(
+                  suffixIcon: IconButton(
+                      icon: Icon(
+                        Icons.cancel,
                       ),
                       onPressed: () {
                         endController.clear();
                       }),
-              labelText: "ٍEnd Date",
-              icon: Icon(
-                Icons.today,color: Color(0xffAB1717),
-              ),
-              labelStyle: TextStyle(
-                  fontFamily: "Caveat",
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF197278))),
-          format: format,
-          onShowPicker: (context, currentValue) async {
-            final date = await showDatePicker(
-                context: context,
-                firstDate: DateTime(1900),
-                initialDate: currentValue ?? DateTime.now(),
-                lastDate: DateTime(2100));
-            if (date != null) {
-              final time = await showTimePicker(
-                context: context,
-                initialTime:
-                    TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
-              );
+                  labelText: "ٍEnd Date",
+                  icon: Icon(
+                    Icons.today,
+                    color: Color(0xffAB1717),
+                  ),
+                  labelStyle: TextStyle(
+                      fontFamily: "Caveat",
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF197278))),
+              format: format,
+              onShowPicker: (context, currentValue) async {
+                final date = await showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1900),
+                    initialDate: currentValue ?? DateTime.now(),
+                    lastDate: DateTime(2100));
+                if (date != null) {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime:
+                        TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                  );
 
-              return DateTimeField.combine(date, time);
-            } else {
-              return currentValue;
-            }
-          },
-        )),
+                  return DateTimeField.combine(date, time);
+                } else {
+                  return currentValue;
+                }
+              },
+            )),
       ],
     );
   }

@@ -56,7 +56,7 @@ class Auth {
       PushNotification.deleteDeviceTokenFromDatabase(Global.user.id);
       PushNotification.unsubscribeFromJourniesNotifications();
       Global.user = null;
-      Global.numberOfcurrentFetchedJournies=0;
+      Global.numberOfcurrentFetchedJournies = 0;
       return true;
     } on PlatformException catch (e) {
       print(e);
@@ -168,8 +168,16 @@ class Auth {
     });
   }
 
-  Future<bool> doit(String initial, String description, DateTime endTime,
-      String name, DateTime startTime, BuildContext context, File image) async {
+  Future<bool> doit(
+      String initial,
+      String description,
+      int distance,
+      DateTime endTime,
+      String name,
+      DateTime startTime,
+      BuildContext context,
+      File image,
+      String places) async {
     bool result = false;
     try {
       /* /* AuthResult authResult = */ await FirebaseAuth.instance
@@ -195,7 +203,9 @@ class Auth {
         'name': name,
         'startTime': startTime,
         'usersRequestedToJoinJourney': [],
-        'invitedUsers': []
+        'invitedUsers': [],
+        'distance': distance,
+        'places': places
       });
 
 //************ */
