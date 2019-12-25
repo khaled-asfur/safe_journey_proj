@@ -1,5 +1,3 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
@@ -7,37 +5,18 @@ import 'package:safe_journey/models/user.dart';
 import 'package:safe_journey/widgets/header.dart';
 import './InfoCard.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
-
-
-
 const url = 'http://thinkdiff.net';
 //const email = 'lana@example.com';
 //const phone = '0595666233';
 
-void main() => runApp(ShowProfile());
 
-class ShowProfile extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "User Profile",
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        //0x .. FF: for full obacity .. 197278: hexadecimal number for the color
-        primaryColor: Color(0xFF197278),
-        accentColor: Color(0xffAB1717),
-      ),
-      home: UserProfilePage(),
-    );
-  }
-}
 
-class UserProfilePage extends StatefulWidget {
+class ShowProfile extends StatefulWidget {
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
 
-class _UserProfilePageState extends State<UserProfilePage> {
+class _UserProfilePageState extends State<ShowProfile> {
   //final String _fullName = "person Name";
 
  // final String _status = "mobile id";
