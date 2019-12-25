@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/notification.dart';
+import 'package:safe_journey/models/user.dart';
 import 'package:safe_journey/widgets/my_raised_button.dart';
 import 'package:safe_journey/widgets/titleText.dart';
 
@@ -27,11 +29,11 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     MyNotification.setNotificationListener();
-    doFetch();
+    refreshUserAndJourneyData();
     super.initState();
   }
 
-  Future<bool> doFetch() async {
+  Future<bool> fetchJourniesData() async {
     bool result = false;
     await Journey.fetchJoinedJournies().then((jour) {
       setState(() {
@@ -44,7 +46,15 @@ class HomePageState extends State<HomePage> {
     });
     return result;
   }
-
+ Future<bool> refreshUserAndJourneyData()async {
+   bool fetchedUserdData=false;
+   bool fetchedjourneiesData=false;
+  fetchedjourneiesData= await fetchJourniesData();
+    FirebaseUser fbUser = await FirebaseAuth.instance.currentUser();
+     User user = User.empty();
+    fetchedUserdData=await  user.getUserData(fbUser);
+    return fetchedUserdData & fetchedjourneiesData;
+ }
   @override
   Widget build(BuildContext context) {
     print('in homepage build');
@@ -53,7 +63,7 @@ class HomePageState extends State<HomePage> {
         : Header(
             body: RefreshIndicator(
               onRefresh: () {
-                return doFetch();
+                return refreshUserAndJourneyData();
               },
               child: ListView(
                children: <Widget>[

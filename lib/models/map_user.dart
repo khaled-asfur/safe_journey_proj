@@ -94,8 +94,9 @@ class MapUser {
       });
       unsafeUsersNames+="${user.name} ,";
       //delete the last caracter which is ','
-      unsafeUsersNames=unsafeUsersNames.substring(0,unsafeUsersNames.length-2);
+      
     });
+    unsafeUsersNames=unsafeUsersNames.substring(0,unsafeUsersNames.length-2);
     return unsafeUsersNames;
   }
 }

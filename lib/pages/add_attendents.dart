@@ -96,15 +96,14 @@ class _AddAttendentsState extends State<AddAttendents> {
   }
 
   Widget _buildBody() {
-    if (searchItem == null || searchItem == '') {
+    if (state == FetchState.FETCHING_IN_PROGRESS) {
+      return Center(child: CircularProgressIndicator());
+    } else if (searchItem == null || searchItem == '') {
       //اليوزر ما بحث عن اشي
       var attendentsList = _attendents.cast<String>().toList();
       return ShowAttendents(attendentsList, userDocs, _journey.id);
     } else if (userDocs == null) {
       return Center(child: Text('Please check your internet connection'));
-    } else if (state == FetchState.FETCHING_IN_PROGRESS && searchItem != null) {
-      //اذا قاعد بعمل بحث على اشي بس داتا اليوزرز بعدها مش واصلة
-      return Center(child: CircularProgressIndicator());
     } else if (state == FetchState.FETCHING_COMPLETED && searchItem != null) {
       //اليوزر عامل بحث وجبت النتيجة بنجاح
       if (userDocs.documents.isEmpty) {
@@ -167,39 +166,38 @@ class _AddAttendentsState extends State<AddAttendents> {
     setState(() {
       _pendingAttendents.add(userID);
     });
-    try{
-    Firestore.instance.collection('notifications').add(
-      {
-        'journeyId': _journey.id,
-        'userId': userID,
-        'senderId': Global.user.id,
-        'type':addingattendents?'ATTENDENCE_REQUEST':'PARENT_REQUEST',
-        'time': DateTime.now()
-      },
-    );
+    try {
+      Firestore.instance.collection('notifications').add(
+        {
+          'journeyId': _journey.id,
+          'userId': userID,
+          'senderId': Global.user.id,
+          'type': addingattendents ? 'ATTENDENCE_REQUEST' : 'PARENT_REQUEST',
+          'time': DateTime.now()
+        },
+      );
 
-    Firestore.instance
-        .collection('journey_user')
-        .where('userId', isEqualTo: Global.user.id)
-        .where('journeyId', isEqualTo: _journey.id)
-        .getDocuments()
-        .then((QuerySnapshot snap) {
-      String journeyUserDocumentID = snap.documents[0].documentID;
       Firestore.instance
           .collection('journey_user')
-          .document(journeyUserDocumentID)
-          .updateData({
-        'pendingAttendents': FieldValue.arrayUnion([userID]),
+          .where('userId', isEqualTo: Global.user.id)
+          .where('journeyId', isEqualTo: _journey.id)
+          .getDocuments()
+          .then((QuerySnapshot snap) {
+        String journeyUserDocumentID = snap.documents[0].documentID;
+        Firestore.instance
+            .collection('journey_user')
+            .document(journeyUserDocumentID)
+            .updateData({
+          'pendingAttendents': FieldValue.arrayUnion([userID]),
+        });
       });
-
-    });
-    String role=addingattendents?"attendent":"parent";
-    String userName=Global.user.name;
-    PushNotification.sendNotificationToUser(userID,
-     "Attendebce Request", '$userName requsted from you to be his $role in the journey ${_journey.name}');
-  }catch(error ){
-    print('error while sending attendence request $error');
-  }
+      String role = addingattendents ? "attendent" : "parent";
+      String userName = Global.user.name;
+      PushNotification.sendNotificationToUser(userID, "Attendebce Request",
+          '$userName requsted from you to be his $role in the journey ${_journey.name}');
+    } catch (error) {
+      print('error while sending attendence request $error');
+    }
   }
 
   List<User> _findUsersMatchsearchValue(String searchValue,
@@ -208,7 +206,8 @@ class _AddAttendentsState extends State<AddAttendents> {
     allUsersDocs.documents.forEach((DocumentSnapshot document) {
       String userId = document.documentID.toLowerCase();
       String userName = document['name'].toLowerCase();
-      if (document.documentID != Global.user.id) {//مشان ما اعرض اليوزر الحالي ضمن نتائج البحث
+      if (document.documentID != Global.user.id) {
+        //مشان ما اعرض اليوزر الحالي ضمن نتائج البحث
         if (!(searchingFor == SearchingFor.ATTENDENT &&
             !usersJoinsThisJourney.contains(document.documentID))) {
           //اذا كنت بدي اضيف اتندنت رح يضيف بس المشاركين بالرحلة

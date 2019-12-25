@@ -134,7 +134,7 @@ class Journey {
       'attendents': List(),
       'pendingAttendents': List(),
       'imageURL': '',
-      'allowedDistance' :"0"
+      'allowedDistance' :0
     };
     try {
       if (firestoreDocument != null)
