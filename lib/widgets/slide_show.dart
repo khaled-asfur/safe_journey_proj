@@ -184,9 +184,10 @@ class SlideShowState extends State<MySlideShow> {
           margin: EdgeInsets.all(5),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(5)),
-              color: Colors.black26),
+              color: Color(0xFF197278)),
           child: Text(
             name,
+             style: TextStyle(color: Colors.white),
             textAlign: TextAlign.center,
           )),
     );
