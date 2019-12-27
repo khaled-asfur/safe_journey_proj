@@ -44,6 +44,7 @@ class _MyAppState extends State<MyApp> {
         'createJourney': (BuildContext context) => Create(),
         'settings': (BuildContext context) => EditProfile(),
         'profilePage': (BuildContext context) => ShowProfile(),
+        
 
       },
       onGenerateRoute: (RouteSettings settings) {

@@ -76,7 +76,7 @@ class ShowJourneyState extends State<AdminShowJourney> {
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF197278),
                           ))),
-                  DataColumn(label: Text('${widget._journey.name}')),
+                  DataColumn(label: Text('${widget._journey.name}',style: TextStyle(color:Colors.grey[700]))),
                 ], rows: [
                   DataRow(cells: [
                     DataCell(Text('Journey Description',
@@ -85,7 +85,7 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF197278),
                         ))),
-                    DataCell(Text('${widget._journey.description}')),
+                    DataCell(Text('${widget._journey.description}',style: TextStyle(color:Colors.grey[700]))),
                   ]),
                   DataRow(cells: [
                     DataCell(Text('Journey Start Date',
@@ -94,7 +94,7 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF197278),
                         ))),
-                    DataCell(Text('$formattedStartTime')),
+                    DataCell(Text('$formattedStartTime',style: TextStyle(color:Colors.grey[700]))),
                   ]),
                   DataRow(cells: [
                     DataCell(Text('Journey End Date',
@@ -103,7 +103,7 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF197278),
                         ))),
-                    DataCell(Text('$formattedEndTime')),
+                    DataCell(Text('$formattedEndTime',style: TextStyle(color:Colors.grey[700]))),
                   ]),
                   DataRow(cells: [
                     DataCell(Text('Journey Places',
@@ -112,7 +112,7 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF197278),
                         ))),
-                    DataCell(Text('${widget._journey.places}')),
+                    DataCell(Text('${widget._journey.places}',style: TextStyle(color:Colors.grey[700]))),
                   ]),
                   DataRow(cells: [
                     DataCell(Text('Allowed Distance',
@@ -121,7 +121,7 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF197278),
                         ))),
-                    DataCell(Text('${widget._journey.distance}')),
+                    DataCell(Text('${widget._journey.distance}',style: TextStyle(color:Colors.grey[700]))),
                   ]),
                 ]),
               ),
@@ -131,9 +131,9 @@ class ShowJourneyState extends State<AdminShowJourney> {
                     label: new FlatButton.icon(
                         icon: Icon(
                           Icons.add_location,
-                          color: Colors.blueAccent,
+                          color: Color(0xFF197278),
                         ),
-                        label: Text("Show User Location"),
+                        label: Text("Show User Location",style: TextStyle(color: Color(0xFF197278))),
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -149,9 +149,9 @@ class ShowJourneyState extends State<AdminShowJourney> {
                       new FlatButton.icon(
                           icon: Icon(
                             Icons.add,
-                            color: Colors.blueAccent,
+                            color: Color(0xFF197278),
                           ),
-                          label: Text("Add participants to the journey"),
+                          label: Text("Add participants to the journey",style: TextStyle(color: Color(0xFF197278))),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -168,9 +168,9 @@ class ShowJourneyState extends State<AdminShowJourney> {
                       new FlatButton.icon(
                           icon: Icon(
                             Icons.edit,
-                            color: Colors.blueAccent,
+                            color: Color(0xFF197278),
                           ),
-                          label: Text("Edit Journey"),
+                          label: Text("Edit Journey",style: TextStyle(color: Color(0xFF197278))),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -187,9 +187,9 @@ class ShowJourneyState extends State<AdminShowJourney> {
                       new FlatButton.icon(
                           icon: Icon(
                             Icons.av_timer,
-                            color: Colors.blueAccent,
+                            color: Color(0xFF197278),
                           ),
-                          label: Text("Start Journey"),
+                          label: Text("Start Journey",style: TextStyle(color: Color(0xFF197278))),
                           onPressed: () {
                             Journey.startJourney(widget._journey.id,context);
                           }),
@@ -200,9 +200,9 @@ class ShowJourneyState extends State<AdminShowJourney> {
                       new FlatButton.icon(
                           icon: Icon(
                             Icons.access_time,
-                            color: Colors.blueAccent,
+                            color: Color(0xFF197278),
                           ),
-                          label: Text("End Journey"),
+                          label: Text("End Journey",style: TextStyle(color: Color(0xFF197278))),
                           onPressed: () {
                             Journey.endJourney(widget._journey.id,context);
                           }),

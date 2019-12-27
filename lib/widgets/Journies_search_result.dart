@@ -68,9 +68,10 @@ class _JourniesSearchResultState extends State<JourniesSearchResult> {
                   subtitle: Text(journey.id),
                   trailing: RaisedButton(
                     textColor: Colors.white,
-                    color: Colors.blue,
+                    color: Color(0xFF197278),
                     disabledTextColor: Colors.white,
-                    child: _buttonLabel(journey),
+                    child: _buttonLabel(journey,),
+                    
                     onPressed: journey.currentUserStateInJourney !=
                             UserStateInJourney.NOT_JOINED
                         ? null
@@ -100,6 +101,6 @@ class _JourniesSearchResultState extends State<JourniesSearchResult> {
         UserStateInJourney.PENDING) {
       return Icon(Icons.hourglass_full);
     }
-    return Text("Join");
+    return Text("Join",style: TextStyle(color: Colors.white));
   }
 }

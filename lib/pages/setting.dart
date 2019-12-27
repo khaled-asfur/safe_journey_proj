@@ -5,12 +5,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+//import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:safe_journey/models/auth.dart';
 //import 'package:safe_journey/models/auth.dart';
 //import 'package:safe_journey/models/auth.dart';
 //import 'package:nice_button/nice_button.dart';
 import 'package:safe_journey/models/global.dart';
+import 'package:safe_journey/models/helpers.dart';
 import 'package:safe_journey/models/user.dart';
 import 'package:safe_journey/pages/changepass.dart';
 //import 'package:safe_journey/pages/showProfile.dart';
@@ -45,7 +46,8 @@ class EditProfileScreenState extends State<EditProfileScreen> {
   var pioController = new TextEditingController();
 
   File avatarImageFile, backgroundImageFile;
-
+  bool change = false;
+  bool error = false;
   String sex;
   //******************************************************************* */
   Future<void> fillUserData() async {
@@ -115,9 +117,8 @@ class EditProfileScreenState extends State<EditProfileScreen> {
     timeDilation = 1.0;
     Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
-        
         appBar: new AppBar(
-         title: Text("update Information Profile"),
+          title: Text("update Information Profile"),
         ),
         //********************************************************************* */
 
@@ -132,18 +133,18 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                     (backgroundImageFile == null &&
                             userData['background'] == null)
                         ? new Image.asset(
-                            'images/bg_uit.jpg',
+                            '',
                             width: double.infinity,
                             height: screenSize.height / 4,
                             fit: BoxFit.cover,
                           )
                         : (backgroundImageFile != null)
-                            ? Image.file(backgroundImageFile,
-                                height: screenSize.height / 4,
+                            ? Image.file(
+                                backgroundImageFile,
+                                height: (screenSize.height / 4) + 10.0,
                                 width: double.infinity,
-                                            fit: BoxFit.cover,
-
-                                )
+                                fit: BoxFit.cover,
+                              )
                             : Image.network(
                                 userData['background'],
                                 width: double.infinity,
@@ -162,6 +163,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                             width: 30.0,
                             height: 30.0,
                             fit: BoxFit.cover,
+                            color: Color(0xFF197278),
                           ),
                           onPressed: () => getImage(false),
                           padding: new EdgeInsets.all(0.0),
@@ -180,7 +182,8 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                     new Positioned(
                       child: new Stack(
                         children: <Widget>[
-                          (avatarImageFile == null && userData['imageURL'] == null)
+                          (avatarImageFile == null &&
+                                  userData['imageURL'] == null)
                               ? new Image.network(
                                   'https://img.pngio.com/deafult-profile-icon-png-image-free-download-searchpngcom-profile-icon-png-673_673.png',
                                   width: 140.0,
@@ -192,10 +195,10 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                                     height: 140.0,
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: (avatarImageFile!=null)?
-                                        FileImage(avatarImageFile):
-                                        NetworkImage(userData['imageURL'] )
-                                        ,
+                                        image: (avatarImageFile != null)
+                                            ? FileImage(avatarImageFile)
+                                            : NetworkImage(
+                                                userData['imageURL']),
                                         fit: BoxFit.cover,
                                       ),
                                       borderRadius: BorderRadius.circular(80.0),
@@ -207,7 +210,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                                   ),
                                 ),
 
-                                /************************************************ */
+                          /************************************************ */
                           new Material(
                             //icon image for profile
                             child: new IconButton(
@@ -216,6 +219,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                                 width: 30.0,
                                 height: 30.0,
                                 fit: BoxFit.cover,
+                                color: Color(0xFF197278),
                               ),
                               onPressed: () => getImage(true),
                               padding: new EdgeInsets.all(0.0),
@@ -295,12 +299,12 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   //*********************************************** */
-                 
+
                   //********************************************** */
                   new FlatButton.icon(
                       icon: Icon(
                         Icons.settings,
-                        color: Colors.blueAccent,
+                        color: Color(0xFF197278),
                       ),
                       label: Text("setting "),
                       onPressed: () {
@@ -312,7 +316,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                   SizedBox(height: 15),
                   //*************************************************************** */
                   SizedBox(
-                      width: 300.0,
+                      width: 200.0,
                       height: 50.0,
                       child: RaisedButton.icon(
                           //radius: 20,
@@ -326,13 +330,14 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                             color: Colors.white,
                           ),
                           splashColor: Colors.white,
-                          color: Color(0xffAB1717),
+                          color: Color(0xFF197278),
                           onPressed: () async {
                             if (nameController.text.isEmpty ||
                                 pioController.text.isEmpty ||
                                 phoneController.text.isEmpty ||
                                 emailController.text.isEmpty) {
-                              _onAlertButtonPressed1(context);
+                              Helpers.showErrorDialog(
+                                  context, "Some Filed is reqierd");
                             } else {
                               updateData();
                             }
@@ -347,83 +352,12 @@ class EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   //*********************************************************************************************** */
-  /*Widget _buildProfileImage() {
-    bool havaAvalidUrl =
-        (userData['imageURL'] != null && userData['imageURL'] != 'noURL');
-    return Center(
-      child: Container(
-        
-        width: 140.0,
-        height: 140.0,
-        //color: Color(0xffAB1717),
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: havaAvalidUrl == false
-                  ? AssetImage("images/profile.png")
-                  : NetworkImage(userData['imageURL']),
-            fit: BoxFit.cover,
-          ),
-          borderRadius: BorderRadius.circular(80.0),
-          border: Border.all(
-            color: Colors.white,
-            width: 10.0,
-          ),
-        ),
-      ),
-    );
-  }*/
+
   void updateData() {
-    
     Auth().update(nameController.text, pioController.text, phoneController.text,
-        emailController.text, context,avatarImageFile,backgroundImageFile);
+        emailController.text, context, avatarImageFile, backgroundImageFile);
+    Helpers.showDoneDialog(context, "Your Information is update");
 
     print(nameController.text);
-    //_onAlertButtonPressed(context);
   }
-
-  //******************* */
-  /* _onAlertButtonPressed(context) {
-    Alert(
-      context: context,
-      type: AlertType.info,
-      title: "Done",
-      desc: "Your Information is successfully Update",
-      buttons: [
-        DialogButton(
-          child: Text(
-            "OK",
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
-          onPressed: (){
-            Navigator.pop(context);
-           },
-          width: 120,
-        )
-      ],
-    ).show();
-  }*/
-  //********************************* */
- _onAlertButtonPressed1(context) {
-    Alert(
-      context: context,
-      type: AlertType.error,
-      title: "Error",
-      desc: "Some fields are required please full them",
-      buttons: [
-        DialogButton(
-          child: Text(
-            "OK",
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
-          onPressed: () => Navigator.pop(context),
-          width: 120,
-        )
-      ],
-    ).show();
-  }
-
-  //*************************** */
-
-//*********************************************************************** */ searchbutton
- 
 }

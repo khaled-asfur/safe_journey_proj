@@ -5,7 +5,7 @@ class EmptyResult extends StatelessWidget {
   EmptyResult(this.text);
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
+  //  double height = MediaQuery.of(context).size.height;
     return Container(
       decoration: BoxDecoration(
        // backgroundBlendMode: BlendMode.darken,

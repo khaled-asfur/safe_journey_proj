@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+
 import 'package:safe_journey/models/auth.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/user.dart';
+import '../models/helpers.dart';
 
 class ChangePass extends StatefulWidget {
   @override
@@ -54,6 +55,7 @@ class _EditpassState extends State<Editpass> {
       }
     });
   }
+  ///////////////////////////////////////////////
 
   @override
   void initState() {
@@ -77,10 +79,12 @@ class _EditpassState extends State<Editpass> {
   final GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
   bool cnewpass = false;
 
-  @override
+  @override //build ********************************************************************************************
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: new AppBar(),
+      appBar: new AppBar(
+        title: Text("Setting"),
+      ),
       body: Container(
 
           // key: _formKey,
@@ -154,40 +158,37 @@ class _EditpassState extends State<Editpass> {
                   },
                 ),
               ),
-              //***************************************************************** */
+              //***************************************************************** */Flat button for change password
               new FlatButton.icon(
                   icon: Icon(
                     Icons.vpn_key,
-                    color: Colors.blueAccent,
+                    color: Color(0xFF197278),
                   ),
                   label: Text("Change passsword "),
                   onPressed: () {
                     if (_formKey.currentState.validate() != true) return;
                     _formKey.currentState.save();
 
-                    if (currentpassController.text.isEmpty ||
-                        newpassController.text.isEmpty) {
-                      _onAlertButtonPressed1(context);
-                    } else {
-                      new Auth()
-                          .cheak(emailuser, currentpassController.text, context)
-                          .then((bool result) {
-                        if (result == true) {
-                          FirebaseAuth.instance
-                              .currentUser()
-                              .then((FirebaseUser user) {
-                            user.updatePassword(newpassController.text);
-                          });
-                          setState(() {});
-                        } else {
-                          cnewpass = false;
-                        }
-                      });
-                    }
+                    new Auth()
+                        .cheak(emailuser, currentpassController.text, context)
+                        .then((bool result) {
+                      if (result == true) {
+                        FirebaseAuth.instance
+                            .currentUser()
+                            .then((FirebaseUser user) {
+                          user.updatePassword(newpassController.text);
+                        });
+                        Helpers.showErrorDialog(
+                            context, "Your Password is update");
+                      } else {
+                        cnewpass = false;
+                      }
+                    });
+                    //  }
                   }),
             ])),
         SizedBox(height: 15.0),
-        //******************************************************************************* */
+        //*******************************************************************************  Form for change email*/
 
         Form(
             key: _formKey1,
@@ -202,7 +203,10 @@ class _EditpassState extends State<Editpass> {
                           fontWeight: FontWeight.bold,
                           color: Colors.grey),
                       suffixIcon: IconButton(
-                          icon: Icon(Icons.cancel), onPressed: () {})),
+                          icon: Icon(Icons.cancel),
+                          onPressed: () {
+                            newemailController.clear();
+                          })),
                   validator: (String value) {
                     if (value.length < 5 ||
                         !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
@@ -220,82 +224,17 @@ class _EditpassState extends State<Editpass> {
               new FlatButton.icon(
                   icon: Icon(
                     Icons.email,
-                    color: Colors.blueAccent,
+                    color: Color(0xFF197278),
                   ),
                   label: Text("Change Email "),
                   onPressed: () async {
                     if (_formKey1.currentState.validate() != true) return;
                     _formKey1.currentState.save();
-                    Alert(
-                        context: context,
-                        title: "Enter Current password",
-                        content: Column(
-                          children: <Widget>[
-                            TextField(
-                              controller: currentpassController1,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                icon: Icon(Icons.lock),
-                                labelText: 'current Password',
-                              ),
-                            ),
-                          ],
-                        ),
-                        buttons: [
-                          DialogButton(
-                            onPressed: () {
-                              new Auth()
-                                  .cheak(emailuser, currentpassController1.text,
-                                      context)
-                                  .then((bool result) {
-                                if (result == true) {
-                                  FirebaseAuth.instance
-                                      .currentUser()
-                                      .then((FirebaseUser user) {
-                                    user.updateEmail(newemailController.text);
-                                  });
-
-                                  setState(() {});
-                                }
-                              });
-                              /* Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => ChangePass()),
-                        );*/
-                            },
-                            child: Text(
-                              "confirm",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
-                            ),
-                          )
-                        ]).show();
-
-                    // FirebaseUser user = await FirebaseAuth.instance.currentUser();
-
-                    // user.updateEmail(newemailController.text);
+                    Helpers.showemailDialog(context, "Enter current password",
+                        newemailController.text, emailuser);
                   }),
             ]))
       ])),
     );
-  }
-
-  _onAlertButtonPressed1(context) {
-    Alert(
-      context: context,
-      type: AlertType.error,
-      title: "Error",
-      desc: "Some fields are required please full them",
-      buttons: [
-        DialogButton(
-          child: Text(
-            "OK",
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
-          onPressed: () => Navigator.pop(context),
-          width: 120,
-        )
-      ],
-    ).show();
   }
 }

@@ -31,7 +31,7 @@ class MyDrawer extends StatelessWidget {
         _buildProfile(deviceWidth, deviceHeight),
         Divider(),
         ListTile(
-          leading: Icon(Icons.create),
+          leading: Icon(Icons.create,color:Color(0xFF197278)),
           title: Text("create journey"),
           onTap: () {
             Navigator.pushNamed(context, 'createJourney');
@@ -39,7 +39,7 @@ class MyDrawer extends StatelessWidget {
         ),
         Divider(),
         ListTile(
-          leading: Icon(Icons.settings),
+          leading: Icon(Icons.settings,color:Color(0xFF197278) ,),
           title: Text("Settings"),
           onTap: () {
             Navigator.pushNamed(context, 'settings');
@@ -47,7 +47,7 @@ class MyDrawer extends StatelessWidget {
         ),
         Divider(),
         ListTile(
-          leading: Icon(Icons.exit_to_app),
+          leading: Icon(Icons.exit_to_app,color:Color(0xFF197278)),
           title: Text("Logout"),
           onTap: () {
             Auth().logout(context);
@@ -74,7 +74,7 @@ class MyDrawer extends StatelessWidget {
                   ? AssetImage("images/profile.png")
                   : NetworkImage(userData['imageURL'])),
         ),
-        Text(userData['name']),
+        Text(userData['name'],style: TextStyle(color: Color(0xFF197278))),
         Text(userData['email'], style: TextStyle(color: Colors.grey))
       ],
     ));

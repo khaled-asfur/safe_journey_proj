@@ -9,7 +9,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:safe_journey/models/auth.dart';
 
-import 'home_page.dart';
+//import 'add_people.dart';
+//import 'package:safe_journey/pages/add_people.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -155,7 +157,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                             width: 30.0,
                             height: 30.0,
                             fit: BoxFit.cover,
-                            color: Color(0xffAB1717),
+                            color: Color(0xFF197278),
                           ),
                           onPressed: () => getImage(true),
                           padding: new EdgeInsets.all(0.0),
@@ -212,7 +214,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                       labelStyle: TextStyle(
                           fontFamily: "Caveat",
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF197278)),
+                          color: Colors.grey),
                       suffixIcon: IconButton(
                           icon: Icon(Icons.cancel),
                           onPressed: () {
@@ -233,7 +235,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                       labelStyle: TextStyle(
                           fontFamily: "Caveat",
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF197278)),
+                          color: Colors.grey),
                       suffixIcon: IconButton(
                           icon: Icon(Icons.cancel),
                           onPressed: () {
@@ -252,7 +254,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                       labelStyle: TextStyle(
                           fontFamily: "Caveat",
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF197278)),
+                          color: Colors.grey),
                       suffixIcon: IconButton(
                           icon: Icon(Icons.cancel),
                           onPressed: () {
@@ -271,7 +273,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                       labelStyle: TextStyle(
                           fontFamily: "Caveat",
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF197278)),
+                          color: Colors.grey),
                       suffixIcon: IconButton(
                           icon: Icon(Icons.cancel),
                           onPressed: () {
@@ -284,18 +286,18 @@ class EditProfileScreenState extends State<EditProfileScreen> {
               SizedBox(height: 15),
               BasicDateTimeEndField(),
               SizedBox(height: 15),
-              new FlatButton.icon(
+            /*  new FlatButton.icon(
                   icon: Icon(
                     Icons.add,
-                    color: Colors.blueAccent,
+                    color: Color(0xFF197278),
                   ),
                   label: Text("Add participants to the trip"),
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
+                      MaterialPageRoute(builder: (context) => AddPeople()),
                     );
-                  }),
+                  }),*/
               SizedBox(height: 15),
               SizedBox(
                 width: 300.0,
@@ -312,7 +314,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                       color: Colors.white,
                     ),
                     splashColor: Colors.white,
-                    color: Color(0xffAB1717),
+                    color: Color(0xFF197278),
                     onPressed: () {
                       if (descriptionController.text.isEmpty ||
                           endController.text.isEmpty ||
@@ -328,11 +330,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                     }),
               ),
               SizedBox(height: 12),
-              /*  Center(
-                child: isLoading == true
-                    ? CircularProgressIndicator()
-                    : Container(),
-              )*/
+            
             ],
             crossAxisAlignment: CrossAxisAlignment.center,
           )
@@ -371,17 +369,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
     _onAlertButtonPressed(context);
   }
 
-  /* void addDataTofirebaseUnknown() {
-    final fireStoreInstance = Firestore.instance;
-    fireStoreInstance.collection('journies').document(initial).setData({
-      'description': descriptionController.text,
-      'endTime': endController.text,
-      'imageURL': _image.toString(),
-      'name': nameController.text,
-      'startTime': startController.text,
-    });
-  }*/
-  //***************** */
+
   _onAlertButtonPressed(context) {
     Alert(
       context: context,
@@ -401,7 +389,9 @@ class EditProfileScreenState extends State<EditProfileScreen> {
             descriptionController.clear();
             distanceController.clear();
             placeseController.clear();
+
             setState(() {
+              _image=null;
               initial = new Random().nextInt(10000000).toString();
             });
 
@@ -454,6 +444,7 @@ class BasicDateTimeStartField extends StatelessWidget {
                   suffixIcon: IconButton(
                       icon: Icon(
                         Icons.cancel,
+                        
                       ),
                       onPressed: () {
                         startController.clear();
@@ -461,12 +452,12 @@ class BasicDateTimeStartField extends StatelessWidget {
                   labelText: "ٍStart Date",
                   icon: Icon(
                     Icons.today,
-                    color: Color(0xffAB1717),
+                    color: Color(0xFF197278),
                   ),
                   labelStyle: TextStyle(
                       fontFamily: "Caveat",
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF197278))),
+                      color: Colors.grey)),
               format: format,
               onShowPicker: (context, currentValue) async {
                 final date = await showDatePicker(
@@ -514,12 +505,15 @@ class BasicDateTimeEndField extends StatelessWidget {
                   labelText: "ٍEnd Date",
                   icon: Icon(
                     Icons.today,
-                    color: Color(0xffAB1717),
+                    color: Color(0xFF197278),
                   ),
                   labelStyle: TextStyle(
                       fontFamily: "Caveat",
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF197278))),
+                      color: Colors.grey
+                      
+                      
+                      )),
               format: format,
               onShowPicker: (context, currentValue) async {
                 final date = await showDatePicker(

@@ -60,7 +60,10 @@ class LoginPageState extends State<LoginPage> {
                                 setState(() {
                                   _isLoading=true;
                                 });
-                              }),
+                              }
+                              
+                              
+                              ),
                    _isLoading?Center(child:CircularProgressIndicator()):FlatButton(
                       child: Text(
                         "swith to signup page",
