@@ -36,10 +36,10 @@ class _AddPeopleState extends State<AddPeople> {
     invitedUsers = List();
     _fetchAllUsersData();
     _journey = await Journey.fetchOneJourneyDetails(widget._journey.id);
-    if(_journey.invitedUsers!=null)
-    _journey.invitedUsers.forEach((user) {
-      invitedUsers.add(user);
-    });
+    if (_journey.invitedUsers != null)
+      _journey.invitedUsers.forEach((user) {
+        invitedUsers.add(user);
+      });
   }
 
   @override
@@ -58,14 +58,18 @@ class _AddPeopleState extends State<AddPeople> {
   }
 
   Widget _buildBody() {
-    if (userDocs == null) {
+    if (state == FetchState.FETCHING_IN_PROGRESS && searchItem != null) {
+      return Center(child: CircularProgressIndicator());
+    } else if (userDocs == null) {
       return MyStyledText('Please check your internet connection');
     } /*else if (_journey.role != 'ADMIN') {
       return new MyStyledText(
           'Your role is not \'ADMIN\', so you are not authorized to add users to this journey.');
-    } */else if (searchItem == null || searchItem == '') {
+    } */
+    else if (searchItem == null || searchItem == '') {
       //اليوزر ما بحث عن اشي
-      return ShowJourneyMembers(usersJoinsThisJourney,userDocs,widget._journey.id);
+      return ShowJourneyMembers(
+          usersJoinsThisJourney, userDocs, widget._journey.id);
     } else if (state == FetchState.FETCHING_IN_PROGRESS && searchItem != null) {
       //اذا قاعد بعمل بحث على اشي بس داتا اليوزرز بعدها مش واصلة
       return Center(child: CircularProgressIndicator());
@@ -108,12 +112,13 @@ class _AddPeopleState extends State<AddPeople> {
     searchItem = searchValue;
     List<User> users = _findUsersMatchsearchValue(searchValue, userDocs);
     List<UserSearchItem> userSearchItems = [];
-    Map<String,dynamic> searchItemConfig;
+    Map<String, dynamic> searchItemConfig;
     if (users != null && users.isNotEmpty) {
       users.forEach((User user) {
-        searchItemConfig= _fillSearchItemConfig(user,invitedUsers, usersJoinsThisJourney);
-        UserSearchItem searchItem = UserSearchItem(
-            user, _sendJoinJourneyRequest,searchItemConfig);
+        searchItemConfig =
+            _fillSearchItemConfig(user, invitedUsers, usersJoinsThisJourney);
+        UserSearchItem searchItem =
+            UserSearchItem(user, _sendJoinJourneyRequest, searchItemConfig);
         userSearchItems.add(searchItem);
       });
     }
@@ -124,7 +129,7 @@ class _AddPeopleState extends State<AddPeople> {
     setState(() {
       invitedUsers.add(userID);
     });
-     Firestore.instance.collection('notifications').add(
+    Firestore.instance.collection('notifications').add(
       {
         'journeyId': _journey.id,
         'userId': userID,
@@ -136,9 +141,9 @@ class _AddPeopleState extends State<AddPeople> {
     Firestore.instance.collection('journies').document(_journey.id).updateData({
       'invitedUsers': FieldValue.arrayUnion([userID]),
     });
-    String userName=Global.user.name;
+    String userName = Global.user.name;
     PushNotification.sendNotificationToUser(userID, 'Journey invitation',
-     '$userName invited you to join the journey ${_journey.name}');
+        '$userName invited you to join the journey ${_journey.name}');
   }
 
   List<User> _findUsersMatchsearchValue(
@@ -172,36 +177,38 @@ class _AddPeopleState extends State<AddPeople> {
     });
   }
 }
-Map<String, dynamic> _fillSearchItemConfig(User user,List invitedUsers, List usersJoinsThisJourney) {
-    Map<String, dynamic> searchItemConfig = {
-      'icon': null,
-      'message': '',
-      'buttonEnabled': false
-    };
-    if (invitedUsers != null && invitedUsers.contains(user.id)) {
-      searchItemConfig['icon'] = Icon(
-        Icons.hourglass_full,
-        size: 30,
-      );
-      searchItemConfig['message'] = 'Invitation was sent before';
-    } else if (usersJoinsThisJourney.contains(user.id)) {
-      searchItemConfig['icon'] = Icon(
-        Icons.done,
-        size: 30,
-      );
-      searchItemConfig['message'] =
-          'This user is already a member in this journey';
-    } else {
-      searchItemConfig['icon'] = Icon(
-        Icons.person_add,
-        size: 30,
-      );
-      searchItemConfig['message'] = 'Successfullly sended invitation ';
-      searchItemConfig['buttonEnabled'] = true;
-    }
 
-    return searchItemConfig;
+Map<String, dynamic> _fillSearchItemConfig(
+    User user, List invitedUsers, List usersJoinsThisJourney) {
+  Map<String, dynamic> searchItemConfig = {
+    'icon': null,
+    'message': '',
+    'buttonEnabled': false
+  };
+  if (invitedUsers != null && invitedUsers.contains(user.id)) {
+    searchItemConfig['icon'] = Icon(
+      Icons.hourglass_full,
+      size: 30,
+    );
+    searchItemConfig['message'] = 'Invitation was sent before';
+  } else if (usersJoinsThisJourney.contains(user.id)) {
+    searchItemConfig['icon'] = Icon(
+      Icons.done,
+      size: 30,
+    );
+    searchItemConfig['message'] =
+        'This user is already a member in this journey';
+  } else {
+    searchItemConfig['icon'] = Icon(
+      Icons.person_add,
+      size: 30,
+    );
+    searchItemConfig['message'] = 'Successfullly sended invitation ';
+    searchItemConfig['buttonEnabled'] = true;
   }
+
+  return searchItemConfig;
+}
 
 class MyStyledText extends StatelessWidget {
   final String text;

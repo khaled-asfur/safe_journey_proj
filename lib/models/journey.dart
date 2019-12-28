@@ -387,6 +387,6 @@ class Journey {
   @override
   String toString() {
     return super.toString() +
-        ("  id: $_id -- name: $_name  --description: $_description -- startTime: $_startTime  --endTime: $_endTime -- places: $_places -- invitedUsers: $_invitedUsers -- role: $_role -- attendents: $_attendents -- pendingAttendents: $pendingAttendents--imageURL: $_imageURL ");
+        ("  id: $_id -- name: $_name  --description: $_description -- startTime: $_startTime  --endTime: $_endTime -- places: $_places -- invitedUsers: $_invitedUsers -- role: $_role -- attendents: $_attendents -- pendingAttendents: $pendingAttendents--imageURL: $_imageURL --distance: $_distance  ");
   }
 }

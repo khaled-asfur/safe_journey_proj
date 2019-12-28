@@ -247,7 +247,7 @@ class Auth {
 
       FirebaseUser user = await FirebaseAuth.instance.currentUser();
 
-      user.updateEmail("family_safe@hotmail.com");
+     // user.updateEmail("family_safe@hotmail.com");
 
       if (imageback != null && imagepro != null) {
         Firestore.instance.collection('users').document(user.uid).updateData({
