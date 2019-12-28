@@ -163,7 +163,7 @@ class Auth {
       'imageURL': imageURL,
       'email': email,
       'bio': 'Add your bio',
-      'background': imageURL,
+      'background': null,
       'token': token
     });
   }

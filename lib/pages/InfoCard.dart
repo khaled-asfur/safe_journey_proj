@@ -26,7 +26,7 @@ class _InfoCardState extends State<InfoCard> {
         child: ListTile(
           leading: Icon(
             widget.icon,
-            color: Colors.black,
+            color:Color(0xFF197278) ,
           ),
           title: Text(
             widget.text,

@@ -70,14 +70,32 @@ class SignupPageState extends State<SignupPage> {
                 height: 10,
               ),
               _buldChooseImageButton(),
-              Container(
+             Center(
                 child: sampleImage == null
-                    ? Text("Please choose an image from gallery")
-                    : Image.file(
+                    ? Text("")
+                    : Container(
+        
+        width: 140.0,
+        height: 140.0,
+        //color: Color(0xffAB1717),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image:FileImage(
                         sampleImage,
-                        height: 300.0,
-                        width: 300.0,
-                      ),
+                      ) ,
+            fit: BoxFit.cover,
+          ),
+          borderRadius: BorderRadius.circular(80.0),
+          border: Border.all(
+            color: Colors.white,
+            width: 10.0,
+          ),
+        ),
+      )
+                    
+              ),
+               SizedBox(
+                height: 10,
               ),
               _buildSignupButton(),
               Center(child:_isLoading==true?CircularProgressIndicator():Container() ,)
@@ -197,18 +215,26 @@ class SignupPageState extends State<SignupPage> {
   }
 
   Widget _buldChooseImageButton() {
-    return Container(
-      padding: EdgeInsets.only(right: 50.0),
-      alignment: Alignment.centerLeft,
+    return Center(
+     // padding: EdgeInsets.only(right: 50.0),
+     // alignment: Alignment.centerLeft,
       child: ButtonTheme(
-  child:RaisedButton(
+  child:FlatButton.icon(
+                      icon: Icon(
+                        Icons.add_photo_alternate,
+                        color: Color(0xFF197278),
+                      ),
+                      label: Text("choose profile Picture "),
+                      onPressed:getImage)
+  
+  /*RaisedButton(
           child: Row(children: <Widget>[
             Text("Choose profile image "),
             Icon(Icons.add_photo_alternate)
           ]),
-          color: Theme.of(context).accentColor,
+          color: Color(0xFF197278),
           textColor: Colors.white,
-          onPressed: getImage),),
+          onPressed: getImage)*/,),
     );
   }
 
@@ -231,7 +257,7 @@ class SignupPageState extends State<SignupPage> {
       children: <Widget>[
         RaisedButton(
             child: Text("upload image"),
-            color: Theme.of(context).accentColor,
+            color: Colors.grey,
             textColor: Colors.white,
             onPressed: () async {
               final StorageReference storageRef =
@@ -244,16 +270,20 @@ class SignupPageState extends State<SignupPage> {
   }
 
   Widget _buildSignupButton() {
-    return RaisedButton(
+    return  Center(
+      child:SizedBox(
+         width: 150.0,
+                      height: 50.0,
+    child:  RaisedButton(
         child: Text("Signup"),
-        color: Theme.of(context).accentColor,
+        color: Color(0xFF197278),
         textColor: Colors.white,
         onPressed:_isLoading?null :(){
           _submitForm();
           setState(() {
             _isLoading=true;
           });
-          });
+          })));
   }
     _setlodingObservable(){
     Global.loadingObservable=rx.PublishSubject<bool>();

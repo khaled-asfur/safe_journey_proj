@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/notification.dart';
 import 'package:safe_journey/models/user.dart';
-import 'package:safe_journey/widgets/my_raised_button.dart';
+//import 'package:safe_journey/widgets/my_raised_button.dart';
 import 'package:safe_journey/widgets/titleText.dart';
 
 import '../models/Enum.dart';

@@ -81,7 +81,7 @@ class _UserProfilePageState extends State<ShowProfile> {
         //color: Color(0xffAB1717),
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: havaAvalidUrl == false
+ image: havaAvalidUrl == false
                   ? AssetImage("images/profile.png")
                   : NetworkImage(userData['imageURL']),
             fit: BoxFit.cover,
@@ -99,7 +99,7 @@ class _UserProfilePageState extends State<ShowProfile> {
   Widget _buildFullName() {
     TextStyle _nameTextStyle = TextStyle(
       fontFamily: 'Roboto',
-      color: Colors.black,
+      color: Color(0xFF197278),
       fontSize: 28.0,
       fontWeight: FontWeight.w700,
     );
@@ -198,7 +198,8 @@ class _UserProfilePageState extends State<ShowProfile> {
                  _buildSeparator(screenSize),
                  SizedBox(height: 30.0),
                   InfoCard(
-                    text: userData["email"],
+                    text: (userData["email"]),
+                    
                     icon: Icons.email,
                     onPressed: () async {
                       final emailAddress = 'mailto:$userData["email"]';
