@@ -200,6 +200,7 @@ class SlideShowState extends State<MySlideShow> {
       "imageURL":
           "https://images.memphistours.com/large/1049635127_Salt+Formations+9.jpg",
       "address": "Jerico - north east",
+      "phone":"0598654123"
     },
     {
       "name": "Hisham palace",
@@ -208,6 +209,7 @@ class SlideShowState extends State<MySlideShow> {
       "imageURL":
           "http://1remva49c8bs3jvwod2dqqqs.wpengine.netdna-cdn.com/wp-content/uploads/2015/06/Hisham-Palace-1.jpg",
       "address": "Jericho - 5 KM to the north of the city",
+      "phone":"0598654123",
     },
     {
       "name": "Haddad hotel",
@@ -215,12 +217,14 @@ class SlideShowState extends State<MySlideShow> {
       "imageURL":
           "https://www.hotelpigonnet.com/sites/hotel-pigonnet.com/files/styles/image_front/public/blocs_hp/hotel-le-pigonnet-aix-en-provence-le-chambres.jpg?itok=xU_fg98M",
       "address": "Jenin - to the west of Jannat",
+      "phone":"0598654123",
     },
     {
       "name": "Banana land",
       "description": "Many games for children",
       "imageURL":"https://murtahil.com/wp-content/uploads/2018/07/IMG_43073.jpg",
       "address": "Ramalla - Al-Ersal street",
+      "phone":"0598654123",
     }
   ];
 }

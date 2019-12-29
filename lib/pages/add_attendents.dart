@@ -32,8 +32,8 @@ class _AddAttendentsState extends State<AddAttendents> {
   bool addingattendents = true;
   @override
   void initState() {
-    _attendenceSwitch = {'value': addingattendents, 'title': 'add attendents'};
-    _parentSwitch = {'value': !addingattendents, 'title': 'add parents'};
+    _attendenceSwitch = {'value': addingattendents, 'title': 'Add attendents'};
+    _parentSwitch = {'value': !addingattendents, 'title': 'Add parents'};
     _journey = widget._journey;
     _fetchData();
     super.initState();

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/widgets/header.dart';
+import 'package:safe_journey/widgets/place_details_item.dart';
+import 'package:safe_journey/widgets/titleText.dart';
 
 class PlacePage extends StatelessWidget {
   final Map<String, dynamic> place;
@@ -10,16 +12,26 @@ class PlacePage extends StatelessWidget {
   Widget build(BuildContext context) {
     Global.currentPageContext = context;
     return Header(
-      body: Column(
+      body: ListView(
         children: <Widget>[
-          Text(place['name']),
+          Image.network(place['imageURL']),
+          SizedBox(
+            height: 10,
+          ),
+          TitleText(place['name']),
           Divider(),
-          Text(place['description']),
-          Divider(),
-          Text(place['imageURL']),
-          Divider(),
-          Text(place['address']),
-          Divider(),
+          PlaceDetailsItem(
+            Icons.location_on,
+            place['address'],
+          ),
+          PlaceDetailsItem(
+            Icons.phone_android,
+            place['phone'],
+          ),
+          PlaceDetailsItem(
+            Icons.description,
+            place['description'],
+          ),
         ],
       ),
     );

@@ -44,6 +44,7 @@ class _AddPeopleState extends State<AddPeople> {
 
   @override
   Widget build(BuildContext context) {
+    print(state);
     Global.currentPageContext = context;
     return Header(
       body: RefreshIndicator(

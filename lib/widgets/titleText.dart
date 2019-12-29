@@ -8,6 +8,7 @@ class TitleText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
+      textAlign: TextAlign.center,
       style: TextStyle(
           color: Colors.teal[600], fontWeight: FontWeight.bold, fontSize: 20),
     );
