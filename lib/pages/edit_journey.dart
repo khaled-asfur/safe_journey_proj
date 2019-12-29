@@ -88,6 +88,7 @@ class EditJourneyState extends State<EditJourney> {
 //*********************************************************************************** */
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
   
 
 

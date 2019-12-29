@@ -32,7 +32,7 @@ class SignupPageState extends State<SignupPage> {
   }
   Widget build(BuildContext context) {
     _setlodingObservable();
-   // print(Auth().currentUser);
+   print(_isLoading);
     double deviceHeight = MediaQuery.of(context).size.width;
    // print("in signup build");
     return Scaffold(
@@ -109,11 +109,15 @@ class SignupPageState extends State<SignupPage> {
 
   Widget _buildNameTextField() {
     return TextFormField(
-      initialValue: "Jood Wafi",
+     // initialValue: "Jood Wafi",
       decoration: InputDecoration(
         labelText: "Name",
         filled: true,
-        fillColor: Colors.blueGrey[50],
+        fillColor: Color(0xAAB0BEC5),
+        enabledBorder: new OutlineInputBorder(
+          borderRadius: new BorderRadius.circular(10.0),
+          borderSide: new BorderSide(color: Colors.white),
+        ),
       ),
       validator: (String value) {
         //بستقبل بس حروف عربي وانجليزي وسبيسز
@@ -131,11 +135,15 @@ class SignupPageState extends State<SignupPage> {
 
   Widget _buildPhoneTextField() {
     return TextFormField(
-      initialValue: "0597458621",
+     // initialValue: "0597458621",
       decoration: InputDecoration(
         labelText: "Phone number",
         filled: true,
-        fillColor: Colors.blueGrey[50],
+        fillColor: Color(0xAAB0BEC5),
+        enabledBorder: new OutlineInputBorder(
+          borderRadius: new BorderRadius.circular(10.0),
+          borderSide: new BorderSide(color: Colors.white),
+        ),
       ),
       validator: (String value) {
         if (value.length != 10) return "Please enter a valid phone number";
@@ -150,11 +158,15 @@ class SignupPageState extends State<SignupPage> {
 
   Widget _buildEmailTextField() {
     return TextFormField(
-      initialValue: "family_safe@hotmail.com",
+    // initialValue: "family_safe@hotmail.com",
       decoration: InputDecoration(
         labelText: "Email",
         filled: true,
-        fillColor: Colors.blueGrey[50],
+        fillColor: Color(0xAAB0BEC5),
+        enabledBorder: new OutlineInputBorder(
+          borderRadius: new BorderRadius.circular(10.0),
+          borderSide: new BorderSide(color: Colors.white),
+        ),
       ),
       validator: (String value) {
         if (value.length < 5 ||
@@ -172,11 +184,15 @@ class SignupPageState extends State<SignupPage> {
 
   Widget _buildPasswordTextField() {
     return TextFormField(
-      initialValue: "123456",
+     // initialValue: "123456",
       decoration: InputDecoration(
         labelText: "Password",
         filled: true,
-        fillColor: Colors.blueGrey[50],
+        fillColor: Color(0xAAB0BEC5),
+        enabledBorder: new OutlineInputBorder(
+          borderRadius: new BorderRadius.circular(10.0),
+          borderSide: new BorderSide(color: Colors.white),
+        ),
       ),
       keyboardType: TextInputType.text,
       obscureText: true, //يخفي الاحرف لانها باسسوورد
@@ -193,11 +209,15 @@ class SignupPageState extends State<SignupPage> {
 
   Widget _buildConfirmPasswordTextField() {
     return TextFormField(
-      initialValue: "123456",
+     // initialValue: "123456",
       decoration: InputDecoration(
         labelText: "Confirm password",
         filled: true,
-        fillColor: Colors.blueGrey[50],
+        fillColor: Color(0xAAB0BEC5),
+        enabledBorder: new OutlineInputBorder(
+          borderRadius: new BorderRadius.circular(10.0),
+          borderSide: new BorderSide(color: Colors.white),
+        ),
       ),
 
       validator: (String value) {
@@ -239,7 +259,11 @@ class SignupPageState extends State<SignupPage> {
   }
 
   void _submitForm() {
-    if (_formKey.currentState.validate() != true) return;
+    if (_formKey.currentState.validate() != true){
+     Global.loadingObservable.add(false);
+      return;
+
+    } 
     _formKey.currentState.save();
     Auth().signup(
         _formData['name'],_formData['phoneNumber'],_formData['email'], _formData['password'], context, sampleImage);
@@ -291,6 +315,7 @@ class SignupPageState extends State<SignupPage> {
      if (this.mounted) {//if this page is  opened now(still in the widget tree)
         setState(() {
           _isLoading=value;
+          print('from observable $_isLoading');
         });
       }
     });

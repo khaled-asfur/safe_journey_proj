@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:safe_journey/models/journey_search_element.dart';
 import '../models/user.dart';
 import 'package:rxdart/subjects.dart' as rx;
@@ -15,7 +16,8 @@ class Global {
   static List<String> pendingJournies;
   static int numberOfcurrentFetchedJournies=0;
   //for realtime screen
-
+  static BuildContext currentPageContext;
+  static String activeJourneyId;
   //for notifications
   static closeNotificationObservable() {
     notificationObservable.close();

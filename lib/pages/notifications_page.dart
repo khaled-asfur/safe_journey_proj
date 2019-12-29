@@ -8,6 +8,7 @@ import '../widgets/notifications_builder.dart';
 class Notifications extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     print('in notification page builder');
     User user = Global.user;
      print( Global.user.id);

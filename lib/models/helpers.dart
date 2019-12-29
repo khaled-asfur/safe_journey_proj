@@ -7,16 +7,16 @@ import 'auth.dart';
 //not staged change
 
 class Helpers {
-  static void showErrorDialog(BuildContext context, String message) {
+  static void showErrorDialog(BuildContext context, String message,{bool warning=false}) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("An error occured"),
+            title: Center(child:Text(warning?" Warning":"An error occured")),
             content: Text(message),
             actions: <Widget>[
               FlatButton(
-                child: Text('OK'),
+                child: Center(child:Text('OK')),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -38,7 +38,7 @@ class Helpers {
                 child: Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  if(message=="Your Email is update")
+                  if(message=="Your Email is updated")
                          {
                               Navigator.pushReplacementNamed(context, '/');
                          }

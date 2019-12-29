@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safe_journey/models/global.dart';
 
 class InfoCard extends StatefulWidget {
   final String text;
@@ -18,6 +19,7 @@ class InfoCard extends StatefulWidget {
 class _InfoCardState extends State<InfoCard> {
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     return GestureDetector(
       onTap: widget.onPressed,
       child: Card(

@@ -15,8 +15,10 @@ class WaitingPage extends StatelessWidget {
         user.getUserData(currentFBuser).then((fetchedSuccessfully) {
           if (fetchedSuccessfully) {
             Navigator.pushReplacementNamed(context, 'homePage');
-          } else
+          } else {
             Helpers.showErrorDialog(context, 'error occured');
+            Navigator.pushReplacementNamed(context, 'loginPage');
+          }
         });
       } else if (currentFBuser == null && !Global.visitedWaitingPage) {
         print('current user = null go to login');

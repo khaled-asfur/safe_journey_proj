@@ -41,6 +41,7 @@ class _AddAttendentsState extends State<AddAttendents> {
 
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     _attendenceSwitch['value'] = addingattendents;
     _parentSwitch['value'] = !addingattendents;
     return Header(

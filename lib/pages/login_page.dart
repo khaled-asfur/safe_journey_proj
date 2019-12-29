@@ -3,7 +3,7 @@ import "package:flutter/material.dart";
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/widgets/my_raised_button.dart';
 import '../models/auth.dart';
-import 'package:rxdart/subjects.dart' as rx ;
+import 'package:rxdart/subjects.dart' as rx;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -11,7 +11,6 @@ class LoginPage extends StatefulWidget {
     return LoginPageState();
   }
 }
-
 
 class LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
@@ -58,21 +57,20 @@ class LoginPageState extends State<LoginPage> {
                             : () {
                                 _submitForm(context);
                                 setState(() {
-                                  _isLoading=true;
+                                  _isLoading = true;
                                 });
-                              }
-                              
-                              
-                              ),
-                   _isLoading?Center(child:CircularProgressIndicator()):FlatButton(
-                      child: Text(
-                        "swith to signup page",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () {
-                        Navigator.pushNamed(context, "signupPage");
-                      },
-                    ),
+                              },large: true,),
+                    _isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : FlatButton(
+                            child: Text(
+                              "swith to signup page",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onPressed: () {
+                              Navigator.pushNamed(context, "signupPage");
+                            },
+                          ),
                   ],
                 ),
               ),
@@ -82,12 +80,14 @@ class LoginPageState extends State<LoginPage> {
       ),
     );
   }
-  _setlodingObservable(){
-    Global.loadingObservable=rx.PublishSubject<bool>();
+
+  _setlodingObservable() {
+    Global.loadingObservable = rx.PublishSubject<bool>();
     Global.loadingObservable.listen((bool value) {
-     if (this.mounted) {//if this page is opened now(still in the widget tree)
+      if (this.mounted) {
+        //if this page is opened now(still in the widget tree)
         setState(() {
-          _isLoading=value;
+          _isLoading = value;
         });
       }
     });

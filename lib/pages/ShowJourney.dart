@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/journey.dart';
 import 'package:safe_journey/pages/realtime_screen.dart';
 import 'add_attendents.dart';
@@ -17,11 +18,12 @@ class ShowJourney extends StatefulWidget {
 class ShowJourneyState extends State<ShowJourney> {
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     DateTime startTime = widget._journey.startTime;
     String formattedStartTime =
-        DateFormat('yyyy-MM-dd kk:mm').format(startTime);
+        DateFormat("yyyy-MM-dd 'at' h:mm a").format(startTime);
     DateTime endTime = widget._journey.endTime;
-    String formattedEndTime = DateFormat('yyyy-MM-dd kk:mm').format(endTime);
+    String formattedEndTime = DateFormat("yyyy-MM-dd 'at' h:mm a").format(endTime);
     return Header(
         body: SingleChildScrollView(
             child: new Column(

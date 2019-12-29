@@ -38,7 +38,7 @@ class HomePageState extends State<HomePage> {
     await Journey.fetchJoinedJournies().then((jour) {
       setState(() {
         _loadedJournies = true;
-        if (jour['result'] == FetchResult.SUCCESS) {
+        if (jour['result'] == FetchResult.SUCCESS||jour['result'] == FetchResult.EMPTY) {
           _journies = jour['journies'];
           userJoinedJournies = true;
         }
@@ -53,11 +53,13 @@ class HomePageState extends State<HomePage> {
     FirebaseUser fbUser = await FirebaseAuth.instance.currentUser();
      User user = User.empty();
     fetchedUserdData=await  user.getUserData(fbUser);
+    setState(() {
+    });
     return fetchedUserdData & fetchedjourneiesData;
  }
   @override
   Widget build(BuildContext context) {
-    print('in homepage build');
+    Global.currentPageContext = context;
     return Global.user == null
         ? CircularProgressIndicator()
         : Header(

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/helpers.dart';
 import 'package:safe_journey/models/journey.dart';
@@ -69,7 +70,8 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                         notification.buildNotificationText(),
                         Container(
                           child: Text(
-                            notification.time.toString(),
+                            DateFormat("yyyy-MM-dd 'at' h:mm a")
+                                .format(notification.time),
                             textAlign: TextAlign.left,
                             style: TextStyle(fontSize: 10),
                           ),
@@ -91,7 +93,6 @@ class _NotificationsBuilderState extends State<NotificationsBuilder> {
                                 _doAttendence(notification, index);
                               } else if (notification.type ==
                                   'PARENT_REQUEST') {
-                                
                                 _addUserAsParentToSender(notification);
                               } else if (notification.type ==
                                   'JOIN_JOURNEY_REQUEST') {

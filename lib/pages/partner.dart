@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/Enum.dart';
+import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/user.dart';
 import 'package:safe_journey/pages/people.dart';
 //import 'package:safe_journey/widgets/show_user.dart';
@@ -37,6 +38,7 @@ class PartnerState extends State<Partner>{
 
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     return Header(
         body: ListView(
       children: <Widget>[_build(), _buildUserList()],

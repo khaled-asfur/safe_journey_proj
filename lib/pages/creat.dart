@@ -15,11 +15,13 @@ import 'package:safe_journey/models/auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:safe_journey/models/global.dart';
 //import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Create extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     return new Scaffold(
       appBar: new AppBar(
         title: Text("Create Journy"),
@@ -431,6 +433,7 @@ class BasicDateTimeStartField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     return Column(
       children: <Widget>[
         // Text('Start Date'),
@@ -488,6 +491,7 @@ class BasicDateTimeEndField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     return Column(
       children: <Widget>[
         new Container(

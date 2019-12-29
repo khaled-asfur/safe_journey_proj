@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:safe_journey/models/Enum.dart';
+import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/user.dart';
 import 'package:safe_journey/pages/partner.dart';
 import 'package:safe_journey/widgets/show_user.dart';
@@ -35,6 +36,7 @@ class _PeopleState extends State<People> {
 
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     return Header(
         body: ListView(
       children: <Widget>[_build(), _buildUserList()],

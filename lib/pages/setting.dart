@@ -114,6 +114,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
   //*********************************************************************************** */
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     timeDilation = 1.0;
     Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
@@ -133,7 +134,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                     (backgroundImageFile == null &&
                             userData['background'] == null)
                         ? new Image.asset(
-                            '',
+                            'images/background.jpeg',
                             width: double.infinity,
                             height: screenSize.height / 4,
                             fit: BoxFit.cover,

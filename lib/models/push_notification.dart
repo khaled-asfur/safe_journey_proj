@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:safe_journey/models/global.dart';
+import 'package:safe_journey/models/helpers.dart';
 import 'package:safe_journey/models/journey.dart';
 import 'package:safe_journey/models/sounds.dart';
 
@@ -82,27 +84,31 @@ class PushNotification {
     print("$text: $message");
     final data = message['data'];
     if (data['type'] != null) {
-      print('1111111111');
-      if (data['type'] == "START_JOURNEY"){
-         print('2222222222222');
+      if (data['type'] == "START_JOURNEY") {
         MapUser.setmyLocationStream(message['notification']['body']);
         Sounds.playSound('../sounds/start_journey.mp3');
-        SnackBar snack=SnackBar(content:Text('journey started by admin'),);
+        SnackBar snack = SnackBar(
+          content: Text('journey started by admin'),
+        );
         Scaffold.of(context).showSnackBar(snack);
-      }
-      else if (data['type'] == "END_JOURNEY"){
-         print('33333333');
+      } else if (data['type'] == "END_JOURNEY") {
         MapUser.closeSendLocationtoDBStream();
         Sounds.playSound('../sounds/end_send_location.mp3');
-        SnackBar snack=SnackBar(content:Text('journey was ended by admin'),);
+        SnackBar snack = SnackBar(
+          content: Text('journey was ended by admin'),
+        );
         Scaffold.of(context).showSnackBar(snack);
+      } else if (data['type'] == "EXCCEEDED_ALLOWED_DISTANCE") {
+        Sounds.playSound('../sounds/alert.mp3');
+        Helpers.showErrorDialog(Global.currentPageContext,
+            'You are outside the allowed area please go back',
+            warning: true);
       }
-    } else{
+    } else {
       print("data type = null");
       Sounds.playSound('../sounds/notification.mp3');
 
       Navigator.pushNamed(context, 'notifications');
-      
     }
   }
 

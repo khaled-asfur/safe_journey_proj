@@ -81,6 +81,7 @@ class _EditpassState extends State<Editpass> {
 
   @override //build ********************************************************************************************
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     return Scaffold(
       appBar: new AppBar(
         title: Text("Setting"),

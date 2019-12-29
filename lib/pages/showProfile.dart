@@ -53,7 +53,7 @@ class _UserProfilePageState extends State<ShowProfile> {
       decoration: BoxDecoration(
         image: DecorationImage(
           image:  havaAvalidUrl == false
-                  ? AssetImage("")
+                  ? AssetImage("images/background.jpeg")
                   : NetworkImage(userData['background']),
           fit: BoxFit.cover,
         ),),
@@ -177,6 +177,7 @@ class _UserProfilePageState extends State<ShowProfile> {
 //******************************************************************************************** */
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     Size screenSize = MediaQuery.of(context).size;
     return Header(
       //********************************************************************** */

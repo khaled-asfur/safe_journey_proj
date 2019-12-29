@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/widgets/header.dart';
 
 class PlacePage extends StatelessWidget {
@@ -7,6 +8,7 @@ class PlacePage extends StatelessWidget {
   const PlacePage(this.place);
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     return Header(
       body: Column(
         children: <Widget>[

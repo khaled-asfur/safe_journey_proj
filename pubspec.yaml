@@ -77,6 +77,7 @@ flutter:
    - images/journeyIcon.ico
    - images/bg_uit.jpg
    - images/empty1.jpg
+   - images/background.jpeg
    - sounds/alert.mp3
    - sounds/start_journey.mp3
    - sounds/end_send_location.mp3

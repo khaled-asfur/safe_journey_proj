@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safe_journey/models/global.dart';
 import 'package:safe_journey/models/journey.dart';
 import 'package:safe_journey/pages/realtime_screen.dart';
 import '../widgets/header.dart';
@@ -41,6 +42,9 @@ class ShowJourneyState extends State<AdminShowJourney> {
 
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
+    bool journeyEnabled =
+        Global.activeJourneyId == widget._journey.id ? true : false;
     DateTime startTime = widget._journey.startTime;
     String formattedStartTime =
         DateFormat('yyyy-MM-dd kk:mm').format(startTime);
@@ -76,7 +80,9 @@ class ShowJourneyState extends State<AdminShowJourney> {
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF197278),
                           ))),
-                  DataColumn(label: Text('${widget._journey.name}',style: TextStyle(color:Colors.grey[700]))),
+                  DataColumn(
+                      label: Text('${widget._journey.name}',
+                          style: TextStyle(color: Colors.grey[700]))),
                 ], rows: [
                   DataRow(cells: [
                     DataCell(Text('Journey Description',
@@ -85,7 +91,8 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF197278),
                         ))),
-                    DataCell(Text('${widget._journey.description}',style: TextStyle(color:Colors.grey[700]))),
+                    DataCell(Text('${widget._journey.description}',
+                        style: TextStyle(color: Colors.grey[700]))),
                   ]),
                   DataRow(cells: [
                     DataCell(Text('Journey Start Date',
@@ -94,7 +101,8 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF197278),
                         ))),
-                    DataCell(Text('$formattedStartTime',style: TextStyle(color:Colors.grey[700]))),
+                    DataCell(Text('$formattedStartTime',
+                        style: TextStyle(color: Colors.grey[700]))),
                   ]),
                   DataRow(cells: [
                     DataCell(Text('Journey End Date',
@@ -103,7 +111,8 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF197278),
                         ))),
-                    DataCell(Text('$formattedEndTime',style: TextStyle(color:Colors.grey[700]))),
+                    DataCell(Text('$formattedEndTime',
+                        style: TextStyle(color: Colors.grey[700]))),
                   ]),
                   DataRow(cells: [
                     DataCell(Text('Journey Places',
@@ -112,7 +121,8 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF197278),
                         ))),
-                    DataCell(Text('${widget._journey.places}',style: TextStyle(color:Colors.grey[700]))),
+                    DataCell(Text('${widget._journey.places}',
+                        style: TextStyle(color: Colors.grey[700]))),
                   ]),
                   DataRow(cells: [
                     DataCell(Text('Allowed Distance',
@@ -121,7 +131,8 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF197278),
                         ))),
-                    DataCell(Text('${widget._journey.distance}',style: TextStyle(color:Colors.grey[700]))),
+                    DataCell(Text('${widget._journey.distance}',
+                        style: TextStyle(color: Colors.grey[700]))),
                   ]),
                 ]),
               ),
@@ -133,7 +144,8 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           Icons.add_location,
                           color: Color(0xFF197278),
                         ),
-                        label: Text("Show User Location",style: TextStyle(color: Color(0xFF197278))),
+                        label: Text("Show User Location",
+                            style: TextStyle(color: Color(0xFF197278))),
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -151,7 +163,8 @@ class ShowJourneyState extends State<AdminShowJourney> {
                             Icons.add,
                             color: Color(0xFF197278),
                           ),
-                          label: Text("Add participants to the journey",style: TextStyle(color: Color(0xFF197278))),
+                          label: Text("Add participants to the journey",
+                              style: TextStyle(color: Color(0xFF197278))),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -170,7 +183,8 @@ class ShowJourneyState extends State<AdminShowJourney> {
                             Icons.edit,
                             color: Color(0xFF197278),
                           ),
-                          label: Text("Edit Journey",style: TextStyle(color: Color(0xFF197278))),
+                          label: Text("Edit Journey",
+                              style: TextStyle(color: Color(0xFF197278))),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -187,12 +201,25 @@ class ShowJourneyState extends State<AdminShowJourney> {
                       new FlatButton.icon(
                           icon: Icon(
                             Icons.av_timer,
-                            color: Color(0xFF197278),
+                            color: journeyEnabled
+                                ? Colors.grey[300]
+                                : Color(0xFF197278),
                           ),
-                          label: Text("Start Journey",style: TextStyle(color: Color(0xFF197278))),
-                          onPressed: () {
-                            Journey.startJourney(widget._journey.id,context);
-                          }),
+                          label: Text("Start Journey",
+                              style: TextStyle(
+                                  color: journeyEnabled
+                                      ? Colors.grey[300]
+                                      : Color(0xFF197278))),
+                          onPressed: journeyEnabled
+                              ? null
+                              : () {
+                                  print("started jour");
+                                  print(Global.activeJourneyId);
+                                  Global.activeJourneyId = widget._journey.id;
+                                  Journey.startJourney(
+                                      widget._journey.id, context);
+                                  setState(() {});
+                                }),
                     )
                   ]),
                   DataRow(cells: [
@@ -200,12 +227,24 @@ class ShowJourneyState extends State<AdminShowJourney> {
                       new FlatButton.icon(
                           icon: Icon(
                             Icons.access_time,
-                            color: Color(0xFF197278),
+                            color: !journeyEnabled
+                                ? Colors.grey[300]
+                                : Color(0xFF197278),
                           ),
-                          label: Text("End Journey",style: TextStyle(color: Color(0xFF197278))),
-                          onPressed: () {
-                            Journey.endJourney(widget._journey.id,context);
-                          }),
+                          label: Text("End Journey",
+                              style: TextStyle(
+                                  color: !journeyEnabled
+                                      ? Colors.grey[300]
+                                      : Color(0xFF197278))),
+                          onPressed: !journeyEnabled
+                              ? null
+                              : () {
+                                  print("ended jour");
+                                  Global.activeJourneyId = null;
+                                  Journey.endJourney(
+                                      widget._journey.id, context);
+                                  setState(() {});
+                                }),
                     )
                   ]),
                 ]),
@@ -302,5 +341,4 @@ FlatButton(
       ),
     );
   }
-  
 }

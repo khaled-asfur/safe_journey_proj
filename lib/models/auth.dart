@@ -204,7 +204,7 @@ class Auth {
         'startTime': startTime,
         'usersRequestedToJoinJourney': [],
         'invitedUsers': [],
-        'distance': distance,
+        'allowedDistance': distance,
         'places': places
       });
 

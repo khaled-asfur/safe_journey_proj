@@ -28,9 +28,9 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   Position _myPosition;
   StreamSubscription<DocumentSnapshot> _usersLocationsStream;
   Map<String, dynamic> _myLocation = {'latitude': null, 'longitude': null};
-  double allowedDistance = 5;
+  double allowedDistance = 2;
   //GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  double _distance = 0;
+ // double _distance = 0;
   List<MapUser> _usersJoinsJourney;
   bool userStartedSendLocation = false;
   bool _allowedToSendNotifications = true;
@@ -55,6 +55,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Global.currentPageContext = context;
     print('in map build');
     MapUser.myLocationObservable.listen((Map<String, dynamic> location) {
       _myLocation = location;
@@ -65,7 +66,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     return Scaffold(
       // key: scaffoldKey,
       appBar: AppBar(
-        title: Text('$_distance'),
+       // title: Text('${_distance.round()} m'),
       ),
       body: (_loadedCameraPositon)
           ? GoogleMap(
@@ -179,6 +180,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   }
 
   _checkIfUsersInSafeDistance() async {
+   // _distance=0;
     List<String> unsafeUsers = [];
     String distances = '';
     bool unsafeUsersExist = false;
@@ -193,11 +195,11 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
                 _myLocation['latitude'],
                 _myLocation['longitude'])
             .then((distance) {
-          _distance = distance;
+         // if (distance > _distance) _distance = distance;
           _addDistanceToUserObject(distance, userId);
           if (distance > allowedDistance) {
             unsafeUsers.add(marker.markerId.value);
-            int intDistance=distance.round();
+            int intDistance = distance.round();
             distances += "$intDistance, ";
             unsafeUsersExist = true;
           }
@@ -206,13 +208,15 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     }
 
     if (unsafeUsersExist && widget._journey.role == "ADMIN") {
-      String unsafeUsersStr =MapUser.getUsersNames(_usersJoinsJourney,unsafeUsers);
-      distances=distances.substring(0,distances.length-2);
+      String unsafeUsersStr =
+          MapUser.getUsersNames(_usersJoinsJourney, unsafeUsers);
+      distances = distances.substring(0, distances.length - 2);
       String message =
           'The users  ($unsafeUsersStr) are out side the allowed area' +
               '\n and far from you the following distances($distances)m.';
       if (_allowedToSendNotifications) {
         _allowedToSendNotifications = false;
+        if(Global.activeJourneyId==widget._journey.id)
         _notifyAdminAboutUSersOutOfRange(message, unsafeUsers);
         Timer(Duration(minutes: 1), () {
           _allowedToSendNotifications = true;
@@ -222,7 +226,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   }
 
   _notifyAdminAboutUSersOutOfRange(String message, List<String> usersIds) {
-    Helpers.showErrorDialog(context, message);
+    Helpers.showErrorDialog(context, message,warning: true);
     Sounds.playSound('../sounds/alert.mp3');
     usersIds.forEach((String userId) {
       PushNotification.sendNotificationToUser(
