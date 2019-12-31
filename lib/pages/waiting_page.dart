@@ -10,15 +10,14 @@ class WaitingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     print('in waiting build');
     FirebaseAuth.instance.currentUser().then((FirebaseUser currentFBuser) {
+      print(currentFBuser);
       User user = User.empty();
       if (currentFBuser != null) {
         user.getUserData(currentFBuser).then((fetchedSuccessfully) {
           if (fetchedSuccessfully) {
             Navigator.pushReplacementNamed(context, 'homePage');
-          } else {
+          } else
             Helpers.showErrorDialog(context, 'error occured');
-            Navigator.pushReplacementNamed(context, 'loginPage');
-          }
         });
       } else if (currentFBuser == null && !Global.visitedWaitingPage) {
         print('current user = null go to login');

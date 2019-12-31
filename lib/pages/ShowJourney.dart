@@ -60,7 +60,7 @@ class ShowJourneyState extends State<ShowJourney> {
                       );
                     },
                   ),
-                  IconButton(
+               widget._journey.role=="PARENT"?Container():  IconButton(
                     icon: Icon(Icons.group),
                     color: Colors.blueAccent,
                     onPressed: () {

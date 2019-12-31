@@ -131,7 +131,7 @@ class LoginPageState extends State<LoginPage> {
 
   Widget _buildPasswordTextField() {
     return TextFormField(
-      initialValue: "123456",
+    initialValue: "123456",
       decoration: InputDecoration(
           labelText: "Password",
           filled: true,

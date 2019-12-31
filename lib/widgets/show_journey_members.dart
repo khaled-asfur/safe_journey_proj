@@ -5,7 +5,7 @@ import 'package:safe_journey/widgets/show_list_of_users.dart';
 class ShowJourneyMembers extends ShowListOfUsers {
   ShowJourneyMembers(
       List<String> membersIds, QuerySnapshot allUsers, String journeyId)
-      : super(membersIds, allUsers, journeyId,'Journey members',Icons.delete);
+      : super(membersIds, allUsers, journeyId, 'Journey members', Icons.delete);
 
   @override
   listButtonPressedFunction(String memberId) {
@@ -32,6 +32,7 @@ class ShowJourneyMembers extends ShowListOfUsers {
         String attendentId = att.toString();
         _deleteTheDeletedMemberFromUserAttendentsList(memberId, attendentId);
       });
+      _deleteUsercoordinatesFromDB(memberId, super.journeyId);
     } catch (error) {
       print("error occured $error");
     }
@@ -54,6 +55,20 @@ class ShowJourneyMembers extends ShowListOfUsers {
       });
     } catch (error) {
       print("error occured $error");
+    }
+  }
+
+  _deleteUsercoordinatesFromDB(String userId, String journeyId) async {
+    try {
+      await Firestore.instance
+          .collection('realtimeLocations')
+          .document(super.journeyId)
+          .updateData(
+        {userId: FieldValue.delete()},
+      );
+      print('coordinates deleted successfully');
+    } catch (error) {
+      print("error  occured while deleting user coordinates $error");
     }
   }
 }

@@ -57,7 +57,7 @@ class User {
         print('User data was fetched successfully');
       }
     } on PlatformException catch (e) {
-      print('error occured while fetching user data');
+      print('error occured while fetching user data ${e.details}');
       print(e);
     }
 

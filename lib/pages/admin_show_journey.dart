@@ -50,6 +50,8 @@ class ShowJourneyState extends State<AdminShowJourney> {
         DateFormat('yyyy-MM-dd kk:mm').format(startTime);
     DateTime endTime = widget._journey.endTime;
     String formattedEndTime = DateFormat('yyyy-MM-dd kk:mm').format(endTime);
+    
+  //  print(widget._journey.distance);
     return Header(
       body: SingleChildScrollView(
         child: new Column(
@@ -239,7 +241,8 @@ class ShowJourneyState extends State<AdminShowJourney> {
                           onPressed: !journeyEnabled
                               ? null
                               : () {
-                                  print("ended jour");
+                                 // print("ended jour");
+                                  
                                   Global.activeJourneyId = null;
                                   Journey.endJourney(
                                       widget._journey.id, context);

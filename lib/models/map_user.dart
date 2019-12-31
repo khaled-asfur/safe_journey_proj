@@ -53,7 +53,7 @@ class MapUser {
     String uid = Global.user.id;
     if (_allowedToSendCoordinates) {
       _allowedToSendCoordinates = false;
-      Timer(Duration(seconds: 5), () {
+      Timer(Duration(milliseconds : 5), () {
         _allowedToSendCoordinates = true;
       });
 

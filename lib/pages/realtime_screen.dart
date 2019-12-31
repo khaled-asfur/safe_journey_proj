@@ -30,7 +30,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   Map<String, dynamic> _myLocation = {'latitude': null, 'longitude': null};
   double allowedDistance = 2;
   //GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
- // double _distance = 0;
+  // double _distance = 0;
   List<MapUser> _usersJoinsJourney;
   bool userStartedSendLocation = false;
   bool _allowedToSendNotifications = true;
@@ -66,8 +66,8 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     return Scaffold(
       // key: scaffoldKey,
       appBar: AppBar(
-       // title: Text('${_distance.round()} m'),
-      ),
+          // title: Text('${_distance.round()} m'),
+          ),
       body: (_loadedCameraPositon)
           ? GoogleMap(
               mapType: MapType.hybrid,
@@ -115,9 +115,10 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
           } else if (user.role == 'ADMIN') {
             //اذا اليوزر الي بحاول اعرضه هو مسؤول الرحلة مشان يظهر لون مختلف للماركر
             _addmarkerForUser(userId, data, 240);
-          } else if (widget._journey.role == 'ADMIN')
+          } else if (widget._journey.role == 'ADMIN') {
             //current user is admin, so add marker for all users
-            _addmarkerForUser(userId, data, 0.0);
+            if (user.role != 'PARENT') _addmarkerForUser(userId, data, 0.0);
+          }
         });
       }
       _checkIfUsersInSafeDistance();
@@ -126,6 +127,10 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   }
 
   MapUser _getMapUserObject(String userId) {
+    _usersJoinsJourney.forEach((MapUser user){
+    //  print('${user.id} -- ${user.name}  joins journey ');
+    });
+   // print('userid= $userId ${_usersJoinsJourney.length}');
     MapUser user = _usersJoinsJourney.firstWhere((MapUser u) {
       return u.id == userId ? true : false;
     });
@@ -161,14 +166,18 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   }
 
   String getDistanceFromCurrentUser(String userId) {
+    
     if (userId == Global.user.id) {
       return "This is your marker";
     }
-    return _usersJoinsJourney
+    String distance =
+     _usersJoinsJourney
             .lastWhere((user) => user.id == userId)
             .distanceFromCurrentUser
             .toString() +
         " m";
+        print('$userId distance on marker = $distance');
+        return distance;
   }
 
   String getUserName(String userId) {
@@ -180,7 +189,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   }
 
   _checkIfUsersInSafeDistance() async {
-   // _distance=0;
+    // _distance=0;
     List<String> unsafeUsers = [];
     String distances = '';
     bool unsafeUsersExist = false;
@@ -195,9 +204,11 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
                 _myLocation['latitude'],
                 _myLocation['longitude'])
             .then((distance) {
-         // if (distance > _distance) _distance = distance;
+          // if (distance > _distance) _distance = distance;
           _addDistanceToUserObject(distance, userId);
-          if (distance > allowedDistance) {
+          print("user id=$userId and distance = $distance ");
+          if (distance > widget._journey.distance) {
+          //  print("the allowed distance= ${widget._journey.distance} -- ******************************");
             unsafeUsers.add(marker.markerId.value);
             int intDistance = distance.round();
             distances += "$intDistance, ";
@@ -216,8 +227,8 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
               '\n and far from you the following distances($distances)m.';
       if (_allowedToSendNotifications) {
         _allowedToSendNotifications = false;
-        if(Global.activeJourneyId==widget._journey.id)
-        _notifyAdminAboutUSersOutOfRange(message, unsafeUsers);
+        if (Global.activeJourneyId == widget._journey.id)
+          _notifyAdminAboutUSersOutOfRange(message, unsafeUsers);
         Timer(Duration(minutes: 1), () {
           _allowedToSendNotifications = true;
         });
@@ -226,7 +237,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   }
 
   _notifyAdminAboutUSersOutOfRange(String message, List<String> usersIds) {
-    Helpers.showErrorDialog(context, message,warning: true);
+    Helpers.showErrorDialog(context, message, warning: true);
     Sounds.playSound('../sounds/alert.mp3');
     usersIds.forEach((String userId) {
       PushNotification.sendNotificationToUser(
@@ -242,6 +253,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
       _usersJoinsJourney.forEach((MapUser user) {
         if (user.id == userId) {
           user.distanceFromCurrentUser = distance;
+          print('distance $distance added for user $userId');
         }
       });
     }
