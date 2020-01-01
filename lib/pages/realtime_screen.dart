@@ -34,6 +34,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   List<MapUser> _usersJoinsJourney;
   bool userStartedSendLocation = false;
   bool _allowedToSendNotifications = true;
+  bool _markersReady = false;
 
   @override
   void initState() {
@@ -68,7 +69,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
       appBar: AppBar(
           // title: Text('${_distance.round()} m'),
           ),
-      body: (_loadedCameraPositon)
+      body: (_loadedCameraPositon && _markersReady)
           ? GoogleMap(
               mapType: MapType.hybrid,
               initialCameraPosition: _cameraPosition,
@@ -104,33 +105,42 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
       markers = [];
       print("trying to get markersssssssssssssssssssssssssssssssssss");
       if (snapshot != null && _usersJoinsJourney != null) {
-        snapshot.data.forEach((String userId, dynamic data) {
-          MapUser user = _getMapUserObject(userId);
-          if (user.id == Global.user.id) {
-            //add markers only for attendents
-            _addmarkerForUser(userId, data, 60.0);
-          } else if (user.relation == Relation.ATTENDENT) {
-            //add markers only for attendents
-            _addmarkerForUser(userId, data, 120.0);
-          } else if (user.role == 'ADMIN') {
-            //اذا اليوزر الي بحاول اعرضه هو مسؤول الرحلة مشان يظهر لون مختلف للماركر
-            _addmarkerForUser(userId, data, 240);
-          } else if (widget._journey.role == 'ADMIN') {
-            //current user is admin, so add marker for all users
-            if (user.role != 'PARENT') _addmarkerForUser(userId, data, 0.0);
-          }
+        _checkIfUsersInSafeDistance(snapshot.data).then((bool x) {
+          print('in then');
+          updateMarkers(snapshot);
+          setState(() {
+            _markersReady = true;
+          });
         });
       }
-      _checkIfUsersInSafeDistance();
-      setState(() {});
+      // setState(() {});
+    });
+  }
+
+  updateMarkers(DocumentSnapshot realtimeLocationsSnapshot) {
+    realtimeLocationsSnapshot.data.forEach((String userId, dynamic data) {
+      MapUser user = _getMapUserObject(userId);
+      if (user.id == Global.user.id) {
+        //add markers only for attendents
+        _addmarkerForUser(userId, data, 60.0);
+      } else if (user.relation == Relation.ATTENDENT) {
+        //add markers only for attendents
+        _addmarkerForUser(userId, data, 120.0);
+      } else if (user.role == 'ADMIN') {
+        //اذا اليوزر الي بحاول اعرضه هو مسؤول الرحلة مشان يظهر لون مختلف للماركر
+        _addmarkerForUser(userId, data, 240);
+      } else if (widget._journey.role == 'ADMIN') {
+        //current user is admin, so add marker for all users
+        if (user.role != 'PARENT') _addmarkerForUser(userId, data, 0.0);
+      }
     });
   }
 
   MapUser _getMapUserObject(String userId) {
-    _usersJoinsJourney.forEach((MapUser user){
-    //  print('${user.id} -- ${user.name}  joins journey ');
+    _usersJoinsJourney.forEach((MapUser user) {
+      //  print('${user.id} -- ${user.name}  joins journey ');
     });
-   // print('userid= $userId ${_usersJoinsJourney.length}');
+    // print('userid= $userId ${_usersJoinsJourney.length}');
     MapUser user = _usersJoinsJourney.firstWhere((MapUser u) {
       return u.id == userId ? true : false;
     });
@@ -166,18 +176,16 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
   }
 
   String getDistanceFromCurrentUser(String userId) {
-    
     if (userId == Global.user.id) {
       return "This is your marker";
     }
-    String distance =
-     _usersJoinsJourney
+    String distance = _usersJoinsJourney
             .lastWhere((user) => user.id == userId)
             .distanceFromCurrentUser
             .toString() +
         " m";
-        print('$userId distance on marker = $distance');
-        return distance;
+ //   print('$userId distance on marker = $distance');
+    return distance;
   }
 
   String getUserName(String userId) {
@@ -188,33 +196,41 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     return name;
   }
 
-  _checkIfUsersInSafeDistance() async {
-    // _distance=0;
+  Future<bool>_checkIfUsersInSafeDistance(
+      Map<String, dynamic> realtimeLocationsData) async {
+         List<Map<String,dynamic>> lst= [];
+         realtimeLocationsData.forEach((String id ,dynamic  element ){
+        Map<String,dynamic> k= {
+          'id':id,
+          'latitude':element['latitude'],
+          'longitude':element['longitude'],
+          'time':element['time'],
+        };
+        lst.add(k);
+         });
+        
+   
     List<String> unsafeUsers = [];
     String distances = '';
     bool unsafeUsersExist = false;
-    for (Marker marker in markers) {
-      String userId = marker.markerId.value;
-      if (_myLocation['latitude'] != null && userId != Global.user.id) {
-        //  print('in lat != null  ${ marker.position}$_myLocation');
-        await Geolocator()
-            .distanceBetween(
-                marker.position.latitude,
-                marker.position.longitude,
-                _myLocation['latitude'],
-                _myLocation['longitude'])
-            .then((distance) {
-          // if (distance > _distance) _distance = distance;
-          _addDistanceToUserObject(distance, userId);
-          print("user id=$userId and distance = $distance ");
+    //realtimeLocationsData.forEach((String userId, dynamic data) async
+      for(var data in lst){
+      //String userId = marker.markerId.value;
+      if (_myLocation['latitude'] != null && data['id'] != Global.user.id) {
+     var distance=   await Geolocator()
+            .distanceBetween(data['latitude'], data['longitude'],
+                _myLocation['latitude'], _myLocation['longitude']);
+            //.then((distance) {
+          _addDistanceToUserObject(distance,  data['id']);
+         // print("user id=${ data['id']} and distance = $distance ");
           if (distance > widget._journey.distance) {
-          //  print("the allowed distance= ${widget._journey.distance} -- ******************************");
-            unsafeUsers.add(marker.markerId.value);
+            //  print("the allowed distance= ${widget._journey.distance} -- ******************************");
+            unsafeUsers.add( data['id']);
             int intDistance = distance.round();
             distances += "$intDistance, ";
             unsafeUsersExist = true;
           }
-        });
+       // });
       }
     }
 
@@ -234,6 +250,7 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
         });
       }
     }
+    return true;
   }
 
   _notifyAdminAboutUSersOutOfRange(String message, List<String> usersIds) {
@@ -252,8 +269,8 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
     if (_usersJoinsJourney != null && _usersJoinsJourney.length != null) {
       _usersJoinsJourney.forEach((MapUser user) {
         if (user.id == userId) {
-          user.distanceFromCurrentUser = distance;
-          print('distance $distance added for user $userId');
+          user.distanceFromCurrentUser = distance ;
+         // print('distance $distance added for user $userId');
         }
       });
     }
@@ -261,19 +278,19 @@ class _RealTimeScreenState extends State<RealTimeScreen> {
 
   void _checkPermission() {
     _geolocator.checkGeolocationPermissionStatus().then((status) {
-      print('status: $status');
+    //  print('status: $status');
     });
     _geolocator
         .checkGeolocationPermissionStatus(
             locationPermission: GeolocationPermission.locationAlways)
         .then((status) {
-      print('always status: $status');
+    //  print('always status: $status');
     });
     _geolocator
         .checkGeolocationPermissionStatus(
             locationPermission: GeolocationPermission.locationWhenInUse)
         .then((status) {
-      print('whenInUse status: $status');
+     // print('whenInUse status: $status');
     });
   }
 
