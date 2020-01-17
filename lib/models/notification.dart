@@ -81,8 +81,13 @@ class MyNotification {
         .where('userId', isEqualTo: Global.user.id)
         .snapshots()
         .listen((QuerySnapshot snapshot) {
+          if(Global.notificationsCount != snapshot.documents.length){
+            Global.notificationObservable.add(snapshot.documents.length);
+          }
+          print(snapshot.documents.length);
+          print(Global.notificationsCount);
       Global.notificationsCount = snapshot.documents.length;
-      Global.notificationObservable.add(snapshot.documents.length);
+      
      // print(snapshot.documents.length);
       /*snapshot.documentChanges.forEach((DocumentChange change) {
       /*  if (change.type == DocumentChangeType.added)

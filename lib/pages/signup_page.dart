@@ -19,7 +19,7 @@ class SignupPageState extends State<SignupPage> {
   File sampleImage;
  
   final Map<String, dynamic> _formData = {
-    "name": null,
+    "name": "",
     "phoneNumber": null,
     "email": null,
     "password": null,
@@ -109,7 +109,7 @@ class SignupPageState extends State<SignupPage> {
 
   Widget _buildNameTextField() {
     return TextFormField(
-     // initialValue: "Jood Wafi",
+      initialValue: _formData["name"],
       decoration: InputDecoration(
         labelText: "Name",
         filled: true,
@@ -127,7 +127,7 @@ class SignupPageState extends State<SignupPage> {
         return null;
       },
       keyboardType: TextInputType.text,
-      onSaved: (String value) {
+      onChanged: (String value) {
         _formData["name"] = value;
       },
     );

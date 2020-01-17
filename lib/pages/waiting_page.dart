@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:safe_journey/widgets/titleText.dart';
 
 import '../models/global.dart';
 import '../models/helpers.dart';
@@ -10,7 +11,6 @@ class WaitingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     print('in waiting build');
     FirebaseAuth.instance.currentUser().then((FirebaseUser currentFBuser) {
-      print(currentFBuser);
       User user = User.empty();
       if (currentFBuser != null) {
         user.getUserData(currentFBuser).then((fetchedSuccessfully) {
@@ -26,8 +26,19 @@ class WaitingPage extends StatelessWidget {
     }).catchError((error) {
       print(error);
     });
-    return Center(
-      child: CircularProgressIndicator(),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width/8),
+            child: Image.asset("images/logo.jpg"),
+          ),
+          TitleText("Loading ..",color: Colors.black54,),
+        ],
+      ),
     );
   }
 }

@@ -233,7 +233,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                         ],
                       ),
-                      top: 70.0,
+                      top: MediaQuery.of(context).size.height /30,
                       left: MediaQuery.of(context).size.width / 2 - 115 / 2,
                     )
                   ],

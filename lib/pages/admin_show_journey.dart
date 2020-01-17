@@ -162,10 +162,10 @@ class ShowJourneyState extends State<AdminShowJourney> {
                     DataCell(
                       new FlatButton.icon(
                           icon: Icon(
-                            Icons.add,
+                            Icons.people,
                             color: Color(0xFF197278),
                           ),
-                          label: Text("Add participants to the journey",
+                          label: Text("Participants options",
                               style: TextStyle(color: Color(0xFF197278))),
                           onPressed: () {
                             Navigator.push(
