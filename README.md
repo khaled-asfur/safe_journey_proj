@@ -1,16 +1,17 @@
-# safe_journey
 
-A new Flutter project.
+# Safe journey
+"Safe journey" is a flutter mobile application used in the groups journies including schools journies, It helps the teachers to monitor children, They can see  the locations of their students on the map at realtime, and parents also can see the locations of their kids and how far they are from the superviors on the map at realtime during the journey.
 
-## Getting Started
+**The application also provides the following features:**
+* The teacher specifies the allowed distance for the student to move in, if any student moves farther than the allowed distance from the teacher distance, a notification will be     sent to the teachers device and to the students device.
+* Students location can only be seen by the student himself, the teacher and the parents.
+* The student can specify his friends in the journey so they can see the locations of each others in the map during the journey too.
+* Every studen has a profile page contains his email and phone number, The mobile number enables the teacher to be in contact with him in case the internet connection broke down.
+# Technologies
+* Flutter framework using dart programming language.
+* Firebase authentication.
+* Firebase-Firestore realtime database.
+* Firebase storage.
+* Firebase cloud massaging(FCM)
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
